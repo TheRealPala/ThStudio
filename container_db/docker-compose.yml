@@ -1,0 +1,19 @@
+version: '3'
+
+services:  
+  mariadb:
+      container_name: db_swe
+      image: mariadb:10.11
+      ports:
+        - '33065:3306'
+      expose:
+        - '3306'
+      environment:
+        - PATH=/usr/local/sbin:/usr/local/bin/:usr/sbin:/usr/bin:/sbin:/bin
+        - GOSU_VERSION=1.17
+        - LANG=C.UTF-8
+        - MARIADB_VERSION=1:10.11.8+maria~ubu2204
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_ROOT_HOST=%
+      volumes:
+        - ./dataDb:/var/lib/mysql

@@ -1,0 +1,1 @@
+docker-compose -f container_db/docker-compose.yml down

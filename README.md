@@ -2,6 +2,8 @@
 Software engineering project
 
 ## Scaffold
+
+### Container
 - Be careful to install all the dependecies: 
     - <b>docker</b> 
     - <b>docker-compose</b>
@@ -20,3 +22,12 @@ Software engineering project
 
 - Give to scaffold.sh the execution privilege: `chmod +x scaffold.sh`
 - Run the scaffold script with a user capable of run docker deamon: `./scaffold.sh`
+
+### Codebase
+<b> The codebase has been created using maven, you must use it to build the project.</b>
+
+- Install maven from cli (in an apt based linux distro) with the following command: ` sudo apt install maven `
+- Rename .env.dist file into .env (you can find it in `config/.env.dist`), than fill it with the db access's data
+- Move into the project's root (the one with the pom.xml file)
+- Install all the maven dependencies: `mvn install`
+- Usefull command: If you got some problem with the maven dependencies, you can try to clean the maven cache: `mvn clean install -U` or reinstall all the dependencies: `mvn dependency:purge-local-repository`

@@ -2,3 +2,5 @@ try
 container_db/dataDb/*
 !container_db/dataDb/.gitkeep
 .idea
+target
+.env

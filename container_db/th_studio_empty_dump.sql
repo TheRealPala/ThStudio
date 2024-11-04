@@ -223,6 +223,33 @@ LOCK TABLES `trains` WRITE;
 /*!40000 ALTER TABLE `trains` DISABLE KEYS */;
 /*!40000 ALTER TABLE `trains` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `trains_tags`
+--
+
+DROP TABLE IF EXISTS `trains_tags`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trains_tags` (
+  `id_train` int(11) NOT NULL,
+  `tag` varchar(200) NOT NULL,
+  `tag_type` varchar(200) NOT NULL,
+  PRIMARY KEY (`id_train`,`tag`,`tag_type`),
+  KEY `trains_tags__tags_fk` (`tag`,`tag_type`),
+  CONSTRAINT `trains_tags__tags_fk` FOREIGN KEY (`tag`, `tag_type`) REFERENCES `tags` (`tag`, `tag_type`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `trains_tags__trains_fk` FOREIGN KEY (`id_train`) REFERENCES `trains` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trains_tags`
+--
+
+LOCK TABLES `trains_tags` WRITE;
+/*!40000 ALTER TABLE `trains_tags` DISABLE KEYS */;
+/*!40000 ALTER TABLE `trains_tags` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -233,4 +260,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-02 22:56:07
+-- Dump completed on 2024-11-04 11:40:25

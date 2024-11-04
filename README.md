@@ -13,6 +13,7 @@ Software engineering project
     - `apt update` --> Update repository (run it only if you need to)
     - `apt install docker.io` --> Install docker
     - `apt install docker-compose` --> Install docker-compose
+    - `apt install mysql-client` --> Install mysql client
     
     <b>
     Be careful, in order to use the docker deamon with an ordinary user (in a UNIX compliant shell) you MUST add it to the docker group and let the shell reload the groups list (a reboot is highly recommended)  
@@ -30,4 +31,4 @@ Software engineering project
 - Rename .env.dist file into .env (you can find it in `config/.env.dist`), than fill it with the db access's data
 - Move into the project's root (the one with the pom.xml file)
 - Install all the maven dependencies: `mvn install`
-- Usefull command: If you got some problem with the maven dependencies, you can try to clean the maven cache: `mvn clean install -U` or reinstall all the dependencies: `mvn dependency:purge-local-repository`
+- Useful command: If you got some problem with the maven dependencies, you can try to clean the maven cache: `mvn clean install -U` or reinstall all the dependencies: `mvn dependency:purge-local-repository`

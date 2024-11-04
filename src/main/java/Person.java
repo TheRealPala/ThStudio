@@ -7,11 +7,11 @@ public class Person {
         this.Iban = Iban;
         this.Id = Id;
     }
-    private String Name;
-    private String Surname;
-    private String Date_of_birth;
-    private String Iban;
-    private int Id;
+    protected String Name;
+    protected String Surname;
+    protected String Date_of_birth;
+    protected String Iban;
+    protected int Id;
 
 
 

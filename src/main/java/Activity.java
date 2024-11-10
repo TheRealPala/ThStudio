@@ -14,16 +14,16 @@ public class Activity {
         this.id_customer = id_customer;
         this.id = id;
     }
-    private String title;
-    private String description;
-    private String status;
-    private String date;
-    private String state;
-    private String start_time;
-    private String duration;
-    private String end_time;
-    private int id_Employee;
-    private String state_extra_info;
-    private int id_customer;
-    private int id;
+    protected String title;
+    protected String description;
+    protected String status;
+    protected String date;
+    protected String state;
+    protected String start_time;
+    protected String duration;
+    protected String end_time;
+    protected int id_Employee;
+    protected String state_extra_info;
+    protected int id_customer;
+    protected int id;
 }

@@ -1,3 +1,5 @@
+package domainModel;
+
 public class Tags {
     public Tags(){};
     public Tags(String tags,String tags_type ){

@@ -1,3 +1,5 @@
+package domainModel;
+
 public class Trains extends Activity {
 
     public Trains() {

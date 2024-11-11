@@ -1,3 +1,5 @@
+package domainModel;
+
 import java.util.ArrayList;
 
 public class Trainer extends Employee{
@@ -24,7 +26,7 @@ public class Trainer extends Employee{
     }
     /*public void Create_activity(){
         // TODO implement here
-        Trains train = new Trains(); // to add,  a way to add description and the trainer id
+        domainModel.Trains train = new domainModel.Trains(); // to add,  a way to add description and the trainer id
         trainslist.add(train);
 
 

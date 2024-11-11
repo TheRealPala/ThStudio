@@ -1,3 +1,5 @@
+package domainModel;
+
 public class Person {
     public Person(){}
     public Person(String Name, String Surname, String Date_of_birth, String Iban, int Id){

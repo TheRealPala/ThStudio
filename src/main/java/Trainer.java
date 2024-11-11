@@ -6,6 +6,22 @@ public class Trainer extends Employee{
         super(Name, Surname, Date_of_birth, Iban, Id);
         this.Specialization = Specialization;
     }
+
+    public String getSpecialization() {
+        return Specialization;
+    }
+
+    public void setSpecialization(String specialization) {
+        Specialization = specialization;
+    }
+
+    public ArrayList<Trains> getTrainslist() {
+        return trainslist;
+    }
+
+    public void setTrainslist(ArrayList<Trains> trainslist) {
+        this.trainslist = trainslist;
+    }
     /*public void Create_activity(){
         // TODO implement here
         Trains train = new Trains(); // to add,  a way to add description and the trainer id

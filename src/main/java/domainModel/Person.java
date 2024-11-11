@@ -1,62 +1,58 @@
 package domainModel;
 
 public class Person {
+    protected String name;
+    protected String surname;
+    protected String dateOfBirth;
+    protected String iban;
+    protected int id;
     public Person(){}
+
     public Person(String Name, String Surname, String Date_of_birth, String Iban, int Id){
-        this.Name = Name;
-        this.Surname = Surname;
-        this.Date_of_birth = Date_of_birth;
-        this.Iban = Iban;
-        this.Id = Id;
+        this.name = Name;
+        this.surname = Surname;
+        this.dateOfBirth = Date_of_birth;
+        this.iban = Iban;
+        this.id = Id;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public String getSurname() {
-        return Surname;
+        return surname;
     }
 
     public void setSurname(String surname) {
-        Surname = surname;
+        this.surname = surname;
     }
 
-    public String getDate_of_birth() {
-        return Date_of_birth;
+    public String getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setDate_of_birth(String date_of_birth) {
-        Date_of_birth = date_of_birth;
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getIban() {
-        return Iban;
+        return iban;
     }
 
     public void setIban(String iban) {
-        Iban = iban;
+        this.iban = iban;
     }
 
     public int getId() {
-        return Id;
+        return id;
     }
 
     public void setId(int id) {
-        Id = id;
+        this.id = id;
     }
-
-    protected String Name;
-    protected String Surname;
-    protected String Date_of_birth;
-    protected String Iban;
-    protected int Id;
-
-
-
-
 }

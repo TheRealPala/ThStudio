@@ -6,23 +6,23 @@ public class Trainer extends Employee{
     public Trainer(){}
     public Trainer(String Name, String Surname, String Date_of_birth, String Iban, int Id, String Specialization){
         super(Name, Surname, Date_of_birth, Iban, Id);
-        this.Specialization = Specialization;
+        this.specialization = Specialization;
     }
 
     public String getSpecialization() {
-        return Specialization;
+        return specialization;
     }
 
     public void setSpecialization(String specialization) {
-        Specialization = specialization;
+        specialization = specialization;
     }
 
     public ArrayList<Trains> getTrainslist() {
-        return trainslist;
+        return trainsList;
     }
 
-    public void setTrainslist(ArrayList<Trains> trainslist) {
-        this.trainslist = trainslist;
+    public void setTrainslist(ArrayList<Trains> trainsList) {
+        this.trainsList = trainsList;
     }
     /*public void Create_activity(){
         // TODO implement here
@@ -47,7 +47,7 @@ public class Trainer extends Employee{
 
 
 
-    private String Specialization;
-    private ArrayList<Trains> trainslist;
+    private String specialization;
+    private ArrayList<Trains> trainsList;
 
 }

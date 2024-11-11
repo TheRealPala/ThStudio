@@ -4,7 +4,7 @@ public class Tags {
     public Tags(){};
     public Tags(String tags,String tags_type ){
         this.tags=tags;
-        this.tags_type=tags_type;
+        this.tagsType=tags_type;
     };
 
     public String getTags() {
@@ -16,15 +16,15 @@ public class Tags {
     }
 
     public String getTags_type() {
-        return tags_type;
+        return tagsType;
     }
 
     public void setTags_type(String tags_type) {
-        this.tags_type = tags_type;
+        this.tagsType = tags_type;
     }
 
     protected String tags;
-    protected String tags_type;
+    protected String tagsType;
 
 
 }

@@ -1,6 +1,19 @@
 package domainModel;
 
 public class Activity {
+    protected String title;
+    protected String description;
+    protected String status;
+    protected String date;
+    protected String state;
+    protected String startTime;
+    protected String duration;
+    protected String endTime;
+    protected int idEmployee;
+    protected String stateExtraInfo;
+    protected int idCustomer;
+    protected int id;
+
     public Activity(){}
     public Activity(String title, String description, String status, String date, String state, String start_time, String duration, String end_time, int id_trainer, String state_extra_info, int id_customer, int id){
         this.title = title;
@@ -8,12 +21,12 @@ public class Activity {
         this.status = status;
         this.date = date;
         this.state = state;
-        this.start_time = start_time;
+        this.startTime = start_time;
         this.duration = duration;
-        this.end_time = end_time;
-        this.id_Employee = id_trainer;
-        this.state_extra_info = state_extra_info;
-        this.id_customer = id_customer;
+        this.endTime = end_time;
+        this.idEmployee = id_trainer;
+        this.stateExtraInfo = state_extra_info;
+        this.idCustomer = id_customer;
         this.id = id;
     }
 
@@ -57,12 +70,12 @@ public class Activity {
         this.state = state;
     }
 
-    public String getStart_time() {
-        return start_time;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public void setStart_time(String start_time) {
-        this.start_time = start_time;
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
     public String getDuration() {
@@ -73,36 +86,36 @@ public class Activity {
         this.duration = duration;
     }
 
-    public String getEnd_time() {
-        return end_time;
+    public String getEndTime() {
+        return endTime;
     }
 
-    public void setEnd_time(String end_time) {
-        this.end_time = end_time;
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
-    public int getId_Employee() {
-        return id_Employee;
+    public int getIdEmployee() {
+        return idEmployee;
     }
 
-    public void setId_Employee(int id_Employee) {
-        this.id_Employee = id_Employee;
+    public void setIdEmployee(int idEmployee) {
+        this.idEmployee = idEmployee;
     }
 
-    public String getState_extra_info() {
-        return state_extra_info;
+    public String getStateExtraInfo() {
+        return stateExtraInfo;
     }
 
-    public void setState_extra_info(String state_extra_info) {
-        this.state_extra_info = state_extra_info;
+    public void setStateExtraInfo(String stateExtraInfo) {
+        this.stateExtraInfo = stateExtraInfo;
     }
 
-    public int getId_customer() {
-        return id_customer;
+    public int getIdCustomer() {
+        return idCustomer;
     }
 
-    public void setId_customer(int id_customer) {
-        this.id_customer = id_customer;
+    public void setIdCustomer(int idCustomer) {
+        this.idCustomer = idCustomer;
     }
 
     public int getId() {
@@ -112,17 +125,4 @@ public class Activity {
     public void setId(int id) {
         this.id = id;
     }
-
-    protected String title;
-    protected String description;
-    protected String status;
-    protected String date;
-    protected String state;
-    protected String start_time;
-    protected String duration;
-    protected String end_time;
-    protected int id_Employee;
-    protected String state_extra_info;
-    protected int id_customer;
-    protected int id;
 }

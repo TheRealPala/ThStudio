@@ -8,12 +8,12 @@ public class Person {
     protected int id;
     public Person(){}
 
-    public Person(String Name, String Surname, String Date_of_birth, String Iban, int Id){
-        this.name = Name;
-        this.surname = Surname;
-        this.dateOfBirth = Date_of_birth;
-        this.iban = Iban;
-        this.id = Id;
+    public Person(String name, String surname, String dateOfBirth, String iban, int id){
+        this.name = name;
+        this.surname = surname;
+        this.dateOfBirth = dateOfBirth;
+        this.iban = iban;
+        this.id = id;
     }
 
     public String getName() {

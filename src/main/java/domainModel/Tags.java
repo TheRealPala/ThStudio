@@ -1,6 +1,9 @@
 package domainModel;
 
 public class Tags {
+    protected String tags;
+    protected String tagsType;
+
     public Tags(){};
     public Tags(String tags,String tags_type ){
         this.tags=tags;
@@ -23,8 +26,6 @@ public class Tags {
         this.tagsType = tags_type;
     }
 
-    protected String tags;
-    protected String tagsType;
 
 
 }

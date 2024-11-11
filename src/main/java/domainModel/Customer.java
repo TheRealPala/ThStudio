@@ -3,19 +3,20 @@ package domainModel;
 import java.util.ArrayList;
 public class Customer extends Person{
     private int level;
-    private ArrayList<Activity> Activity_list;
-    public Customer(String Name, String Surname, String Date_of_birth, String Iban, int Id, int level){
-        super(Name, Surname, Date_of_birth, Iban, Id);
+    private ArrayList<Activity> activityList;
+
+    public Customer(String name, String surname, String dateOfBirth, String iban, int id, int level){
+        super(name, surname, dateOfBirth , iban, id);
         this.level = level;
     }
     public Customer(){}
 
     public ArrayList<Activity> getActivity_list() {
-        return Activity_list;
+        return activityList;
     }
 
     public void setActivity_list(ArrayList<Activity> activity_list) {
-        Activity_list = activity_list;
+        this.activityList = activity_list;
     }
 
     public int getLevel() {
@@ -25,6 +26,10 @@ public class Customer extends Person{
     public void setLevel(int level) {
         this.level = level;
     }
+
+
+
+
     /*    public void Book_activity( domainModel.Activity p){
         domainModel.Activity book=Search_Activity(p);
         Pay(book);

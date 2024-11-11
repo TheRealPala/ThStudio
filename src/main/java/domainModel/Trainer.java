@@ -3,10 +3,13 @@ package domainModel;
 import java.util.ArrayList;
 
 public class Trainer extends Employee{
+    private String specialization;
+    private ArrayList<Trains> trainsList;
+
     public Trainer(){}
-    public Trainer(String Name, String Surname, String Date_of_birth, String Iban, int Id, String Specialization){
-        super(Name, Surname, Date_of_birth, Iban, Id);
-        this.specialization = Specialization;
+    public Trainer(String name, String surname, String dateOfBirth, String iban, int id, String specialization){
+        super(name, surname, dateOfBirth, iban, id);
+        this.specialization = specialization;
     }
 
     public String getSpecialization() {
@@ -36,18 +39,4 @@ public class Trainer extends Employee{
         // TODO implement observer
 
     }*/
-
-
-
-
-
-
-
-
-
-
-
-    private String specialization;
-    private ArrayList<Trains> trainsList;
-
 }

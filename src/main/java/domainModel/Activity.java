@@ -5,7 +5,6 @@ public class Activity {
     protected String description;
     protected String status;
     protected String date;
-    protected String state;
     protected String startTime;
     protected String duration;
     protected String endTime;
@@ -15,18 +14,17 @@ public class Activity {
     protected int id;
 
     public Activity(){}
-    public Activity(String title, String description, String status, String date, String state, String start_time, String duration, String end_time, int id_trainer, String state_extra_info, int id_customer, int id){
+    public Activity(String title, String description, String status, String date, String startTime, String duration, String endTime, int idEmployee, String stateExtraInfo, int idCustomer, int id){
         this.title = title;
         this.description = description;
         this.status = status;
         this.date = date;
-        this.state = state;
-        this.startTime = start_time;
+        this.startTime = startTime;
         this.duration = duration;
-        this.endTime = end_time;
-        this.idEmployee = id_trainer;
-        this.stateExtraInfo = state_extra_info;
-        this.idCustomer = id_customer;
+        this.endTime = endTime;
+        this.idEmployee = idEmployee;
+        this.stateExtraInfo = stateExtraInfo;
+        this.idCustomer = idCustomer;
         this.id = id;
     }
 
@@ -62,13 +60,6 @@ public class Activity {
         this.date = date;
     }
 
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
 
     public String getStartTime() {
         return startTime;

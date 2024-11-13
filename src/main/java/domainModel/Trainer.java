@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class Trainer extends Employee{
     private String specialization;
-    private ArrayList<Trains> trainsList;
 
     public Trainer(){}
     public Trainer(String name, String surname, String dateOfBirth, String iban, int id, String specialization){
@@ -20,13 +19,9 @@ public class Trainer extends Employee{
         specialization = specialization;
     }
 
-    public ArrayList<Trains> getTrainslist() {
-        return trainsList;
-    }
-
-    public void setTrainslist(ArrayList<Trains> trainsList) {
-        this.trainsList = trainsList;
-    }
+    // public void setTrainslist(ArrayList<Trains> trainsList) {
+     //   this.trainsList = trainsList;
+    // }
     /*public void Create_activity(){
         // TODO implement here
         domainModel.Trains train = new domainModel.Trains(); // to add,  a way to add description and the trainer id

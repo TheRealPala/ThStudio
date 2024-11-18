@@ -1,11 +1,11 @@
 package domainModel;
 
-public class MedicalExamTags extends Tags {
+public class MedicalExamTag extends Tag {
     int idMedicalExam;
-    public MedicalExamTags() {
+    public MedicalExamTag() {
     }
 
-    public MedicalExamTags(String tags, String tags_type, int idMedicalExam) {
+    public MedicalExamTag(String tags, String tags_type, int idMedicalExam) {
         super(tags, tags_type);
         this.idMedicalExam = idMedicalExam;
     }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Trainer extends Employee{
     private String specialization;
-    private ArrayList<Trains> trainsList;
+    private ArrayList<Train> trainList;
 
     public Trainer(){}
     public Trainer(String name, String surname, String dateOfBirth, String iban, int id, String specialization){
@@ -20,12 +20,12 @@ public class Trainer extends Employee{
         specialization = specialization;
     }
 
-    public ArrayList<Trains> getTrainslist() {
-        return trainsList;
+    public ArrayList<Train> getTrainslist() {
+        return trainList;
     }
 
-    public void setTrainslist(ArrayList<Trains> trainsList) {
-        this.trainsList = trainsList;
+    public void setTrainslist(ArrayList<Train> trainList) {
+        this.trainList = trainList;
     }
     /*public void Create_activity(){
         // TODO implement here

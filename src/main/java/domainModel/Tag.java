@@ -1,11 +1,11 @@
 package domainModel;
 
-public class Tags {
+public class Tag {
     protected String tags;
     protected String tagsType;
 
-    public Tags(){};
-    public Tags(String tags,String tags_type ){
+    public Tag(){};
+    public Tag(String tags, String tags_type ){
         this.tags=tags;
         this.tagsType=tags_type;
     };

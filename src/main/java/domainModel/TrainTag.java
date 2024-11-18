@@ -1,12 +1,12 @@
 package domainModel;
 
-public class TrainTags extends Tags {
+public class TrainTag extends Tag {
     int idTrain;
 
-    public TrainTags() {
+    public TrainTag() {
     }
 
-    public TrainTags(String tags, String tags_type, int idTrain) {
+    public TrainTag(String tags, String tags_type, int idTrain) {
         super(tags, tags_type);
         this.idTrain = idTrain;
     }

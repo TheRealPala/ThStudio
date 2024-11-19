@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 public class Doctor extends Employee {
     private String medicalLicenseNumber;
-    private ArrayList<MedicalExam> medicalExamList;
-
 
     public Doctor() {
 
@@ -20,12 +18,6 @@ public class Doctor extends Employee {
     }
     public void setMedicalLicenseNumber(String medicalLicenseNumber) {
         this.medicalLicenseNumber = medicalLicenseNumber;
-    }
-    public ArrayList<MedicalExam> getMedicalExamsList() {
-        return medicalExamList;
-    }
-    public void setMedicalExamsList(ArrayList<MedicalExam> medicalExamList) {
-        this.medicalExamList = medicalExamList;
     }
 
 }

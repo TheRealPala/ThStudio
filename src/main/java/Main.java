@@ -1,7 +1,7 @@
 import io.github.cdimascio.dotenv.Dotenv;
 import dao.*;
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
         Database.setDbHost(dotenv.get("DB_HOST"));
         Database.setDbName(dotenv.get("DB_NAME_DEFAULT"));

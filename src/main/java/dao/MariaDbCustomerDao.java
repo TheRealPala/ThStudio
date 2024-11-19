@@ -2,7 +2,6 @@ package dao;
 
 import domainModel.Customer;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;

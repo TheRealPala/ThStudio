@@ -9,6 +9,10 @@ public class Customer extends Person{
         super(name, surname, dateOfBirth , iban, id);
         this.level = level;
     }
+    public Customer(String name, String surname, String dateOfBirth, String iban, int level){
+        super(name, surname, dateOfBirth , iban);
+        this.level = level;
+    }
     public Customer(){}
 
     public ArrayList<Activity> getActivity_list() {

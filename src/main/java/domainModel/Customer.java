@@ -3,7 +3,6 @@ package domainModel;
 import java.util.ArrayList;
 public class Customer extends Person{
     private int level;
-    private ArrayList<Activity> activityList;
 
     public Customer(String name, String surname, String dateOfBirth, String iban, int id, int level){
         super(name, surname, dateOfBirth , iban, id);
@@ -14,14 +13,6 @@ public class Customer extends Person{
         this.level = level;
     }
     public Customer(){}
-
-    public ArrayList<Activity> getActivity_list() {
-        return activityList;
-    }
-
-    public void setActivity_list(ArrayList<Activity> activity_list) {
-        this.activityList = activity_list;
-    }
 
     public int getLevel() {
         return level;

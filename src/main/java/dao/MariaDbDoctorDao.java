@@ -125,7 +125,7 @@ public class MariaDbDoctorDao implements DoctorDao{
         int rows = 0;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("delete from customers where id = ?");
+            ps = con.prepareStatement("delete from doctors where id = ?");
             ps.setInt(1, id);
             rows = ps.executeUpdate();
         } finally {

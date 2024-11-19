@@ -73,19 +73,25 @@ public class MariaDbCustomerDao implements CustomerDao {
     public void insert(Customer customer) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
-        Customer c = null;
+        ResultSet rs = null;
         try {
             con = Database.getConnection();
             ps = con.prepareStatement("insert into customers (name, surname, date_of_birth, iban, level) " +
-                    "values (?, ?, ?, ?, ?)");
+                    "values (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, customer.getName());
             ps.setString(2, customer.getSurname());
             ps.setString(3, customer.getDateOfBirth());
             ps.setString(4, customer.getIban());
             ps.setInt(5, customer.getLevel());
             ps.executeUpdate();
+            //get generated id from dbms
+            rs = ps.getGeneratedKeys();
+            if (rs.next()){
+                customer.setId(rs.getInt(1));
+            }
         } finally {
-            assert ps != null: "preparedStatement is Null";
+            assert rs != null: "ResultSet is null";
+            rs.close();
             ps.close();
             Database.closeConnection(con);
         }

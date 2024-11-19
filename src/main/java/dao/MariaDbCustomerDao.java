@@ -48,7 +48,7 @@ public class MariaDbCustomerDao implements CustomerDao {
             con = Database.getConnection();
             stm = con.createStatement();
             rs = stm.executeQuery("select * from customers");
-            if (rs.next()) {
+            while (rs.next()) {
                 cList.add(
                     new Customer(
                         rs.getString("name"),

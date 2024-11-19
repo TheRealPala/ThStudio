@@ -1,31 +1,32 @@
 package dao;
 
 import domainModel.Customer;
+import domainModel.Doctor;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.*;
 
-public class MariaDbCustomerDao implements CustomerDao {
+public class MariaDbDoctorDao implements DoctorDao{
     @Override
-    public Customer get(Integer id) throws SQLException {
+    public Doctor get(Integer id) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        Customer c = null;
+        Doctor d = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("select * from customers where id = ?");
+            ps = con.prepareStatement("select * from doctors where id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
             if (rs.next()) {
-                c = new Customer(
+                d = new Doctor(
                         rs.getString("name"),
                         rs.getString("surname"),
                         rs.getString("date_of_birth"),
                         rs.getString("iban"),
                         rs.getInt("id"),
-                        rs.getInt("level")
+                        rs.getString("medical_license_number")
                 );
             }
         } finally {
@@ -34,29 +35,29 @@ public class MariaDbCustomerDao implements CustomerDao {
             ps.close();
             Database.closeConnection(con);
         }
-        return c;
+        return d;
     }
 
     @Override
-    public List<Customer> getAll() throws SQLException {
+    public List<Doctor> getAll() throws SQLException {
         Connection con = null;
         Statement stm = null;
         ResultSet rs = null;
-        List<Customer> cList = new ArrayList<>();
+        List<Doctor> dList = new ArrayList<>();
         try {
             con = Database.getConnection();
             stm = con.createStatement();
-            rs = stm.executeQuery("select * from customers");
+            rs = stm.executeQuery("select * from doctors");
             while (rs.next()) {
-                cList.add(
-                    new Customer(
-                        rs.getString("name"),
-                        rs.getString("surname"),
-                        rs.getString("date_of_birth"),
-                        rs.getString("iban"),
-                        rs.getInt("id"),
-                        rs.getInt("level")
-                    )
+                dList.add(
+                        new Doctor(
+                                rs.getString("name"),
+                                rs.getString("surname"),
+                                rs.getString("date_of_birth"),
+                                rs.getString("iban"),
+                                rs.getInt("id"),
+                                rs.getString("medical_license_number")
+                        )
                 );
             }
         } finally {
@@ -65,28 +66,28 @@ public class MariaDbCustomerDao implements CustomerDao {
             stm.close();
             Database.closeConnection(con);
         }
-        return cList;
+        return dList;
     }
 
     @Override
-    public void insert(Customer customer) throws SQLException {
+    public void insert(Doctor doctor) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("insert into customers (name, surname, date_of_birth, iban, level) " +
+            ps = con.prepareStatement("insert into doctors (name, surname, date_of_birth, iban, medical_license_number) " +
                     "values (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, customer.getName());
-            ps.setString(2, customer.getSurname());
-            ps.setString(3, customer.getDateOfBirth());
-            ps.setString(4, customer.getIban());
-            ps.setInt(5, customer.getLevel());
+            ps.setString(1, doctor.getName());
+            ps.setString(2, doctor.getSurname());
+            ps.setString(3, doctor.getDateOfBirth());
+            ps.setString(4, doctor.getIban());
+            ps.setString(5, doctor.getMedicalLicenseNumber());
             ps.executeUpdate();
             //get generated id from dbms
             rs = ps.getGeneratedKeys();
             if (rs.next()){
-                customer.setId(rs.getInt(1));
+                doctor.setId(rs.getInt(1));
             }
         } finally {
             assert rs != null: "ResultSet is null";
@@ -97,18 +98,18 @@ public class MariaDbCustomerDao implements CustomerDao {
     }
 
     @Override
-    public void update(Customer customer) throws Exception {
+    public void update(Doctor doctor) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update customers set name = ?, surname = ?, date_of_birth = ?, iban = ?, level = ? where id = ?");
-            ps.setString(1, customer.getName());
-            ps.setString(2, customer.getSurname());
-            ps.setString(3, customer.getDateOfBirth());
-            ps.setString(4, customer.getIban());
-            ps.setInt(5, customer.getLevel());
-            ps.setInt(6, customer.getId());
+            ps = con.prepareStatement("update doctors set name = ?, surname = ?, date_of_birth = ?, iban = ?, medical_license_number = ? where id = ?");
+            ps.setString(1, doctor.getName());
+            ps.setString(2, doctor.getSurname());
+            ps.setString(3, doctor.getDateOfBirth());
+            ps.setString(4, doctor.getIban());
+            ps.setString(5, doctor.getMedicalLicenseNumber());
+            ps.setInt(6, doctor.getId());
             ps.executeUpdate();
         } finally {
             assert ps != null: "preparedStatement is Null";

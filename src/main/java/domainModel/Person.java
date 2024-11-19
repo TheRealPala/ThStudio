@@ -15,6 +15,12 @@ public class Person {
         this.iban = iban;
         this.id = id;
     }
+    public Person(String name, String surname, String dateOfBirth, String iban){
+        this.name = name;
+        this.surname = surname;
+        this.dateOfBirth = dateOfBirth;
+        this.iban = iban;
+    }
 
     public String getName() {
         return name;

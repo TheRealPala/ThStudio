@@ -1,31 +1,36 @@
 package domainModel;
 
-public class Activity {
-    protected String title;
-    protected String description;
-    protected String status;
-    protected String date;
-    protected String startTime;
-    protected String duration;
-    protected String endTime;
-    protected int idEmployee;
-    protected String stateExtraInfo;
-    protected int idCustomer;
-    protected int id;
+import domainModel.State.State;
 
-    public Activity(){}
-    public Activity(String title, String description, String status, String date, String startTime, String duration, String endTime, int idEmployee, String stateExtraInfo, int idCustomer, int id){
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.date = date;
-        this.startTime = startTime;
-        this.duration = duration;
-        this.endTime = endTime;
-        this.idEmployee = idEmployee;
-        this.stateExtraInfo = stateExtraInfo;
-        this.idCustomer = idCustomer;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
+public class MedicalExam {
+    private String title;
+    private String description;
+    private State state;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private final int idDoctor;
+    private String stateExtraInfo;
+    private int idCustomer;
+    private int id;
+    private ArrayList<Document> documents;
+    private ArrayList<Tag> tags;
+
+    public MedicalExam(int id, int idCustomer, String stateExtraInfo, int idDoctor, LocalDateTime endTime,
+                       LocalDateTime startTime, State state, String description, String title) {
+        this.tags = new ArrayList<>();
+        this.documents = new ArrayList<>();
         this.id = id;
+        this.idCustomer = idCustomer;
+        this.stateExtraInfo = stateExtraInfo;
+        this.idDoctor = idDoctor;
+        this.endTime = endTime;
+        this.startTime = startTime;
+        this.state = state;
+        this.description = description;
+        this.title = title;
     }
 
     public String getTitle() {
@@ -36,69 +41,28 @@ public class Activity {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+    public ArrayList<Tag> getTags() {
+        return tags;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTags(ArrayList<Tag> tags) {
+        this.tags = tags;
     }
 
-    public String getStatus() {
-        return status;
+    public ArrayList<Document> getDocuments() {
+        return documents;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setDocuments(ArrayList<Document> documents) {
+        this.documents = documents;
     }
 
-    public String getDate() {
-        return date;
+    public int getId() {
+        return id;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getDuration() {
-        return duration;
-    }
-
-    public void setDuration(String duration) {
-        this.duration = duration;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
-    public int getIdEmployee() {
-        return idEmployee;
-    }
-
-    public void setIdEmployee(int idEmployee) {
-        this.idEmployee = idEmployee;
-    }
-
-    public String getStateExtraInfo() {
-        return stateExtraInfo;
-    }
-
-    public void setStateExtraInfo(String stateExtraInfo) {
-        this.stateExtraInfo = stateExtraInfo;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getIdCustomer() {
@@ -109,11 +73,47 @@ public class Activity {
         this.idCustomer = idCustomer;
     }
 
-    public int getId() {
-        return id;
+    public String getStateExtraInfo() {
+        return stateExtraInfo;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setStateExtraInfo(String stateExtraInfo) {
+        this.stateExtraInfo = stateExtraInfo;
+    }
+
+    public int getIdDoctor() {
+        return idDoctor;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 }

@@ -79,6 +79,33 @@ LOCK TABLES `doctors` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `documents`
+--
+
+DROP TABLE IF EXISTS `documents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `documents` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `path` varchar(255) NOT NULL,
+  `id_medical_exam` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `documents_medical_exams_fk` (`id_medical_exam`),
+  CONSTRAINT `documents_medical_exams_fk` FOREIGN KEY (`id_medical_exam`) REFERENCES `medical_exams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `documents`
+--
+
+LOCK TABLES `documents` WRITE;
+/*!40000 ALTER TABLE `documents` DISABLE KEYS */;
+/*!40000 ALTER TABLE `documents` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `medical_exams`
 --
 
@@ -172,4 +199,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-22 14:58:10
+-- Dump completed on 2024-11-22 18:13:22

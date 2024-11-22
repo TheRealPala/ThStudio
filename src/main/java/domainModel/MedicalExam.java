@@ -1,6 +1,7 @@
 package domainModel;
 
 import domainModel.State.State;
+import domainModel.Tags.Tag;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class MedicalExam {
     private int id;
     private double price;
     private ArrayList<Document> documents;
-    private ArrayList<Person.Tag> tags;
+    private ArrayList<Tag> tags;
 
     public MedicalExam(int id, int idCustomer, String stateExtraInfo, int idDoctor, LocalDateTime endTime,
                        LocalDateTime startTime, State state, String description, String title, double price) {
@@ -43,11 +44,11 @@ public class MedicalExam {
         this.title = title;
     }
 
-    public ArrayList<Person.Tag> getTags() {
+    public ArrayList<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(ArrayList<Person.Tag> tags) {
+    public void setTags(ArrayList<Tag> tags) {
         this.tags = tags;
     }
 

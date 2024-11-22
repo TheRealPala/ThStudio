@@ -15,11 +15,12 @@ public class MedicalExam {
     private String stateExtraInfo;
     private int idCustomer;
     private int id;
+    private double price;
     private ArrayList<Document> documents;
     private ArrayList<Tag> tags;
 
     public MedicalExam(int id, int idCustomer, String stateExtraInfo, int idDoctor, LocalDateTime endTime,
-                       LocalDateTime startTime, State state, String description, String title) {
+                       LocalDateTime startTime, State state, String description, String title, double price) {
         this.tags = new ArrayList<>();
         this.documents = new ArrayList<>();
         this.id = id;
@@ -31,6 +32,7 @@ public class MedicalExam {
         this.state = state;
         this.description = description;
         this.title = title;
+        this.price = price;
     }
 
     public String getTitle() {
@@ -115,5 +117,13 @@ public class MedicalExam {
 
     public void setState(State state) {
         this.state = state;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }

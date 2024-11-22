@@ -1,32 +1,31 @@
 package dao;
+import domainModel.Trainer;
 
-import domainModel.Customer;
-import domainModel.Doctor;
-
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.*;
 
-public class MariaDbDoctorDao implements DoctorDao{
+public class MariaDbTrainerDao implements TrainerDAO{
+
     @Override
-    public Doctor get(Integer id) throws SQLException {
+    public Trainer get(Integer id) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        Doctor d = null;
+        Trainer t = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("select * from doctors where id = ?");
+            ps = con.prepareStatement("select * from trainers where id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
             if (rs.next()) {
-                d = new Doctor(
+                t = new Trainer(
                         rs.getString("name"),
                         rs.getString("surname"),
                         rs.getString("date_of_birth"),
                         rs.getString("iban"),
                         rs.getInt("id"),
-                        rs.getString("medical_license_number")
+                        rs.getString("specialization")
                 );
             }
         } finally {
@@ -35,28 +34,28 @@ public class MariaDbDoctorDao implements DoctorDao{
             ps.close();
             Database.closeConnection(con);
         }
-        return d;
+        return t;
     }
 
     @Override
-    public List<Doctor> getAll() throws SQLException {
+    public List<Trainer> getAll() throws SQLException {
         Connection con = null;
         Statement stm = null;
         ResultSet rs = null;
-        List<Doctor> dList = new ArrayList<>();
+        List<Trainer> tList = new ArrayList<>();
         try {
             con = Database.getConnection();
             stm = con.createStatement();
-            rs = stm.executeQuery("select * from doctors");
+            rs = stm.executeQuery("select * from trainers");
             while (rs.next()) {
-                dList.add(
-                        new Doctor(
+                tList.add(
+                        new Trainer(
                                 rs.getString("name"),
                                 rs.getString("surname"),
                                 rs.getString("date_of_birth"),
                                 rs.getString("iban"),
                                 rs.getInt("id"),
-                                rs.getString("medical_license_number")
+                                rs.getString("specialization")
                         )
                 );
             }
@@ -66,73 +65,60 @@ public class MariaDbDoctorDao implements DoctorDao{
             stm.close();
             Database.closeConnection(con);
         }
-        return dList;
+        return tList;
     }
-
     @Override
-    public void insert(Doctor doctor) throws SQLException {
+    public void insert(Trainer t) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("insert into doctors (name, surname, date_of_birth, iban, medical_license_number) " +
+            ps = con.prepareStatement("insert into trainers (name, surname, date_of_birth, iban, specialization) " +
                     "values (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, doctor.getName());
-            ps.setString(2, doctor.getSurname());
-            ps.setString(3, doctor.getDateOfBirth());
-            ps.setString(4, doctor.getIban());
-            ps.setString(5, doctor.getMedicalLicenseNumber());
+            ps.setString(1, t.getName());
+            ps.setString(2, t.getSurname());
+            ps.setString(3, t.getDateOfBirth());
+            ps.setString(4, t.getIban());
+            ps.setString(5, t.getSpecialization());
             ps.executeUpdate();
-            //get generated id from dbms
-            rs = ps.getGeneratedKeys();
-            if (rs.next()){
-                doctor.setId(rs.getInt(1));
-            }
         } finally {
-            assert rs != null: "ResultSet is null";
-            rs.close();
             ps.close();
             Database.closeConnection(con);
         }
     }
-
     @Override
-    public void update(Doctor doctor) throws SQLException {
+    public void update(Trainer t) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update doctors set name = ?, surname = ?, date_of_birth = ?, iban = ?, medical_license_number = ? where id = ?");
-            ps.setString(1, doctor.getName());
-            ps.setString(2, doctor.getSurname());
-            ps.setString(3, doctor.getDateOfBirth());
-            ps.setString(4, doctor.getIban());
-            ps.setString(5, doctor.getMedicalLicenseNumber());
-            ps.setInt(6, doctor.getId());
+            ps = con.prepareStatement("update trainers set name = ?, surname = ?, date_of_birth = ?, iban = ?, specialization = ? where id = ?");
+            ps.setString(1, t.getName());
+            ps.setString(2, t.getSurname());
+            ps.setString(3, t.getDateOfBirth());
+            ps.setString(4, t.getIban());
+            ps.setString(5, t.getSpecialization());
+            ps.setInt(6, t.getId());
             ps.executeUpdate();
         } finally {
-            assert ps != null: "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }
     }
-
     @Override
     public boolean delete(Integer id) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
-        int rows = 0;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("delete from doctors where id = ?");
+            ps = con.prepareStatement("delete from trainers where id = ?");
             ps.setInt(1, id);
-            rows = ps.executeUpdate();
+            return ps.executeUpdate() == 1;
         } finally {
-            assert ps != null: "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }
-        return rows > 0;
+
     }
 }
+

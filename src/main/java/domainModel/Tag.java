@@ -1,31 +1,27 @@
 package domainModel;
 
 public class Tag {
-    protected String tags;
-    protected String tagsType;
+    protected String tag;
+    protected String tagType;
 
-    public Tag(){};
-    public Tag(String tags, String tags_type ){
-        this.tags=tags;
-        this.tagsType=tags_type;
+    public Tag(String tag, String tagType ){
+        this.tag = tag;
+        this.tagType = tagType;
     };
 
-    public String getTags() {
-        return tags;
+    public String getTag() {
+        return tag;
     }
 
-    public void setTags(String tags) {
-        this.tags = tags;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
-    public String getTags_type() {
-        return tagsType;
+    public String getTagType() {
+        return tagType;
     }
 
-    public void setTags_type(String tags_type) {
-        this.tagsType = tags_type;
+    public void setTagType(String tagType) {
+        this.tagType = tagType;
     }
-
-
-
 }

@@ -17,7 +17,7 @@ public class MedicalExam {
     private int id;
     private double price;
     private ArrayList<Document> documents;
-    private ArrayList<Tag> tags;
+    private ArrayList<Person.Tag> tags;
 
     public MedicalExam(int id, int idCustomer, String stateExtraInfo, int idDoctor, LocalDateTime endTime,
                        LocalDateTime startTime, State state, String description, String title, double price) {
@@ -43,11 +43,11 @@ public class MedicalExam {
         this.title = title;
     }
 
-    public ArrayList<Tag> getTags() {
+    public ArrayList<Person.Tag> getTags() {
         return tags;
     }
 
-    public void setTags(ArrayList<Tag> tags) {
+    public void setTags(ArrayList<Person.Tag> tags) {
         this.tags = tags;
     }
 

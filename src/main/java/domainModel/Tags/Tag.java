@@ -1,15 +1,22 @@
 package domainModel.Tags;
 
-public abstract class Tag {
+public class Tag {
     protected String tag;
+    protected String tagType;
 
-    protected String typeOfTag;
-
-    public String getTypeOfTag() {
-        return this.typeOfTag;
+    public String getTag() {
+        return tag;
     }
 
-    public String getTag(){
-        return this.tag;
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTagType() {
+        return tagType;
+    }
+
+    public void setTagType(String tagType) {
+        this.tagType = tagType;
     }
 }

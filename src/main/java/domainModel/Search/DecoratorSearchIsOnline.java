@@ -1,9 +1,9 @@
 package domainModel.Search;
 
 public class DecoratorSearchIsOnline extends BaseDecoratorSearch {
-    private final boolean online;
+    private final String online;
 
-    public DecoratorSearchIsOnline(Search decoratedSearch, boolean online){
+    public DecoratorSearchIsOnline(Search decoratedSearch, String online){
         super(decoratedSearch);
         this.online = online;
     }

@@ -1,5 +1,5 @@
 package dao;
-import domainModel.Tags.Tag
+import domainModel.Tags.Tag;
 import java.util.ArrayList;
 
 public interface TagDao extends DAO<Tag, String[]> {

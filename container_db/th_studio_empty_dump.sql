@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 8.0.39, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.40, for Linux (x86_64)
 --
 -- Host: 127.0.0.1    Database: th_studio
 -- ------------------------------------------------------
@@ -38,7 +38,7 @@ CREATE TABLE `customers` (
   `iban` varchar(27) NOT NULL,
   `level` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,6 +47,7 @@ CREATE TABLE `customers` (
 
 LOCK TABLES `customers` WRITE;
 /*!40000 ALTER TABLE `customers` DISABLE KEYS */;
+INSERT INTO `customers` VALUES (31,'Nome2','Cognome2','2020-02-08','iban2','4');
 /*!40000 ALTER TABLE `customers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -78,6 +79,33 @@ LOCK TABLES `doctors` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `documents`
+--
+
+DROP TABLE IF EXISTS `documents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `documents` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `path` varchar(255) NOT NULL,
+  `id_medical_exam` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `documents_medical_exams_fk` (`id_medical_exam`),
+  CONSTRAINT `documents_medical_exams_fk` FOREIGN KEY (`id_medical_exam`) REFERENCES `medical_exams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `documents`
+--
+
+LOCK TABLES `documents` WRITE;
+/*!40000 ALTER TABLE `documents` DISABLE KEYS */;
+/*!40000 ALTER TABLE `documents` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `medical_exams`
 --
 
@@ -96,10 +124,10 @@ CREATE TABLE `medical_exams` (
   `id_customer` int(11) DEFAULT NULL,
   `id_doctor` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `medical_exams__customers_fk` (`id_customer`),
-  KEY `medical_exams__trainers_fk` (`id_doctor`),
-  CONSTRAINT `medical_exams__customers_fk` FOREIGN KEY (`id_customer`) REFERENCES `customers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `medical_exams__trainers_fk` FOREIGN KEY (`id_doctor`) REFERENCES `doctors` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `medical_exams_customers_fk` (`id_customer`),
+  KEY `medical_exams_doctors_fk` (`id_doctor`),
+  CONSTRAINT `medical_exams_customers_fk` FOREIGN KEY (`id_customer`) REFERENCES `customers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `medical_exams_doctors_fk` FOREIGN KEY (`id_doctor`) REFERENCES `doctors` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -161,95 +189,6 @@ LOCK TABLES `tags` WRITE;
 /*!40000 ALTER TABLE `tags` DISABLE KEYS */;
 /*!40000 ALTER TABLE `tags` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `trainers`
---
-
-DROP TABLE IF EXISTS `trainers`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `trainers` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `surname` varchar(100) NOT NULL,
-  `date_of_birth` date NOT NULL,
-  `iban` varchar(27) NOT NULL,
-  `specialization` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `trainers`
---
-
-LOCK TABLES `trainers` WRITE;
-/*!40000 ALTER TABLE `trainers` DISABLE KEYS */;
-/*!40000 ALTER TABLE `trainers` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `trains`
---
-
-DROP TABLE IF EXISTS `trains`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `trains` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(100) NOT NULL,
-  `description` varchar(300) DEFAULT NULL,
-  `start_time` datetime NOT NULL,
-  `end_time` datetime DEFAULT NULL,
-  `price` float NOT NULL CHECK (`price` >= 0),
-  `state` text NOT NULL,
-  `state_extra_info` text DEFAULT NULL,
-  `id_customer` int(11) DEFAULT NULL,
-  `id_trainer` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `trains__customers_fk` (`id_customer`),
-  KEY `trains__trainers_fk` (`id_trainer`),
-  CONSTRAINT `trains__customers_fk` FOREIGN KEY (`id_customer`) REFERENCES `customers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `trains__trainers_fk` FOREIGN KEY (`id_trainer`) REFERENCES `trainers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `trains`
---
-
-LOCK TABLES `trains` WRITE;
-/*!40000 ALTER TABLE `trains` DISABLE KEYS */;
-/*!40000 ALTER TABLE `trains` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `trains_tags`
---
-
-DROP TABLE IF EXISTS `trains_tags`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `trains_tags` (
-  `id_train` int(11) NOT NULL,
-  `tag` varchar(200) NOT NULL,
-  `tag_type` varchar(200) NOT NULL,
-  PRIMARY KEY (`id_train`,`tag`,`tag_type`),
-  KEY `trains_tags__tags_fk` (`tag`,`tag_type`),
-  CONSTRAINT `trains_tags__tags_fk` FOREIGN KEY (`tag`, `tag_type`) REFERENCES `tags` (`tag`, `tag_type`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `trains_tags__trains_fk` FOREIGN KEY (`id_train`) REFERENCES `trains` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `trains_tags`
---
-
-LOCK TABLES `trains_tags` WRITE;
-/*!40000 ALTER TABLE `trains_tags` DISABLE KEYS */;
-/*!40000 ALTER TABLE `trains_tags` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -260,4 +199,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-04 11:40:25
+-- Dump completed on 2024-11-22 18:13:22

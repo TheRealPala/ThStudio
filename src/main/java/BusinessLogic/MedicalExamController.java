@@ -67,4 +67,8 @@ public class MedicalExamController {
         return unmodifiableList(this.medicalExamDao.getDoctorExams(idDoctor));
     }
 
+    public List<MedicalExam> getCustomerExams(int idCustomer) throws Exception {
+        return unmodifiableList(this.medicalExamDao.getCustomerExams(idCustomer));
+    }
+
 }

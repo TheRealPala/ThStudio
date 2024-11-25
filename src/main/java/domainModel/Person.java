@@ -6,15 +6,15 @@ public class Person {
     protected String dateOfBirth;
     protected String iban;
     protected int id;
-    public Person(){}
 
-    public Person(String name, String surname, String dateOfBirth, String iban, int id){
+    public Person(int id, String name, String surname, String dateOfBirth, String iban){
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.dateOfBirth = dateOfBirth;
         this.iban = iban;
-        this.id = id;
     }
+
     public Person(String name, String surname, String dateOfBirth, String iban){
         this.name = name;
         this.surname = surname;

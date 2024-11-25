@@ -3,8 +3,15 @@ package domainModel;
 public class Document {
     private String title;
     private String path;
+    private int id;
 
-    public Document(String title, String path) {
+    public Document (int id, String title, String path) {
+        this.id = id;
+        this.title = title;
+        this.path = path;
+    }
+
+    public Document (String title, String path) {
         this.title = title;
         this.path = path;
     }

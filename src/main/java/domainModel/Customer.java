@@ -5,14 +5,9 @@ public class Customer extends Person{
     private int level;
 
     public Customer(String name, String surname, String dateOfBirth, String iban, int id, int level){
-        super(name, surname, dateOfBirth , iban, id);
+        super(id, surname, dateOfBirth , iban, name);
         this.level = level;
     }
-    public Customer(String name, String surname, String dateOfBirth, String iban, int level){
-        super(name, surname, dateOfBirth , iban);
-        this.level = level;
-    }
-    public Customer(){}
 
     public int getLevel() {
         return level;

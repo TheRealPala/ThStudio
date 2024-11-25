@@ -6,6 +6,10 @@ import domainModel.MedicalExam;
 import domainModel.State.State;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+
+import static java.util.Collections.unmodifiableList;
 
 
 public class MedicalExamController {
@@ -53,6 +57,14 @@ public class MedicalExamController {
 
     public MedicalExam getExam (int id) throws Exception {
         return medicalExamDao.get(id);
+    }
+
+    public List<MedicalExam> getAll() throws Exception {
+        return unmodifiableList(this.medicalExamDao.getAll());
+    }
+
+    public List<MedicalExam> getDoctorExams(int idDoctor) throws Exception {
+        return unmodifiableList(this.medicalExamDao.getDoctorExams(idDoctor));
     }
 
 }

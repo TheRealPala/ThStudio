@@ -3,6 +3,7 @@ package BusinessLogic;
 import dao.MedicalExamDao;
 import domainModel.Doctor;
 import domainModel.MedicalExam;
+import domainModel.Search.Search;
 import domainModel.State.State;
 
 import java.time.LocalDateTime;
@@ -69,6 +70,11 @@ public class MedicalExamController {
 
     public List<MedicalExam> getCustomerExams(int idCustomer) throws Exception {
         return unmodifiableList(this.medicalExamDao.getCustomerExams(idCustomer));
+    }
+
+    public List<MedicalExam> search(Search search) throws Exception {
+      System.out.println(search.getSearchQuery());
+      return medicalExamDao.search(search.getSearchQuery());
     }
 
 }

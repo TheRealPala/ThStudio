@@ -17,6 +17,8 @@ public class MedicalExamController {
         this.doctorController = doctorController;
     }
 
+    //TODO aggiungere Doc block
+
     public int addMedicalExam(int idCustomer, String stateExtraInfo, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, State state, String description, String title, double price) throws Exception {
         Doctor doctor = doctorController.getPerson(idDoctor);
         if (doctor == null)
@@ -41,8 +43,12 @@ public class MedicalExamController {
         if (this.medicalExamDao.get(ExamId) == null)
             throw new IllegalArgumentException("Medical Exam not found");
 
-        MedicalExam medicalExam = new MedicalExam(ExamId, idCustomer, stateExtraInfo, idDoctor, endTime, startTime, state, description, title, price);
+        MedicalExam medicalExam = new MedicalExam(idCustomer, stateExtraInfo, idDoctor, endTime, startTime, state, description, title, price);
         this.medicalExamDao.update(medicalExam);
+    }
+
+    public boolean removeMedicalExam(int id) throws Exception {
+        return medicalExamDao.delete(id);
     }
 
     public MedicalExam getExam (int id) throws Exception {

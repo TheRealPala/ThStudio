@@ -14,8 +14,8 @@ public class CustomerController extends PersonController<Customer> {
      * @return The CF of the newly created customer
      * @throws Exception bubbles up exceptions of PeopleController::addPerson()
      */
-    public String addPerson(String name, String surname, String dateOfBirth, String iban, int level) throws Exception {
-        Customer c = new Customer(name, surname, dateOfBirth, iban,level);
+    public String addPerson(String name, String surname, String dateOfBirth, String iban, int id, int level) throws Exception {
+        Customer c = new Customer(name, surname, dateOfBirth, iban, id, level);
         return super.addPerson(c);
     }
 }

@@ -7,7 +7,6 @@ import domainModel.Search.Search;
 import domainModel.State.State;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.unmodifiableList;
@@ -24,7 +23,7 @@ public class MedicalExamController {
 
     //TODO aggiungere Doc block
 
-    public int addMedicalExam(int idCustomer, String stateExtraInfo, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, State state, String description, String title, double price) throws Exception {
+    public int addMedicalExam(int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price) throws Exception {
         Doctor doctor = doctorController.getPerson(idDoctor);
         if (doctor == null)
             throw new IllegalArgumentException("Doctor not found");
@@ -38,17 +37,17 @@ public class MedicalExamController {
             }
         }
 
-        MedicalExam medicalExam = new MedicalExam(idCustomer, stateExtraInfo, idDoctor, endTime, startTime, state, description, title, price);
+        MedicalExam medicalExam = new MedicalExam(idCustomer, idDoctor, endTime, startTime, description, title, price);
         //TODO aggiungete tag
         medicalExamDao.insert(medicalExam);
         return medicalExam.getId();
     }
 
-    public void updateMedicalExam(int ExamId, int idCustomer, String stateExtraInfo, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, State state, String description, String title, double price) throws Exception {
+    public void updateMedicalExam(int ExamId, int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price) throws Exception {
         if (this.medicalExamDao.get(ExamId) == null)
             throw new IllegalArgumentException("Medical Exam not found");
 
-        MedicalExam medicalExam = new MedicalExam(idCustomer, stateExtraInfo, idDoctor, endTime, startTime, state, description, title, price);
+        MedicalExam medicalExam = new MedicalExam(idCustomer, idDoctor, endTime, startTime, description, title, price);
         this.medicalExamDao.update(medicalExam);
     }
 

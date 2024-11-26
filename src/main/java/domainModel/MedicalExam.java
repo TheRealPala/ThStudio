@@ -20,16 +20,27 @@ public class MedicalExam {
     private ArrayList<Document> documents;
     private ArrayList<Tag> tags;
 
-    public MedicalExam(int idCustomer, String stateExtraInfo, int idDoctor, LocalDateTime endTime,
-                       LocalDateTime startTime, State state, String description, String title, double price) {
+    public MedicalExam(int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime,
+                       String description, String title, double price) {
         this.tags = new ArrayList<>();
         this.documents = new ArrayList<>();
         this.idCustomer = idCustomer;
-        this.stateExtraInfo = stateExtraInfo;
         this.idDoctor = idDoctor;
         this.endTime = endTime;
         this.startTime = startTime;
-        this.state = state;
+        this.description = description;
+        this.title = title;
+        this.price = price;
+    }
+
+    public MedicalExam(int id, int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime,
+                       String description, String title, double price) {
+        this.tags = new ArrayList<>();
+        this.documents = new ArrayList<>();
+        this.idCustomer = idCustomer;
+        this.idDoctor = idDoctor;
+        this.endTime = endTime;
+        this.startTime = startTime;
         this.description = description;
         this.title = title;
         this.price = price;

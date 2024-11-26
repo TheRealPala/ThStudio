@@ -2,7 +2,7 @@ package domainModel.State;
 
 public class Booked extends State {
 
-    public Booked(String studentCF){
+    public Booked(){
         this.state = "Booked";
     }
 

@@ -182,5 +182,42 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
         }
         return rows > 0;
     }
+
+    @Override
+    public List<MedicalExam> getDoctorExam(int doctorId, int examId) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<MedicalExam> mEList = new ArrayList<>();
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("select * from medical_exams where id_doctor = ? and id = ?");
+            ps.setInt(1, doctorId);
+            ps.setInt(2, examId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                MedicalExam tmp = new MedicalExam(
+                        rs.getInt("id"),
+                        rs.getInt("id_customer"),
+                        rs.getInt("id_doctor"),
+                        LocalDateTime.parse(rs.getString("start_time")),
+                        LocalDateTime.parse(rs.getString("end_time")),
+                        rs.getString("description"),
+                        rs.getString("title"),
+                        rs.getDouble("price")
+                );
+                this.setMedicalExamState(rs, tmp);
+                ArrayList<Tag> tags = this.tagDao.getTagsFromMedicalExam(tmp.getId());
+                tmp.setTags(tags);
+                mEList.add(tmp);
+            }
+        } finally {
+            assert rs != null : "ResultSet is Null";
+            rs.close();
+            ps.close();
+            Database.closeConnection(con);
+        }
+        return mEList;
+    }
 }
 

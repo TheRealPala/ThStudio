@@ -82,9 +82,9 @@ public class MedicalExamController {
     /**
      * Delete a medical exam
      *
-     * @param ExamId
-     * @return
-     * @throws Exception
+     * @param ExamId            The id of the medical exam
+     * @return                  True if the medical exam is deleted, false otherwise
+     * @throws Exception        If the medical exam is not found, bubbles up exceptions of MedicalExamDAO::delete()
      */
     public boolean removeMedicalExam(int ExamId) throws Exception {
         return medicalExamDao.delete(ExamId);
@@ -93,9 +93,9 @@ public class MedicalExamController {
     /**
      * Return the given medical exam
      *
-     * @param ExamId
-     * @return
-     * @throws Exception
+     * @param ExamId            The id of the medical exam
+     * @return                  The medical exam
+     * @throws Exception        If the medical exam is not found
      */
     public MedicalExam getExam (int ExamId) throws Exception {
         return medicalExamDao.get(ExamId);
@@ -104,8 +104,8 @@ public class MedicalExamController {
     /**
      * Return a read-only list of medical exam
      *
-     * @return
-     * @throws Exception
+     * @return                  The list of medical exam
+     * @throws Exception        If there are no medical exams
      */
     public List<MedicalExam> getAll() throws Exception {
         return unmodifiableList(this.medicalExamDao.getAll());
@@ -114,9 +114,9 @@ public class MedicalExamController {
     /**
      * Return a read-only list of medical exam for the given doctor
      *
-     * @param idDoctor
-     * @return
-     * @throws Exception
+     * @param idDoctor          The id of the doctor
+     * @return                  The list of medical exam
+     * @throws Exception        If the doctor is not found or if the doctor doesn't have any medical exam
      */
     public List<MedicalExam> getDoctorExams(int idDoctor) throws Exception {
         return unmodifiableList(this.medicalExamDao.getDoctorExams(idDoctor));
@@ -125,9 +125,9 @@ public class MedicalExamController {
     /**
      * Return a read-only list of medical exam for the given customer
      *
-     * @param idCustomer
-     * @return
-     * @throws Exception
+     * @param idCustomer        The id of the customer
+     * @return                  The list of medical exam
+     * @throws Exception        If the customer is not found or if the customer doesn't have any medical exam
      */
     public List<MedicalExam> getCustomerExams(int idCustomer) throws Exception {
         return unmodifiableList(this.medicalExamDao.getCustomerExams(idCustomer));

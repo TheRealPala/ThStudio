@@ -39,9 +39,9 @@ public class PersonController <T extends Person>{
     }
 
     /**
-     * Returns a read-only list of people
+     * Returns a read-only list of person
      *
-     * @return The list of people
+     * @return The list of person
      */
     public List<T> getAllPersons() throws Exception {
         return unmodifiableList(dao.getAll());

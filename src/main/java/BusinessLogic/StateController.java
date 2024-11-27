@@ -36,7 +36,7 @@ public class StateController {
         if (medicalExam == null) throw new IllegalArgumentException("The given medical exam does not exist.");
 
         if (Objects.equals(medicalExam.getStateExtraInfo(), customerId)){
-            throw new RuntimeException("The given student is already booked for this exem");
+            throw new RuntimeException("The given customer is already booked for this exem");
         }
 
         if (!Objects.equals(medicalExam.getState(), "Available")){

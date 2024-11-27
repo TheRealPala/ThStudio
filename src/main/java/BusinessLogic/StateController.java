@@ -18,9 +18,6 @@ public class StateController {
         this.customerController = customerController;
         this.medicalExamDao = medicalExamDao;
     }
-    
-//    public List<MedicalExam> getCustomerBookedExams(int customerId) {
-//        return medicalExamDao.get()
 
      /**
       * Book a medical exam for a customer
@@ -48,6 +45,23 @@ public class StateController {
                     && (m.getEndTime().isAfter(medicalExam.getStartTime()) || m.getEndTime().equals(medicalExam.getStartTime())))
                 throw new RuntimeException("The given customer is already occupied in the given time range (in course #" + m.getId() + ")");
         }
+    }
+
+    public void cancelMedicalExam(int customerId, int ExamId) throws Exception{
+        MedicalExam medicalExam = medicalExamController.getExam(ExamId);
+        Customer customer = customerController.getPerson(customerId);
+        if (customer == null) throw new IllegalArgumentException("The given customer does not exist.");
+        if (medicalExam == null) throw new IllegalArgumentException("The given medical exam does not exist.");
+
+        if (!Objects.equals(medicalExam.getState(), "Booked")){
+            throw new RuntimeException("You cannot cancel this exam because it is not booked");
+        }
+
+        if (!Objects.equals(medicalExam.getStateExtraInfo(), customerId)){
+            throw new RuntimeException("The given customer is not booked for this exam");
+        }
+
+        medicalExamDao.changeState(ExamId, new Available());
     }
 
     /**

@@ -18,8 +18,18 @@ public class StateController {
         this.customerController = customerController;
         this.medicalExamDao = medicalExamDao;
     }
+    
+//    public List<MedicalExam> getCustomerBookedExams(int customerId) {
+//        return medicalExamDao.get()
 
-    public void bookMedicalExam(int customerId, int ExamId) throws Exception{
+     /**
+      * Book a medical exam for a customer
+      *
+      * @param customerId        The id of the customer
+      * @param ExamId            The id of the medical exam
+      * @throws                  Exception If the customer or the medical exam is not found
+      */
+     public void bookMedicalExam(int customerId, int ExamId) throws Exception{
         MedicalExam medicalExam = medicalExamController.getExam(ExamId);
         Customer customer = customerController.getPerson(customerId);
         if (customer == null) throw new IllegalArgumentException("The given customer does not exist.");
@@ -32,6 +42,22 @@ public class StateController {
         if (!Objects.equals(medicalExam.getState(), "Available")){
             throw new RuntimeException("You cannot book this exam");
         }
+        
+        for (MedicalExam m: this.getCustomerBookedExam(customerId)){
+            if ((m.getStartTime().isBefore(medicalExam.getEndTime()) || m.getStartTime().equals(medicalExam.getEndTime()))
+                    && (m.getEndTime().isAfter(medicalExam.getStartTime()) || m.getEndTime().equals(medicalExam.getStartTime())))
+                throw new RuntimeException("The given customer is already occupied in the given time range (in course #" + m.getId() + ")");
+        }
+    }
+
+    /**
+     * Get all the exam booked by a customer.
+     *
+     * @param customerId        The id of the customer
+     * @throws Exception        If the customer is not found or if doesn't have any booked exam
+     */
+    private List<MedicalExam> getCustomerBookedExam(int customerId) throws Exception {
+        return medicalExamDao.getCustomerBookedExams(customerId);
     }
 
 }

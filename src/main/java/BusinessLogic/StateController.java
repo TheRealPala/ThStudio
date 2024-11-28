@@ -87,6 +87,18 @@ public class StateController {
         this.medicalExamDao.changeState(ExamId, new Deleted(ldt));
     }
 
+    public void completeMedicalExam(int ExamId) throws Exception{
+        MedicalExam medicalExam = medicalExamController.getExam(ExamId);
+        if (medicalExam == null) throw new IllegalArgumentException("The given medical exam does not exist.");
+
+        if (Objects.equals(medicalExam.getState(), "Completed")){
+            throw new RuntimeException("The exam is already completed");
+        }
+
+        LocalDateTime ldt = LocalDateTime.now();
+        this.medicalExamDao.changeState(ExamId, new Completed(ldt));
+    }
+
     /**
      * Get all the exam booked by a customer.
      *

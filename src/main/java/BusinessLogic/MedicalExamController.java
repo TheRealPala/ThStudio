@@ -133,6 +133,10 @@ public class MedicalExamController {
         return unmodifiableList(this.medicalExamDao.getCustomerExams(idCustomer));
     }
 
+    public List<MedicalExam> getExamsByState(State state) throws Exception {
+        return unmodifiableList(this.medicalExamDao.getExamsByState(state.toString()));
+    }
+
     /**
      * Search for medical exams
      *

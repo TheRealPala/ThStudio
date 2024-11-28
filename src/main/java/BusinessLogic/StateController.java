@@ -51,7 +51,7 @@ public class StateController {
         this.medicalExamDao.changeState(ExamId, book);
     }
 
-    public void cancelMedicalExam(int customerId, int ExamId) throws Exception{
+    public void deleteMedicalExamBook(int customerId, int ExamId) throws Exception{
         MedicalExam medicalExam = medicalExamController.getExam(ExamId);
         Customer customer = customerController.getPerson(customerId);
         if (customer == null) throw new IllegalArgumentException("The given customer does not exist.");

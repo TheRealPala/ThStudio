@@ -2,6 +2,7 @@ package dao;
 
 import domainModel.MedicalExam;
 import domainModel.Search.Search;
+import domainModel.State.*;
 
 import java.util.List;
 
@@ -33,6 +34,15 @@ public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
      * @throws Exception        If something goes wrong
      */
     public List<MedicalExam> getExamsByState(String state) throws Exception;
+
+    /**
+     * Change the state of an exam
+     *
+     * @param idExam            The exam's ID
+     * @param newState          The new state
+     * @throws Exception        If something goes wrong
+     */
+    public void changeState(Integer idExam, State newState) throws Exception;
 
     /**
      *

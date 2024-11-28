@@ -87,6 +87,12 @@ public class StateController {
         this.medicalExamDao.changeState(ExamId, new Deleted(ldt));
     }
 
+    /**
+     * Complete a medical exam
+     *
+     * @param ExamId            The id of the medical exam
+     * @throws Exception        If the medical exam is not found or if it is already completed
+     */
     public void completeMedicalExam(int ExamId) throws Exception{
         MedicalExam medicalExam = medicalExamController.getExam(ExamId);
         if (medicalExam == null) throw new IllegalArgumentException("The given medical exam does not exist.");

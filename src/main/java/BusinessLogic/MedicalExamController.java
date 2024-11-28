@@ -133,6 +133,13 @@ public class MedicalExamController {
         return unmodifiableList(this.medicalExamDao.getCustomerExams(idCustomer));
     }
 
+    /**
+     * Return a read-only list of medical exam for the given state
+     *
+     * @param state             The state of the medical exam
+     * @return                  The list of medical exam
+     * @throws Exception        If there are no medical exams
+     */
     public List<MedicalExam> getExamsByState(State state) throws Exception {
         return unmodifiableList(this.medicalExamDao.getExamsByState(state.toString()));
     }

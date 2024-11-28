@@ -2,6 +2,7 @@ package dao;
 
 import domainModel.Doctor;
 import domainModel.MedicalExam;
+import domainModel.Search.Search;
 import domainModel.State.Available;
 import domainModel.State.Booked;
 import domainModel.State.Completed;
@@ -184,7 +185,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     }
 
     @Override
-    public List<MedicalExam> getDoctorExam(int doctorId, int examId) throws Exception {
+    public List<MedicalExam> getDoctorExams(int doctorId, int examId) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -221,7 +222,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     }
 
     @Override
-    public List<MedicalExam> getCustomerExam(int customerId, int examId) throws Exception {
+    public List<MedicalExam> getCustomerExams(int customerId, int examId) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -256,5 +257,42 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
         }
         return mEList;
     }
+
+    @Override
+    public List<MedicalExam> search(Search search) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<MedicalExam> mEList = new ArrayList<>();
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement(search.getSearchQuery());
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                MedicalExam tmp = new MedicalExam(
+                        rs.getInt("id"),
+                        rs.getInt("id_customer"),
+                        rs.getInt("id_doctor"),
+                        LocalDateTime.parse(rs.getString("start_time")),
+                        LocalDateTime.parse(rs.getString("end_time")),
+                        rs.getString("description"),
+                        rs.getString("title"),
+                        rs.getDouble("price")
+                );
+                this.setMedicalExamState(rs, tmp);
+                ArrayList<Tag> tags = this.tagDao.getTagsFromMedicalExam(tmp.getId());
+                tmp.setTags(tags);
+                mEList.add(tmp);
+            }
+        } finally {
+            assert rs != null : "ResultSet is Null";
+            rs.close();
+            ps.close();
+            Database.closeConnection(con);
+        }
+        return mEList;
+    }
+
+
 }
 

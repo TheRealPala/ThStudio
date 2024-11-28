@@ -1,8 +1,8 @@
 package dao;
 
 import domainModel.MedicalExam;
+import domainModel.Search.Search;
 
-import java.sql.ResultSet;
 import java.util.List;
 
 public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
@@ -15,7 +15,7 @@ public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
      * @return                  The list of exams
      * @throws Exception        If something goes wrong
      */
-    public List<MedicalExam> getDoctorExam(int doctorId, int examId) throws Exception;
+    public List<MedicalExam> getDoctorExams(int doctorId, int examId) throws Exception;
 
     /**
      * Get all customer exams
@@ -25,5 +25,13 @@ public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
      * @return                  The list of exams
      * @throws Exception        If something goes wrong
      */
-    public List<MedicalExam> getCustomerExam(int customerId, int examId) throws Exception;
+    public List<MedicalExam> getCustomerExams(int customerId, int examId) throws Exception;
+
+    /**
+     *
+     * @param search
+     * @return
+     * @throws Exception
+     */
+    public List<MedicalExam> search(Search search) throws Exception;
 }

@@ -1,6 +1,5 @@
 package dao;
 
-import domainModel.Doctor;
 import domainModel.MedicalExam;
 import domainModel.Search.Search;
 import domainModel.State.Available;
@@ -21,7 +20,6 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     MariaDbMedicalExamDao(TagDao tagDao) {
         this.tagDao = tagDao;
     }
-
     private void setMedicalExamState(ResultSet rs, MedicalExam m) throws SQLException {
         if (Objects.equals(rs.getString("state"), "Booked")) {
             Booked booked = new Booked();
@@ -185,16 +183,15 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     }
 
     @Override
-    public List<MedicalExam> getDoctorExams(int doctorId, int examId) throws Exception {
+    public List<MedicalExam> getDoctorExams(int doctorId) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<MedicalExam> mEList = new ArrayList<>();
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("select * from medical_exams where id_doctor = ? and id = ?");
+            ps = con.prepareStatement("select * from medical_exams where id_doctor = ?");
             ps.setInt(1, doctorId);
-            ps.setInt(2, examId);
             rs = ps.executeQuery();
             while (rs.next()) {
                 MedicalExam tmp = new MedicalExam(
@@ -222,16 +219,15 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     }
 
     @Override
-    public List<MedicalExam> getCustomerExams(int customerId, int examId) throws Exception {
+    public List<MedicalExam> getCustomerExams(int customerId) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<MedicalExam> mEList = new ArrayList<>();
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("select * from medical_exams where id_customer = ? and id = ?");
+            ps = con.prepareStatement("select * from medical_exams where id_customer = ?");
             ps.setInt(1, customerId);
-            ps.setInt(2, examId);
             rs = ps.executeQuery();
             while (rs.next()) {
                 MedicalExam tmp = new MedicalExam(

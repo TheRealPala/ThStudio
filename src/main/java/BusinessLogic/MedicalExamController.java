@@ -133,6 +133,13 @@ public class MedicalExamController {
         return unmodifiableList(this.medicalExamDao.getCustomerExams(idCustomer));
     }
 
+    /**
+     * Search for medical exams
+     *
+     * @param search            The search object
+     * @return                  The list of medical exams
+     * @throws Exception        If there are no medical exams
+     */
     public List<MedicalExam> search(Search search) throws Exception {
         return unmodifiableList(this.medicalExamDao.search(search));
     }

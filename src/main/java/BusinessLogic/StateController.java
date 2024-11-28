@@ -65,7 +65,7 @@ public class StateController {
             throw new RuntimeException("The given customer is not booked for this exam");
         }
 
-        medicalExamDao.changeState(ExamId, new Available());
+        this.medicalExamDao.changeState(ExamId, new Available());
     }
 
     /**

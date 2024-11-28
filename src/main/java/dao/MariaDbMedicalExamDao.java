@@ -2,10 +2,7 @@ package dao;
 
 import domainModel.MedicalExam;
 import domainModel.Search.Search;
-import domainModel.State.Available;
-import domainModel.State.Booked;
-import domainModel.State.Completed;
-import domainModel.State.Deleted;
+import domainModel.State.*;
 import domainModel.Tags.Tag;
 
 import java.sql.*;
@@ -288,6 +285,24 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             Database.closeConnection(con);
         }
         return mEList;
+    }
+
+    @Override
+    public void changeState(Integer idExam, State newState) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("update medical_exams set state = ?, state_extra_info = ? where id = ?");
+            ps.setString(1, newState.getState());
+            ps.setString(2, LocalDateTime.now().toString());
+            ps.setInt(3, idExam);
+            ps.executeUpdate();
+        } finally {
+            assert ps != null: "preparedStatement is Null";
+            ps.close();
+            Database.closeConnection(con);
+        }
     }
 
     @Override

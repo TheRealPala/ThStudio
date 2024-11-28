@@ -219,16 +219,15 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     }
 
     @Override
-    public List<MedicalExam> getCustomerExams(int customerId, int examId) throws Exception {
+    public List<MedicalExam> getCustomerExams(int customerId) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<MedicalExam> mEList = new ArrayList<>();
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("select * from medical_exams where id_customer = ? and id = ?");
+            ps = con.prepareStatement("select * from medical_exams where id_customer = ?");
             ps.setInt(1, customerId);
-            ps.setInt(2, examId);
             rs = ps.executeQuery();
             while (rs.next()) {
                 MedicalExam tmp = new MedicalExam(

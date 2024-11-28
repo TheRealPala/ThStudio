@@ -7,6 +7,7 @@ import dao.MedicalExamDao;
 
 import java.util.List;
 import java.util.Objects;
+import java.time.LocalDateTime;
 
 public class StateController {
     private final MedicalExamController medicalExamController;
@@ -66,6 +67,24 @@ public class StateController {
         }
 
         this.medicalExamDao.changeState(ExamId, new Available());
+    }
+
+    /**
+     * Cancel a medical exam
+     *
+     * @param ExamId            The id of the medical exam
+     * @throws Exception        If the medical exam is not found or if it is already completed
+     */
+    public void deleteMedicalExam(int ExamId) throws Exception{
+        MedicalExam medicalExam = medicalExamController.getExam(ExamId);
+        if (medicalExam == null) throw new IllegalArgumentException("The given medical exam does not exist.");
+
+        if (Objects.equals(medicalExam.getState(), "Completed")){
+            throw new RuntimeException("You cannot cancel a exam that is already completed");
+        }
+
+        LocalDateTime ldt = LocalDateTime.now();
+        this.medicalExamDao.changeState(ExamId, new Deleted(ldt));
     }
 
     /**

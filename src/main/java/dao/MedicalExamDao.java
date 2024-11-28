@@ -36,6 +36,15 @@ public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
     public List<MedicalExam> getExamsByState(String state) throws Exception;
 
     /**
+     * Get all exams booked by a customer
+     *
+     * @param customerId        The customer's ID
+     * @return                  The list of exams
+     * @throws Exception        If something goes wrong
+     */
+    public List<MedicalExam> getCustumerBookedExams(int customerId) throws Exception;
+
+    /**
      * Change the state of an exam
      *
      * @param idExam            The exam's ID

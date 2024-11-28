@@ -263,6 +263,10 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
         try {
             con = Database.getConnection();
             ps = con.prepareStatement(search.getSearchQuery());
+            int index = 1;
+            for (Object tmp : search.getArguments()) {
+                ps.setObject(index++, tmp);
+            }
             rs = ps.executeQuery();
             while (rs.next()) {
                 MedicalExam tmp = new MedicalExam(

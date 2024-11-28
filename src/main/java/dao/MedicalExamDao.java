@@ -15,7 +15,7 @@ public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
      * @return                  The list of exams
      * @throws Exception        If something goes wrong
      */
-    public List<MedicalExam> getDoctorExam(int doctorId, int examId) throws Exception;
+    public List<MedicalExam> getDoctorExams(int doctorId, int examId) throws Exception;
 
     /**
      * Get all customer exams
@@ -25,7 +25,7 @@ public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
      * @return                  The list of exams
      * @throws Exception        If something goes wrong
      */
-    public List<MedicalExam> getCustomerExam(int customerId, int examId) throws Exception;
+    public List<MedicalExam> getCustomerExams(int customerId, int examId) throws Exception;
 
     /**
      *

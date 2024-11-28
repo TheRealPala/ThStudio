@@ -185,7 +185,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     }
 
     @Override
-    public List<MedicalExam> getDoctorExam(int doctorId, int examId) throws Exception {
+    public List<MedicalExam> getDoctorExams(int doctorId, int examId) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -222,7 +222,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     }
 
     @Override
-    public List<MedicalExam> getCustomerExam(int customerId, int examId) throws Exception {
+    public List<MedicalExam> getCustomerExams(int customerId, int examId) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;

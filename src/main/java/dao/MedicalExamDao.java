@@ -42,7 +42,7 @@ public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
      * @return                  The list of exams
      * @throws Exception        If something goes wrong
      */
-    public List<MedicalExam> getCustumerBookedExams(int customerId) throws Exception;
+    public List<MedicalExam> getCustomerBookedExams(int customerId) throws Exception;
 
     /**
      * Change the state of an exam

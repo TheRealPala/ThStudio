@@ -288,7 +288,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     }
 
     @Override
-    public List<MedicalExam> getCustumerBookedExams(int customerId) throws Exception {
+    public List<MedicalExam> getCustomerBookedExams(int customerId) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;

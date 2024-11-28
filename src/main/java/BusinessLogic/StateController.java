@@ -45,6 +45,10 @@ public class StateController {
                     && (m.getEndTime().isAfter(medicalExam.getStartTime()) || m.getEndTime().equals(medicalExam.getStartTime())))
                 throw new RuntimeException("The given customer is already occupied in the given time range (in course #" + m.getId() + ")");
         }
+
+        Booked book = new Booked();
+
+        this.medicalExamDao.changeState(ExamId, book);
     }
 
     public void cancelMedicalExam(int customerId, int ExamId) throws Exception{

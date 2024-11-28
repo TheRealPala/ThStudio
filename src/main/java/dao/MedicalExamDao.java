@@ -29,9 +29,9 @@ public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
 
     /**
      *
-     * @param search
-     * @return
-     * @throws Exception
+     * @param search            Search Object with queryString
+     * @return                  List of founded Exams
+     * @throws Exception        If something goes wrong
      */
     public List<MedicalExam> search(Search search) throws Exception;
 }

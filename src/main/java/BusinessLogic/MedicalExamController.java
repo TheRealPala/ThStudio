@@ -134,8 +134,7 @@ public class MedicalExamController {
     }
 
     public List<MedicalExam> search(Search search) throws Exception {
-      System.out.println(search.getSearchQuery());
-      return medicalExamDao.search(search.getSearchQuery());
+        return unmodifiableList(this.medicalExamDao.search(search));
     }
 
 }

@@ -41,5 +41,17 @@ public class TagsController {
         return t;
     }
 
+    /**
+     * Deletes a tag
+     * @param tag           the tag to be deleted
+     * @param tagType       the type of the tag
+     * @return              true if the tag was deleted, false otherwise
+     * @throws Exception    if the tag type is invalid
+     */
+    public boolean deleteTag(String tag, String tagType) throws Exception{
+        String[] tagToRemove = new String[]{tag, tagType};
+        return this.tagDao.delete(tagToRemove);
+    }
+
 
 }

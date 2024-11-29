@@ -33,6 +33,7 @@ public class MedicalExamController {
      * @param description       The description of the medical exam
      * @param title             The title of the medical exam
      * @param price             The price of the medical exam
+     * @param tags              The tags of the medical exam
      *
      * @return The id of the newly created medical exam
      *

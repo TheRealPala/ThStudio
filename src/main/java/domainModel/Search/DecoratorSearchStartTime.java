@@ -3,15 +3,15 @@ package domainModel.Search;
 import java.time.LocalDateTime;
 
 public class DecoratorSearchStartTime extends BaseDecoratorSearch{
-    private final LocalDateTime startTime;
 
     public DecoratorSearchStartTime(Search decoratedSearch, LocalDateTime minStartTime){
         super(decoratedSearch);
-        this.startTime = minStartTime;
+        this.arguments = decoratedSearch.getArguments();
+        this.arguments.add(minStartTime.toString());
     }
 
     @Override
     public String getSearchQuery() {
-        return super.getSearchQuery() + " AND startTime >= '" + startTime.toString() + "'";
+        return super.getSearchQuery() + " AND start_time >= ?";
     }
 }

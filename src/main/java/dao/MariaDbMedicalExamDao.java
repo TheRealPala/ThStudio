@@ -22,11 +22,11 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             Booked booked = new Booked();
             m.setState(booked);
         } else if (Objects.equals(rs.getString("state"), "Cancelled")) {
-            LocalDateTime ldt = LocalDateTime.parse(rs.getString("stateExtraInfo")); //ldt = cancelledTime
+            LocalDateTime ldt = rs.getTimestamp("stateExtraInfo").toLocalDateTime(); //ldt = cancelledTime
             Deleted deleted = new Deleted(ldt);
             m.setState(deleted);
         } else if (Objects.equals(rs.getString("state"), "Completed")) {
-            LocalDateTime ldt = LocalDateTime.parse(rs.getString("stateExtraInfo")); //ldt = completedTime
+            LocalDateTime ldt = rs.getTimestamp("stateExtraInfo").toLocalDateTime(); //ldt = completedTime
             Completed completed = new Completed(ldt);
             m.setState(completed);
         } else {
@@ -51,8 +51,8 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                         rs.getInt("id"),
                         rs.getInt("id_customer"),
                         rs.getInt("id_doctor"),
-                        LocalDateTime.parse(rs.getString("start_time")),
-                        LocalDateTime.parse(rs.getString("end_time")),
+                        rs.getTimestamp("start_time").toLocalDateTime(),
+                        rs.getTimestamp("end_time").toLocalDateTime(),
                         rs.getString("description"),
                         rs.getString("title"),
                         rs.getDouble("price")
@@ -85,8 +85,8 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                         rs.getInt("id"),
                         rs.getInt("id_customer"),
                         rs.getInt("id_doctor"),
-                        LocalDateTime.parse(rs.getString("start_time")),
-                        LocalDateTime.parse(rs.getString("end_time")),
+                        rs.getTimestamp("start_time").toLocalDateTime(),
+                        rs.getTimestamp("end_time").toLocalDateTime(),
                         rs.getString("description"),
                         rs.getString("title"),
                         rs.getDouble("price")
@@ -195,8 +195,8 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                         rs.getInt("id"),
                         rs.getInt("id_customer"),
                         rs.getInt("id_doctor"),
-                        LocalDateTime.parse(rs.getString("start_time")),
-                        LocalDateTime.parse(rs.getString("end_time")),
+                        rs.getTimestamp("start_time").toLocalDateTime(),
+                        rs.getTimestamp("end_time").toLocalDateTime(),
                         rs.getString("description"),
                         rs.getString("title"),
                         rs.getDouble("price")
@@ -231,8 +231,8 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                         rs.getInt("id"),
                         rs.getInt("id_customer"),
                         rs.getInt("id_doctor"),
-                        LocalDateTime.parse(rs.getString("start_time")),
-                        LocalDateTime.parse(rs.getString("end_time")),
+                        rs.getTimestamp("start_time").toLocalDateTime(),
+                        rs.getTimestamp("end_time").toLocalDateTime(),
                         rs.getString("description"),
                         rs.getString("title"),
                         rs.getDouble("price")
@@ -267,8 +267,8 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                         rs.getInt("id"),
                         rs.getInt("id_customer"),
                         rs.getInt("id_doctor"),
-                        LocalDateTime.parse(rs.getString("start_time")),
-                        LocalDateTime.parse(rs.getString("end_time")),
+                        rs.getTimestamp("start_time").toLocalDateTime(),
+                        rs.getTimestamp("end_time").toLocalDateTime(),
                         rs.getString("description"),
                         rs.getString("title"),
                         rs.getDouble("price")
@@ -303,8 +303,8 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                         rs.getInt("id"),
                         rs.getInt("id_customer"),
                         rs.getInt("id_doctor"),
-                        LocalDateTime.parse(rs.getString("start_time")),
-                        LocalDateTime.parse(rs.getString("end_time")),
+                        rs.getTimestamp("start_time").toLocalDateTime(),
+                        rs.getTimestamp("end_time").toLocalDateTime(),
                         rs.getString("description"),
                         rs.getString("title"),
                         rs.getDouble("price")
@@ -350,14 +350,18 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
         try {
             con = Database.getConnection();
             ps = con.prepareStatement(search.getSearchQuery());
+            int index = 1;
+            for (Object tmp : search.getArguments()) {
+                ps.setObject(index++, tmp);
+            }
             rs = ps.executeQuery();
             while (rs.next()) {
                 MedicalExam tmp = new MedicalExam(
                         rs.getInt("id"),
                         rs.getInt("id_customer"),
                         rs.getInt("id_doctor"),
-                        LocalDateTime.parse(rs.getString("start_time")),
-                        LocalDateTime.parse(rs.getString("end_time")),
+                        rs.getTimestamp("start_time").toLocalDateTime(),
+                        rs.getTimestamp("end_time").toLocalDateTime(),
                         rs.getString("description"),
                         rs.getString("title"),
                         rs.getDouble("price")

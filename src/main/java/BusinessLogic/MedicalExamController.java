@@ -5,8 +5,10 @@ import domainModel.Doctor;
 import domainModel.MedicalExam;
 import domainModel.Search.Search;
 import domainModel.State.State;
+import domainModel.Tags.Tag;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.unmodifiableList;
@@ -37,7 +39,7 @@ public class MedicalExamController {
      * @throws Exception If the doctor is not found, bubbles up exceptions of MedicalExamDAO::insert()
      * @throws IllegalArgumentException If the doctor is already occupied in the given time range
      */
-    public int addMedicalExam(int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price) throws Exception {
+    public int addMedicalExam(int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
         Doctor doctor = doctorController.getPerson(idDoctor);
         if (doctor == null)
             throw new IllegalArgumentException("Doctor not found");
@@ -52,7 +54,8 @@ public class MedicalExamController {
         }
 
         MedicalExam medicalExam = new MedicalExam(idCustomer, idDoctor, endTime, startTime, description, title, price);
-        //TODO aggiungete tag
+        medicalExam.setTags(tags);
+
         medicalExamDao.insert(medicalExam);
         return medicalExam.getId();
     }

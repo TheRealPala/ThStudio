@@ -10,6 +10,11 @@ public class CustomerController extends PersonController<Customer> {
 
     /**
      * Add a new customer
+     * @param name                          The name of the customer
+     * @param surname                       The surname of the customer
+     * @param dateOfBirth                   The date of birth of the customer
+     * @param iban                          The IBAN of the customer
+     * @param level                         The level of the customer
      *
      * @return The CF of the newly created customer
      * @throws Exception bubbles up exceptions of PeopleController::addPerson()

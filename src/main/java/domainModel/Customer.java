@@ -9,6 +9,11 @@ public class Customer extends Person{
         this.level = level;
     }
 
+    public Customer(String name, String surname, String dateOfBirth, String iban, int level){
+        super(surname, dateOfBirth , iban, name);
+        this.level = level;
+    }
+
     public int getLevel() {
         return level;
     }

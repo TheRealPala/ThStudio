@@ -35,23 +35,21 @@ public class MedicalExamController {
      * @param price             The price of the medical exam
      * @param tags              The tags of the medical exam
      *
-     * @return The id of the newly created medical exam
+     * @return                  The id of the newly created medical exam
      *
-     * @throws Exception If the doctor is not found, bubbles up exceptions of MedicalExamDAO::insert()
-     * @throws IllegalArgumentException If the doctor is already occupied in the given time range
+     * @throws Exception        Bubbles up exceptions of MedicalExamDAO::insert()
+     * @throws IllegalArgumentException If the doctor is already occupied in the given time range or if the doctor is not found
      */
     public int addMedicalExam(int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
         Doctor doctor = doctorController.getPerson(idDoctor);
         if (doctor == null)
-            throw new IllegalArgumentException("Doctor not found");
+            throw new IllegalArgumentException("The specified doctor was not found");
 
         // Check if the given doctor is not already occupied for the given time range
-        for (MedicalExam i : this.medicalExamDao.getAll()) {
-            if (i.getIdDoctor() == idDoctor) {
-                if ((i.getStartTime().isBefore(endTime) || i.getStartTime().equals(endTime))
-                        && (i.getEndTime().isAfter(startTime) || i.getEndTime().equals(startTime)))
-                    throw new RuntimeException("The given doctor is already occupied in the given time range (in course #" + i.getId() + ")");
-            }
+        for (MedicalExam exam : medicalExamDao.getDoctorExams(idDoctor)) {
+            if ((exam.getStartTime().isBefore(endTime) || exam.getStartTime().equals(endTime))
+                    && (exam.getEndTime().isAfter(startTime) || exam.getEndTime().equals(startTime)))
+                throw new IllegalArgumentException("The given doctor is already occupied in the given time range (in course #" + exam.getId() + ")");
         }
 
         MedicalExam medicalExam = new MedicalExam(idCustomer, idDoctor, endTime, startTime, description, title, price);

@@ -90,6 +90,7 @@ public class MedicalExamController {
      */
     public boolean removeMedicalExam(int ExamId) throws Exception {
         return medicalExamDao.delete(ExamId);
+        // TODO: add a notification to the customer ad a way to pay back the money
     }
 
     /**

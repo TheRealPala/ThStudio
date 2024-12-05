@@ -14,7 +14,7 @@ import java.util.Objects;
 public class MariaDbMedicalExamDao implements MedicalExamDao {
     private final TagDao tagDao;
 
-    MariaDbMedicalExamDao(TagDao tagDao) {
+    public MariaDbMedicalExamDao(TagDao tagDao) {
         this.tagDao = tagDao;
     }
     private void setMedicalExamState(ResultSet rs, MedicalExam m) throws SQLException {
@@ -259,6 +259,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                 tmp.setTags(tags);
                 mEList.add(tmp);
             }
+
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();
@@ -398,6 +399,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                 tmp.setTags(tags);
                 mEList.add(tmp);
             }
+            //TODO:check if this need an exception in case of no result
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();

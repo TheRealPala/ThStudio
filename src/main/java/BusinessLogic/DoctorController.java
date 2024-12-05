@@ -23,4 +23,8 @@ public class DoctorController extends PersonController<Doctor>{
         Doctor d = new Doctor(name, surname, dateOfBirth, iban, medicalLicenseNumber);
         return super.addPerson(d);
     }
+    //TODO: add method to modify date or other properties of the medical exam, and that notify the customer
+    //TODO: add method to get the list of the medical exams
+    //TODO: add method to delete the medical exam, and that notify the customer, and define a policy for the refund
+    //TODO: add a method to create a new medical exam
 }

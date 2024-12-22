@@ -18,16 +18,17 @@ public class MariaDbCustomerDao implements CustomerDao {
             ps = con.prepareStatement("select * from customers where id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            if (rs.next()) {
-                c = new Customer(
-                        rs.getString("name"),
-                        rs.getString("surname"),
-                        rs.getString("date_of_birth"),
-                        rs.getString("iban"),
-                        rs.getInt("id"),
-                        rs.getInt("level")
-                );
+            if(!rs.next()) {
+                throw new RuntimeException("The Customer looked for in not present in the database");
             }
+            c = new Customer(
+                rs.getString("name"),
+                rs.getString("surname"),
+                rs.getString("date_of_birth"),
+                rs.getString("iban"),
+                rs.getInt("id"),
+                rs.getInt("level")
+            );
         } finally {
             assert rs != null: "ResultSet is Null";
             rs.close();
@@ -58,6 +59,9 @@ public class MariaDbCustomerDao implements CustomerDao {
                         rs.getInt("level")
                     )
                 );
+            }
+            if(cList.isEmpty()){
+                throw new RuntimeException("There is no Customers in the database");
             }
         } finally {
             assert rs != null: "ResultSet is Null";

@@ -81,6 +81,7 @@ public class MariaDbTagDao implements TagDao{
             };
             tList.add(tmp);
         }
+        //TODO:check if this should have an exception if the tagType is not recognized
     }
 
     @Override
@@ -97,10 +98,12 @@ public class MariaDbTagDao implements TagDao{
             ps.setString(1, tag);
             ps.setString(2, tagType);
             rs = ps.executeQuery();
-            if (rs.next()) {
-               tag = rs.getString("tag");
-               tagType = rs.getString("tag_type");
+            if(!rs.next()) {
+                throw new RuntimeException("The Tag looked for in not present in the database");
             }
+            tag = rs.getString("tag");
+            tagType = rs.getString("tag_type");
+
             t = switch (tagType) {
                 case "Online" -> new TagIsOnline(tag);
                 case "Zone" -> new TagZone(tag);

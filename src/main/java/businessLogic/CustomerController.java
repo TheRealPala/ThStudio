@@ -23,4 +23,8 @@ public class CustomerController extends PersonController<Customer> {
         Customer c = new Customer(name, surname, dateOfBirth, iban, level);
         return super.addPerson(c);
     }
+    //TODO: add search of the medical exams
+    //TODO: add book medical exams, and a payment method, notify the doctor
+    //TODO: add cancel medical exams, and notify the doctor, and define a policy for the refund
+    //TODO: add a way to get the list of the medical exams
 }

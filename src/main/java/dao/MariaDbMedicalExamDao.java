@@ -14,7 +14,7 @@ import java.util.Objects;
 public class MariaDbMedicalExamDao implements MedicalExamDao {
     private final TagDao tagDao;
 
-    MariaDbMedicalExamDao(TagDao tagDao) {
+    public MariaDbMedicalExamDao(TagDao tagDao) {
         this.tagDao = tagDao;
     }
     private void setMedicalExamState(ResultSet rs, MedicalExam m) throws SQLException {
@@ -46,7 +46,9 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps = con.prepareStatement("select * from medical_exams where id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            if (rs.next()) {
+            if(!rs.next())
+                throw new RuntimeException("The Medical Exam looked for in not present in the database");
+            else  {
                 m = new MedicalExam(
                         rs.getInt("id"),
                         rs.getInt("id_customer"),
@@ -80,22 +82,30 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             con = Database.getConnection();
             stm = con.createStatement();
             rs = stm.executeQuery("select * from medical_exams");
-            while (rs.next()) {
-                MedicalExam tmp = new MedicalExam(
-                        rs.getInt("id"),
-                        rs.getInt("id_customer"),
-                        rs.getInt("id_doctor"),
-                        rs.getTimestamp("start_time").toLocalDateTime(),
-                        rs.getTimestamp("end_time").toLocalDateTime(),
-                        rs.getString("description"),
-                        rs.getString("title"),
-                        rs.getDouble("price")
-                );
-                this.setMedicalExamState(rs, tmp);
-                ArrayList<Tag> tags = this.tagDao.getTagsFromMedicalExam(tmp.getId());
-                tmp.setTags(tags);
-                mEList.add(tmp);
+
+            if (!rs.next()) {
+                throw new RuntimeException("There are no Medical Exams in the database");
+            } else {
+                while (rs.next()) {
+                    MedicalExam tmp = new MedicalExam(
+                            rs.getInt("id"),
+                            rs.getInt("id_customer"),
+                            rs.getInt("id_doctor"),
+                            rs.getTimestamp("start_time").toLocalDateTime(),
+                            rs.getTimestamp("end_time").toLocalDateTime(),
+                            rs.getString("description"),
+                            rs.getString("title"),
+                            rs.getDouble("price")
+                    );
+
+                    // TODO: check if this is correct
+                    this.setMedicalExamState(rs, tmp);
+                    ArrayList<Tag> tags = this.tagDao.getTagsFromMedicalExam(tmp.getId());
+                    tmp.setTags(tags);
+                    mEList.add(tmp);
+                }
             }
+
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();
@@ -190,6 +200,9 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps = con.prepareStatement("select * from medical_exams where id_doctor = ?");
             ps.setInt(1, doctorId);
             rs = ps.executeQuery();
+            if (!rs.next()) {
+                throw new RuntimeException("The Doctor has no Medical Exams in the database");
+            }
             while (rs.next()) {
                 MedicalExam tmp = new MedicalExam(
                         rs.getInt("id"),
@@ -206,6 +219,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                 tmp.setTags(tags);
                 mEList.add(tmp);
             }
+
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();
@@ -226,6 +240,9 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps = con.prepareStatement("select * from medical_exams where id_customer = ?");
             ps.setInt(1, customerId);
             rs = ps.executeQuery();
+            if (!rs.next()) {
+                throw new RuntimeException("The Customer has no Medical Exams in the database");
+            }
             while (rs.next()) {
                 MedicalExam tmp = new MedicalExam(
                         rs.getInt("id"),
@@ -242,6 +259,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                 tmp.setTags(tags);
                 mEList.add(tmp);
             }
+
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();
@@ -262,6 +280,9 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps = con.prepareStatement("select * from medical_exams where state = ?");
             ps.setString(1, state);
             rs = ps.executeQuery();
+            if(!rs.next()) {
+                throw new RuntimeException("There are no Medical Exams in the database with the state " + state);
+            }
             while (rs.next()) {
                 MedicalExam tmp = new MedicalExam(
                         rs.getInt("id"),
@@ -278,6 +299,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                 tmp.setTags(tags);
                 mEList.add(tmp);
             }
+
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();
@@ -298,6 +320,9 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps = con.prepareStatement("select * from medical_exams where id_customer = ? and state = 'Booked'");
             ps.setInt(1, customerId);
             rs = ps.executeQuery();
+            if(!rs.next())  {
+                throw new RuntimeException( "The Customer has no Booked Medical Exams in the database");
+            }
             while (rs.next()) {
                 MedicalExam tmp = new MedicalExam(
                         rs.getInt("id"),
@@ -314,6 +339,8 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                 tmp.setTags(tags);
                 mEList.add(tmp);
             }
+
+
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();
@@ -339,6 +366,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps.close();
             Database.closeConnection(con);
         }
+        // TODO:check if this need an exception in case of no result
     }
 
     @Override
@@ -371,6 +399,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                 tmp.setTags(tags);
                 mEList.add(tmp);
             }
+            //TODO:check if this need an exception in case of no result
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();

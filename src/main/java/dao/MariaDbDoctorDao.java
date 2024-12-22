@@ -19,16 +19,18 @@ public class MariaDbDoctorDao implements DoctorDao{
             ps = con.prepareStatement("select * from doctors where id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            if (rs.next()) {
-                d = new Doctor(
-                        rs.getString("name"),
-                        rs.getString("surname"),
-                        rs.getString("date_of_birth"),
-                        rs.getString("iban"),
-                        rs.getInt("id"),
-                        rs.getString("medical_license_number")
-                );
+            if(!rs.next()) {
+                throw new RuntimeException("The Doctor looked for in not present in the database");
             }
+            d = new Doctor(
+                rs.getString("name"),
+                rs.getString("surname"),
+                rs.getString("date_of_birth"),
+                rs.getString("iban"),
+                rs.getInt("id"),
+                rs.getString("medical_license_number")
+            );
+
         } finally {
             assert rs != null: "ResultSet is Null";
             rs.close();
@@ -60,6 +62,10 @@ public class MariaDbDoctorDao implements DoctorDao{
                         )
                 );
             }
+            if (dList.isEmpty()) {
+                throw new RuntimeException("There is no Doctors in the database");
+            }
+
         } finally {
             assert rs != null: "ResultSet is Null";
             rs.close();

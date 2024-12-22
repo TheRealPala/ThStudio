@@ -1,4 +1,4 @@
-package BusinessLogic;
+package businessLogic;
 
 import domainModel.State.*;
 import domainModel.Customer;

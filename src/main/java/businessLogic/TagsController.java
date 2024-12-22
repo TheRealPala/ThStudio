@@ -1,4 +1,4 @@
-package BusinessLogic;
+package businessLogic;
 
 import dao.TagDao;
 import domainModel.Tags.*;

@@ -1,4 +1,4 @@
-package BusinessLogic;
+package businessLogic;
 
 import dao.CustomerDao;
 import domainModel.Customer;

@@ -112,4 +112,27 @@ public class DoctorController extends PersonController<Doctor>{
         else
             return false;
     }
+    /** modify the Medical exam price
+     * @param me the medical exam
+     * @param d the new price
+     * @param id the id of the doctor
+     * @return true if the modification was successful, false otherwise
+     * @throws Exception
+     */
+
+    public boolean modifyMedicalExamPrice(MedicalExam me, double d, int id) throws Exception {
+        if(me.getIdDoctor()==id&&me.getStartTime().isBefore(LocalDateTime.now())) {
+            if(me.getState().equals("Available")) {
+                mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                        me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), d);
+                return true;
+            }
+            else{
+                System.out.println("The medical exam is already booked");
+                return false;
+            }
+        }
+        else
+            return false;
+    }
 }

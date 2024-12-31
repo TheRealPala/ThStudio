@@ -1,11 +1,21 @@
 package businessLogic;
-
+import java.time.LocalDateTime;
+import java.util.List;
 import dao.CustomerDao;
 import domainModel.Customer;
+import domainModel.MedicalExam;
+import domainModel.Search.Search;
+import domainModel.State.Available;
+import domainModel.State.Booked;
 
 public class CustomerController extends PersonController<Customer> {
-    public CustomerController(CustomerDao customerDAO){
-        super(customerDAO);
+    private MedicalExamController mec;
+    private DoctorController d;
+    private CustomerDao customerDao;
+    public CustomerController(CustomerDao customer, MedicalExamController mec, DoctorController doctor) {
+        super(customer);
+        this.mec = mec;
+        this.d = doctor;
     }
 
     /**

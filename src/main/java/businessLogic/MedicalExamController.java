@@ -60,6 +60,22 @@ public class MedicalExamController {
         medicalExamDao.insert(medicalExam);
         return medicalExam.getId();
     }
+    public int addMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
+        Doctor doctor = doctorController.getPerson(idDoctor);
+        if (doctor == null)
+            throw new IllegalArgumentException("The specified doctor was not found");
+
+        // Check if the given doctor is not already occupied for the given time range
+        for (MedicalExam exam : medicalExamDao.getDoctorExams(idDoctor)) {
+            if ((exam.getStartTime().isBefore(endTime) || exam.getStartTime().equals(endTime))
+                    && (exam.getEndTime().isAfter(startTime) || exam.getEndTime().equals(startTime)))
+                throw new IllegalArgumentException("The given doctor is already occupied in the given time range (in course #" + exam.getId() + ")");
+        }
+
+        MedicalExam medicalExam = new MedicalExam(idDoctor, endTime, startTime, description, title, price, tags);
+        medicalExamDao.insert(medicalExam);
+        return medicalExam.getId();
+    }
 
     /**
      * Updates a medical exam
@@ -92,7 +108,7 @@ public class MedicalExamController {
      */
     public boolean removeMedicalExam(int ExamId) throws Exception {
         return medicalExamDao.delete(ExamId);
-        // TODO: add a notification to the customer ad a way to pay back the money
+
     }
 
     /**

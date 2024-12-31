@@ -79,4 +79,28 @@ public class CustomerController extends PersonController<Customer> {
             return true;
         }
     }
+    /** cancel a medical exam
+     * @param me The medical exam
+     * @param c The customer
+     * @return true if the medical exam is canceled, false otherwise
+     * @throws Exception
+     */
+    public boolean cancelMedicalExam(MedicalExam me, Customer c) throws Exception {
+        if(me.getState() instanceof Booked && me.getIdCustomer()== c.getId()){
+            me.setState(new Available());
+            mec.updateMedicalExam(me.getId(),c.getId(),me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice());
+            payment(c,me);
+            d.getMedicalExam(me.getIdDoctor()).remove(me); // consider adding a new in doctorDomainModel to remove the medical exam
+
+            if(me.getStartTime().isBefore(LocalDateTime.now())){
+               mec.refund(c.getId(),me);
+            }
+
+            //notify the doctor
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }

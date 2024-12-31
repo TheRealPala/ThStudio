@@ -103,4 +103,12 @@ public class CustomerController extends PersonController<Customer> {
             return false;
         }
     }
+    /** get the list of the medical exams
+     * @param c The customer
+     * @return The list of the medical exams
+     * @throws Exception
+     */
+    public List<MedicalExam> examList (int c) throws Exception {
+        return this.mec.getCustomerExams(c);
+    }
 }

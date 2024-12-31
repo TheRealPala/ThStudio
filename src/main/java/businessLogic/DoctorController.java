@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DoctorController extends PersonController<Doctor>{
-    public DoctorController(DoctorDao doctorDAO){
     private DoctorDao doctorDAO;
     private MedicalExamController mec;
     public DoctorController(DoctorDao doctorDAO, MedicalExamController mec) {
@@ -38,4 +37,26 @@ public class DoctorController extends PersonController<Doctor>{
     //TODO: add method to get the list of the medical exams
     //TODO: add method to delete the medical exam, and that notify the customer, and define a policy for the refund
     //TODO: add a method to create a new medical exam
+    /** modify the Medical exam start time
+     * @param me the medical exam
+     * @param t the new start time
+     * @param id the id of the doctor
+     * @return true if the modification was successful, false otherwise
+     * @throws Exception
+     */
+
+    public boolean modifyMedicalExamStartTime(MedicalExam me, LocalDateTime t, int id) throws Exception {
+
+        if( me.getStartTime().isBefore(LocalDateTime.now()) &&me.getIdDoctor()==id&& me.getEndTime().isAfter(t)) {
+            if(me.getState()instanceof Booked){
+                //notify the customer
+            }
+            mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                    me.getIdDoctor(), me.getEndTime(), t, me.getDescription(), me.getTitle(), me.getPrice());
+
+            return true;
+        }
+        else
+            return false;
+    }
 }

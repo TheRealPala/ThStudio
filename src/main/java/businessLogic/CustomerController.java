@@ -111,4 +111,23 @@ public class CustomerController extends PersonController<Customer> {
     public List<MedicalExam> examList (int c) throws Exception {
         return this.mec.getCustomerExams(c);
     }
+    /** payment of the medical exam
+     * @param c The customer
+     * @param me The medical exam
+     * @throws Exception
+     */
+    public void payment(Customer c, MedicalExam me) {
+        if(c.getBalance()< me.getPrice()){
+            throw new RuntimeException(" not enough balance");
+        }
+        else{
+            if(me.getState()instanceof Booked && me.getIdCustomer() == c.getId()){
+                c.setBalance(c.getBalance()-me.getPrice());
+                //TODO: pay the doctor
+            }
+            else {
+                throw new RuntimeException(" not your medical exam");
+            }
+        }
+    }
 }

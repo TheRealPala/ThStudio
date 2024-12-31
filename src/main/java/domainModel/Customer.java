@@ -3,15 +3,18 @@ package domainModel;
 import java.util.ArrayList;
 public class Customer extends Person{
     private int level;
+    double balance;
 
-    public Customer(String name, String surname, String dateOfBirth, String iban, int id, int level){
+    public Customer(String name, String surname, String dateOfBirth, String iban, int id, int level, double balance){
         super(id, surname, dateOfBirth , iban, name);
         this.level = level;
+        this.balance=balance;
     }
 
     public Customer(String name, String surname, String dateOfBirth, String iban, int level){
         super(surname, dateOfBirth , iban, name);
         this.level = level;
+        this.balance=0;
     }
 
     public int getLevel() {
@@ -20,6 +23,12 @@ public class Customer extends Person{
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public double getBalance(){return balance;}
+
+    public void setBalance(double balance){
+        this.balance=balance;
     }
 
 

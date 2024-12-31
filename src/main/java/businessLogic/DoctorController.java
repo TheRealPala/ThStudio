@@ -92,4 +92,24 @@ public class DoctorController extends PersonController<Doctor>{
         else
             return false;
     }
+    /** modify the Medical exam title
+     * @param me the medical exam
+     * @param s the new title
+     * @param id the id of the doctor
+     * @return true if the modification was successful, false otherwise
+     * @throws Exception
+     */
+    public boolean modifyMedicalExamTitle(MedicalExam me, String s, int id) throws Exception {
+        if(me.getIdDoctor()==id&&me.getStartTime().isBefore(LocalDateTime.now())) {
+            if(me.getState()instanceof Booked){
+                //notify the customer
+            }
+            mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                    me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), s, me.getPrice());
+
+            return true;
+        }
+        else
+            return false;
+    }
 }

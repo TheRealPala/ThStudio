@@ -135,4 +135,21 @@ public class DoctorController extends PersonController<Doctor>{
         else
             return false;
     }
+    /** delete the Medical exam
+     * @param me the medical exam
+     * @param id the id of the doctor
+     * @return true if the deletion was successful, false otherwise
+     * @throws Exception
+     */
+    public boolean deleteMedicalExam(MedicalExam me, int id) throws Exception {
+        if(me.getIdDoctor()==id&&me.getStartTime().isBefore(LocalDateTime.now())) {
+            if(me.getState().equals("Booked")){
+                mec.refund(me.getIdCustomer(), me);
+            }
+            mec.removeMedicalExam(me.getId());
+            return true;
+        }
+        else
+            return false;
+    }
 }

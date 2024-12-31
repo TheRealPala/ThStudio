@@ -33,10 +33,6 @@ public class DoctorController extends PersonController<Doctor>{
         Doctor d = new Doctor(name, surname, dateOfBirth, iban, medicalLicenseNumber);
         return super.addPerson(d);
     }
-    //TODO: add method to modify date or other properties of the medical exam, and that notify the customer
-    //TODO: add method to get the list of the medical exams
-    //TODO: add method to delete the medical exam, and that notify the customer, and define a policy for the refund
-    //TODO: add a method to create a new medical exam
     /** modify the Medical exam start time
      * @param me the medical exam
      * @param t the new start time
@@ -53,6 +49,23 @@ public class DoctorController extends PersonController<Doctor>{
             }
             mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
                     me.getIdDoctor(), me.getEndTime(), t, me.getDescription(), me.getTitle(), me.getPrice());
+
+            return true;
+        }
+        else
+            return false;
+    }
+    /** modify the Medical exam end time
+     * @param me the medical exam
+     * @param t the new end time
+     * @param id the id of the doctor
+     * @return true if the modification was successful, false otherwise
+     * @throws Exception
+     */
+    public boolean modifyMedicalExamEndTime(MedicalExam me, LocalDateTime t, int id) throws Exception {
+        if( me.getEndTime().isBefore(LocalDateTime.now()) &&me.getIdDoctor()==id&&me.getStartTime().isBefore(t)) {
+            mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                    me.getIdDoctor(), t, me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice());
 
             return true;
         }

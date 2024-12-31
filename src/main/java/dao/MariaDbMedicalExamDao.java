@@ -366,7 +366,6 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps.close();
             Database.closeConnection(con);
         }
-        // TODO:check if this need an exception in case of no result
     }
 
     @Override

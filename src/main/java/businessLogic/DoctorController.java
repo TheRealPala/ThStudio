@@ -2,10 +2,21 @@ package businessLogic;
 
 import dao.DoctorDao;
 import domainModel.Doctor;
+import domainModel.MedicalExam;
+import domainModel.State.Booked;
+import domainModel.Tags.Tag;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DoctorController extends PersonController<Doctor>{
     public DoctorController(DoctorDao doctorDAO){
+    private DoctorDao doctorDAO;
+    private MedicalExamController mec;
+    public DoctorController(DoctorDao doctorDAO, MedicalExamController mec) {
         super(doctorDAO);
+        this.mec = mec;
     }
 
     /**

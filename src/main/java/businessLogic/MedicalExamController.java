@@ -17,10 +17,12 @@ import static java.util.Collections.unmodifiableList;
 public class MedicalExamController {
     private final MedicalExamDao medicalExamDao;
     private final PersonController<Doctor> doctorController;
+    private CustomerController c;
 
-    public MedicalExamController(MedicalExamDao medicalExamDao, PersonController<Doctor> doctorController) {
+    public MedicalExamController(MedicalExamDao medicalExamDao, PersonController<Doctor> doctorController , CustomerController c) {
         this.medicalExamDao = medicalExamDao;
         this.doctorController = doctorController;
+        this.c = c;
     }
 
     /**

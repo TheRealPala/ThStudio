@@ -165,4 +165,14 @@ public class DoctorController extends PersonController<Doctor>{
     public void createMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
         mec.addMedicalExam(idDoctor, endTime, startTime, description, title, price, tags);
     }
+    /** get the Medical exams of a doctor
+     * @param id the id of the doctor
+     * @return the list of medical exams
+     * @throws Exception
+     */
+    public List<MedicalExam> getMedicalExam(int id) throws Exception {
+        return mec.getDoctorExams(id);
+    }
+
+
 }

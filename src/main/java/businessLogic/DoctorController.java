@@ -152,4 +152,17 @@ public class DoctorController extends PersonController<Doctor>{
         else
             return false;
     }
+    /** create a new Medical exam
+     * @param idDoctor the id of the doctor
+     * @param endTime the end time of the medical exam
+     * @param startTime the start time of the medical exam
+     * @param description the description of the medical exam
+     * @param title the title of the medical exam
+     * @param price the price of the medical exam
+     * @param tags the tags of the medical exam
+     * @throws Exception
+     */
+    public void createMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
+        mec.addMedicalExam(idDoctor, endTime, startTime, description, title, price, tags);
+    }
 }

@@ -175,5 +175,16 @@ public class MedicalExamController {
     public List<MedicalExam> search(Search search) throws Exception {
         return unmodifiableList(this.medicalExamDao.search(search));
     }
+    public void refund(int idCustomer, MedicalExam me) throws Exception {
+
+        if(idCustomer == me.getIdCustomer()){
+            c.getCustomer(idCustomer).setBalance(c.getCustomer(idCustomer).getBalance()+me.getPrice());
+
+        }
+        else{
+            throw new RuntimeException("not your exam");
+        }
+    }
+
 
 }

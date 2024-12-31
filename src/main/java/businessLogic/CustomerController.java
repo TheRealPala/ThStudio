@@ -130,4 +130,19 @@ public class CustomerController extends PersonController<Customer> {
             }
         }
     }
+    /** get the customer
+     * @param id The id of the customer
+     * @return The customer
+     * @throws Exception
+     */
+    public Customer getCustomer(int id) throws Exception {
+        return this.customerDao.get(id);
+    }
+
+
+
+    // add search of the medical exams
+    //add book medical exams, and a payment method, notify the doctor
+    // add cancel medical exams, and notify the doctor, and define a policy for the refund
+    // add a way to get the list of the medical exams
 }

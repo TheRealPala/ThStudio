@@ -37,4 +37,12 @@ public class CustomerController extends PersonController<Customer> {
     //TODO: add book medical exams, and a payment method, notify the doctor
     //TODO: add cancel medical exams, and notify the doctor, and define a policy for the refund
     //TODO: add a way to get the list of the medical exams
+    /** search for the medical exams
+     * @param search The search object
+     * @return The list of the medical exams
+     * @throws Exception
+     */
+    public List<MedicalExam> searchMedicalExam(Search search) throws Exception {
+        return mec.search(search);
+    }
 }

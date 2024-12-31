@@ -140,7 +140,8 @@ public class MedicalExamController {
      * @throws Exception        If the doctor is not found or if the doctor doesn't have any medical exam
      */
     public List<MedicalExam> getDoctorExams(int idDoctor) throws Exception {
-        return unmodifiableList(this.medicalExamDao.getDoctorExams(idDoctor));
+        return this.medicalExamDao.getDoctorExams(idDoctor);
+        
     }
 
     /**

@@ -28,14 +28,14 @@ public class CustomerController extends PersonController<Customer> {
      * @param name                          The name of the customer
      * @param surname                       The surname of the customer
      * @param dateOfBirth                   The date of birth of the customer
-
      * @param level                         The level of the customer
+     * @param balance                       The balance of the customer
      *
      * @return The CF of the newly created customer
      * @throws Exception bubbles up exceptions of PeopleController::addPerson()
      */
-    public String addPerson(String name, String surname, String dateOfBirth, int level) throws Exception {
-        Customer c = new Customer(name, surname, dateOfBirth, level);
+    public String addPerson(String name, String surname, String dateOfBirth, int level, double balance) throws Exception {
+        Customer c = new Customer(name, surname, dateOfBirth, level, balance);
         return super.addPerson(c);
     }
     /**

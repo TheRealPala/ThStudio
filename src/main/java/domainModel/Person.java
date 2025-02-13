@@ -1,9 +1,13 @@
 package domainModel;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Person {
     protected String name;
     protected String surname;
-    protected String dateOfBirth;
+    protected LocalDate dateOfBirth;
     protected int id;
     protected double balance;
 
@@ -11,16 +15,20 @@ public class Person {
         this.id = id;
         this.name = name;
         this.surname = surname;
-        this.dateOfBirth = dateOfBirth;
+        this.dateOfBirth = parseDate(dateOfBirth);
         this.balance = balance;
 
     }
 
-    public Person(String name, String surname, String dateOfBirth){
+    public Person(String name, String surname, String dateOfBirth, double balance){
         this.name = name;
         this.surname = surname;
-        this.dateOfBirth = dateOfBirth;
-        this.balance = 0.0;
+        this.dateOfBirth = parseDate(dateOfBirth);
+        this.balance = balance;
+    }
+
+    private LocalDate parseDate(String date) {
+        return LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
     public String getName() {
@@ -40,11 +48,11 @@ public class Person {
     }
 
     public String getDateOfBirth() {
-        return dateOfBirth;
+        return dateOfBirth.toString();
     }
 
     public void setDateOfBirth(String dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+        this.dateOfBirth = parseDate(dateOfBirth);
     }
 
     public int getId() {

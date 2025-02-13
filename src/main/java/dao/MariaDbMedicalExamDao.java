@@ -17,6 +17,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     public MariaDbMedicalExamDao(TagDao tagDao) {
         this.tagDao = tagDao;
     }
+
     private void setMedicalExamState(ResultSet rs, MedicalExam m) throws SQLException {
         if (Objects.equals(rs.getString("state"), "Booked")) {
             Booked booked = new Booked();

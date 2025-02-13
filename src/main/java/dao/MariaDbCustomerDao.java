@@ -1,12 +1,17 @@
 package dao;
 
 import domainModel.Customer;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
 
 public class MariaDbCustomerDao implements CustomerDao {
+    private final PersonDao personDao;
+
+    public MariaDbCustomerDao(PersonDao personDao) {
+        this.personDao = personDao;
+    }
+
     @Override
     public Customer get(Integer id) throws SQLException {
         Connection con = null;
@@ -15,7 +20,7 @@ public class MariaDbCustomerDao implements CustomerDao {
         Customer c = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("select * from customers where id = ?");
+            ps = con.prepareStatement("select * from people natural join customers where id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
             if(!rs.next()) {
@@ -47,7 +52,7 @@ public class MariaDbCustomerDao implements CustomerDao {
         try {
             con = Database.getConnection();
             stm = con.createStatement();
-            rs = stm.executeQuery("select * from customers");
+            rs = stm.executeQuery("select * from people natural join customers");
             while (rs.next()) {
                 cList.add(
                     new Customer(
@@ -76,25 +81,19 @@ public class MariaDbCustomerDao implements CustomerDao {
     public void insert(Customer customer) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("insert into customers (name, surname, date_of_birth, level, balance) " +
-                    "values (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, customer.getName());
-            ps.setString(2, customer.getSurname());
-            ps.setString(3, customer.getDateOfBirth());
-            ps.setInt(4, customer.getLevel() );
-            ps.setDouble(5, customer.getBalance());
+            this.personDao.insert(customer);
+            System.out.println("id of customer after person insert: " + customer.getId());
+            ps = con.prepareStatement("insert into customers (id, level) " +
+                    "values (?, ?)");
+            ps.setInt(1, customer.getId());
+            ps.setInt(2, customer.getLevel());
             ps.executeUpdate();
-            //get generated id from dbms
-            rs = ps.getGeneratedKeys();
-            if (rs.next()){
-                customer.setId(rs.getInt(1));
-            }
+        } catch (Exception e) {
+            throw new SQLException(e);
         } finally {
-            assert rs != null: "ResultSet is null";
-            rs.close();
+            assert ps != null : "Prepared statement is null";
             ps.close();
             Database.closeConnection(con);
         }
@@ -106,13 +105,10 @@ public class MariaDbCustomerDao implements CustomerDao {
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update customers set name = ?, surname = ?, date_of_birth = ?, level = ?, balance = ? where id = ?");
-            ps.setString(1, customer.getName());
-            ps.setString(2, customer.getSurname());
-            ps.setString(3, customer.getDateOfBirth());
-            ps.setInt(4, customer.getLevel());
-            ps.setInt(5, customer.getId());
-            ps.setDouble(6, customer.getBalance());
+            this.personDao.update(customer);
+            ps = con.prepareStatement("update customers set level=? where id = ?");
+            ps.setInt(1, customer.getLevel());
+            ps.setInt(2, customer.getId());
             ps.executeUpdate();
         } finally {
             assert ps != null: "preparedStatement is Null";
@@ -123,19 +119,12 @@ public class MariaDbCustomerDao implements CustomerDao {
 
     @Override
     public boolean delete(Integer id) throws SQLException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        int rows = 0;
+        boolean success;
         try {
-            con = Database.getConnection();
-            ps = con.prepareStatement("delete from customers where id = ?");
-            ps.setInt(1, id);
-            rows = ps.executeUpdate();
-        } finally {
-            assert ps != null: "preparedStatement is Null";
-            ps.close();
-            Database.closeConnection(con);
+            success = this.personDao.delete(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return rows > 0;
+        return success;
     }
 }

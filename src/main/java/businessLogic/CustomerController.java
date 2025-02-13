@@ -14,10 +14,13 @@ public class CustomerController extends PersonController<Customer> {
     private MedicalExamController mec;
     private DoctorController doctorController;
     private CustomerDao customerDao;
-    public CustomerController(CustomerDao customer, MedicalExamDao me, DoctorDao d) {
+    public CustomerController(CustomerDao customer, MedicalExamDao me, DoctorDao d, CustomerDao customerDao) {
         super(customer);
         this.mec = new MedicalExamController(me ,d , this);
         this.doctorController = new DoctorController(d,mec);
+        this.customerDao = customerDao;
+
+
     }
 
     /**

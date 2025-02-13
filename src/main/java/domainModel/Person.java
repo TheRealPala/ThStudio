@@ -6,13 +6,16 @@ public class Person {
     protected String dateOfBirth;
     protected String iban;
     protected int id;
+    protected double balance;
 
-    public Person(int id, String name, String surname, String dateOfBirth, String iban){
+    public Person(int id, String name, String surname, String dateOfBirth, String iban, double balance){
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.dateOfBirth = dateOfBirth;
         this.iban = iban;
+        this.balance = balance;
+
     }
 
     public Person(String name, String surname, String dateOfBirth, String iban){
@@ -20,6 +23,7 @@ public class Person {
         this.surname = surname;
         this.dateOfBirth = dateOfBirth;
         this.iban = iban;
+        this.balance = 0.0;
     }
 
     public String getName() {

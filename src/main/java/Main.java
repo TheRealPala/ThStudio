@@ -1,4 +1,3 @@
-import domainModel.Customer;
 import io.github.cdimascio.dotenv.Dotenv;
 import dao.*;
 public class Main {

@@ -84,7 +84,6 @@ public class MariaDbCustomerDao implements CustomerDao {
         try {
             con = Database.getConnection();
             this.personDao.insert(customer);
-            System.out.println("id of customer after person insert: " + customer.getId());
             ps = con.prepareStatement("insert into customers (id, level) " +
                     "values (?, ?)");
             ps.setInt(1, customer.getId());
@@ -106,7 +105,7 @@ public class MariaDbCustomerDao implements CustomerDao {
         try {
             con = Database.getConnection();
             this.personDao.update(customer);
-            ps = con.prepareStatement("update customers set level=? where id = ?");
+            ps = con.prepareStatement("update customers set level = ? where id = ?");
             ps.setInt(1, customer.getLevel());
             ps.setInt(2, customer.getId());
             ps.executeUpdate();

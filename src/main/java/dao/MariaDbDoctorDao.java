@@ -1,12 +1,17 @@
 package dao;
 
 import domainModel.Doctor;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MariaDbDoctorDao implements DoctorDao{
+    private final PersonDao personDao;
+
+    public MariaDbDoctorDao(PersonDao personDao) {
+        this.personDao = personDao;
+    }
+
     @Override
     public Doctor get(Integer id) throws SQLException {
         Connection con = null;
@@ -48,7 +53,7 @@ public class MariaDbDoctorDao implements DoctorDao{
         try {
             con = Database.getConnection();
             stm = con.createStatement();
-            rs = stm.executeQuery("select * from doctors");
+            rs = stm.executeQuery("select * from people natural join doctors");
             while (rs.next()) {
                 dList.add(
                         new Doctor(
@@ -81,19 +86,19 @@ public class MariaDbDoctorDao implements DoctorDao{
         ResultSet rs = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("insert into doctors (name, surname, date_of_birth, medical_license_number, balance) " +
-                    "values (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, doctor.getName());
-            ps.setString(2, doctor.getSurname());
-            ps.setString(3, doctor.getDateOfBirth());
-            ps.setString(4, doctor.getMedicalLicenseNumber());
-            ps.setDouble(5, doctor.getBalance());
+            this.personDao.insert(doctor);
+            ps = con.prepareStatement("insert into doctors (id, medical_license_number) " +
+                    "values (?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, doctor.getId());
+            ps.setString(2, doctor.getMedicalLicenseNumber());
             ps.executeUpdate();
             //get generated id from dbms
             rs = ps.getGeneratedKeys();
             if (rs.next()){
                 doctor.setId(rs.getInt(1));
             }
+        } catch (Exception e) {
+            throw new SQLException(e);
         } finally {
             assert rs != null: "ResultSet is null";
             rs.close();
@@ -108,14 +113,13 @@ public class MariaDbDoctorDao implements DoctorDao{
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update doctors set name = ?, surname = ?, date_of_birth = ?, medical_license_number = ?, balance = ? where id = ?");
-            ps.setString(1, doctor.getName());
-            ps.setString(2, doctor.getSurname());
-            ps.setString(3, doctor.getDateOfBirth());
-            ps.setString(4, doctor.getMedicalLicenseNumber());
-            ps.setInt(5, doctor.getId());
-            ps.setDouble(6, doctor.getBalance());
+            this.personDao.update(doctor);
+            ps = con.prepareStatement("update doctors set medical_license_number = ? where id = ?");
+            ps.setString(1, doctor.getMedicalLicenseNumber());
+            ps.setInt(2, doctor.getId());
             ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             assert ps != null: "preparedStatement is Null";
             ps.close();
@@ -125,19 +129,12 @@ public class MariaDbDoctorDao implements DoctorDao{
 
     @Override
     public boolean delete(Integer id) throws SQLException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        int rows = 0;
+        boolean success;
         try {
-            con = Database.getConnection();
-            ps = con.prepareStatement("delete from doctors where id = ?");
-            ps.setInt(1, id);
-            rows = ps.executeUpdate();
-        } finally {
-            assert ps != null: "preparedStatement is Null";
-            ps.close();
-            Database.closeConnection(con);
+            success = this.personDao.delete(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return rows > 0;
+        return success;
     }
 }

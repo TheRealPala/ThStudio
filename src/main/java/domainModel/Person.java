@@ -4,25 +4,22 @@ public class Person {
     protected String name;
     protected String surname;
     protected String dateOfBirth;
-    protected String iban;
     protected int id;
     protected double balance;
 
-    public Person(int id, String name, String surname, String dateOfBirth, String iban, double balance){
+    public Person(int id, String name, String surname, String dateOfBirth, double balance){
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.dateOfBirth = dateOfBirth;
-        this.iban = iban;
         this.balance = balance;
 
     }
 
-    public Person(String name, String surname, String dateOfBirth, String iban){
+    public Person(String name, String surname, String dateOfBirth){
         this.name = name;
         this.surname = surname;
         this.dateOfBirth = dateOfBirth;
-        this.iban = iban;
         this.balance = 0.0;
     }
 
@@ -50,19 +47,19 @@ public class Person {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getIban() {
-        return iban;
-    }
-
-    public void setIban(String iban) {
-        this.iban = iban;
-    }
-
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public double getBalance(){
+        return balance;
+    }
+
+    public void setBalance(double balance){
+        this.balance = balance;
     }
 }

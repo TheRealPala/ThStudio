@@ -26,9 +26,10 @@ public class MariaDbDoctorDao implements DoctorDao{
                 rs.getString("name"),
                 rs.getString("surname"),
                 rs.getString("date_of_birth"),
-                rs.getString("iban"),
                 rs.getInt("id"),
-                rs.getString("medical_license_number")
+                rs.getString("medical_license_number"),
+                rs.getDouble("balance")
+
             );
 
         } finally {
@@ -56,9 +57,9 @@ public class MariaDbDoctorDao implements DoctorDao{
                                 rs.getString("name"),
                                 rs.getString("surname"),
                                 rs.getString("date_of_birth"),
-                                rs.getString("iban"),
                                 rs.getInt("id"),
-                                rs.getString("medical_license_number")
+                                rs.getString("medical_license_number"),
+                                rs.getDouble("balance")
                         )
                 );
             }
@@ -82,13 +83,13 @@ public class MariaDbDoctorDao implements DoctorDao{
         ResultSet rs = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("insert into doctors (name, surname, date_of_birth, iban, medical_license_number) " +
+            ps = con.prepareStatement("insert into doctors (name, surname, date_of_birth, medical_license_number, balance) " +
                     "values (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, doctor.getName());
             ps.setString(2, doctor.getSurname());
             ps.setString(3, doctor.getDateOfBirth());
-            ps.setString(4, doctor.getIban());
-            ps.setString(5, doctor.getMedicalLicenseNumber());
+            ps.setString(4, doctor.getMedicalLicenseNumber());
+            ps.setDouble(5, doctor.getBalance());
             ps.executeUpdate();
             //get generated id from dbms
             rs = ps.getGeneratedKeys();
@@ -109,13 +110,13 @@ public class MariaDbDoctorDao implements DoctorDao{
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update doctors set name = ?, surname = ?, date_of_birth = ?, iban = ?, medical_license_number = ? where id = ?");
+            ps = con.prepareStatement("update doctors set name = ?, surname = ?, date_of_birth = ?, medical_license_number = ?, balance = ? where id = ?");
             ps.setString(1, doctor.getName());
             ps.setString(2, doctor.getSurname());
             ps.setString(3, doctor.getDateOfBirth());
-            ps.setString(4, doctor.getIban());
-            ps.setString(5, doctor.getMedicalLicenseNumber());
-            ps.setInt(6, doctor.getId());
+            ps.setString(4, doctor.getMedicalLicenseNumber());
+            ps.setInt(5, doctor.getId());
+            ps.setDouble(6, doctor.getBalance());
             ps.executeUpdate();
         } finally {
             assert ps != null: "preparedStatement is Null";

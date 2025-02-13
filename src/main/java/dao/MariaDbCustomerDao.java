@@ -81,13 +81,14 @@ public class MariaDbCustomerDao implements CustomerDao {
         ResultSet rs = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("insert into customers (name, surname, date_of_birth, iban, level) " +
-                    "values (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps = con.prepareStatement("insert into customers (name, surname, date_of_birth, iban, level, balance) " +
+                    "values (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, customer.getName());
             ps.setString(2, customer.getSurname());
             ps.setString(3, customer.getDateOfBirth());
             ps.setString(4, customer.getIban());
             ps.setInt(5, customer.getLevel());
+            ps.setDouble(6, customer.getBalance());
             ps.executeUpdate();
             //get generated id from dbms
             rs = ps.getGeneratedKeys();
@@ -108,7 +109,7 @@ public class MariaDbCustomerDao implements CustomerDao {
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update customers set name = ?, surname = ?, date_of_birth = ?, iban = ?, level = ?,balance = ? where id = ?");
+            ps = con.prepareStatement("update customers set name = ?, surname = ?, date_of_birth = ?, iban = ?, level = ?, balance = ? where id = ?");
             ps.setString(1, customer.getName());
             ps.setString(2, customer.getSurname());
             ps.setString(3, customer.getDateOfBirth());

@@ -22,11 +22,7 @@ public class Customer extends Person{
         this.level = level;
     }
 
-    public double getBalance(){return balance;}
 
-    public void setBalance(double balance){
-        this.balance=balance;
-    }
 
 
 

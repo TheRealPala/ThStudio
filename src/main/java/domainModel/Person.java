@@ -65,4 +65,12 @@ public class Person {
     public void setId(int id) {
         this.id = id;
     }
+
+    public double getBalance(){
+        return balance;
+    }
+
+    public void setBalance(double balance){
+        this.balance = balance;
+    }
 }

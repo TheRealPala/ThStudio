@@ -2,6 +2,8 @@ package businessLogic;
 import java.time.LocalDateTime;
 import java.util.List;
 import dao.CustomerDao;
+import dao.DoctorDao;
+import dao.MedicalExamDao;
 import domainModel.Customer;
 import domainModel.MedicalExam;
 import domainModel.Search.Search;
@@ -10,12 +12,12 @@ import domainModel.State.Booked;
 
 public class CustomerController extends PersonController<Customer> {
     private MedicalExamController mec;
-    private DoctorController d;
+    private DoctorController doctorController;
     private CustomerDao customerDao;
-    public CustomerController(CustomerDao customer, MedicalExamController mec, DoctorController doctor) {
+    public CustomerController(CustomerDao customer, MedicalExamDao me, DoctorDao d) {
         super(customer);
-        this.mec = mec;
-        this.d = doctor;
+        this.mec = new MedicalExamController(me ,d , this);
+        this.doctorController = new DoctorController(d,mec);
     }
 
     /**
@@ -74,7 +76,7 @@ public class CustomerController extends PersonController<Customer> {
             mec.updateMedicalExam(me.getId(),c.getId(),me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice());
             payment(c,me);
             //add a payment method
-            d.getMedicalExam(me.getIdDoctor()).add(me); // consider adding a new in doctorDomainModel to add the medical exam
+            doctorController.getMedicalExam(me.getIdDoctor()).add(me); // consider adding a new in doctorDomainModel to add the medical exam
             // notify the doctor
             return true;
         }
@@ -90,7 +92,7 @@ public class CustomerController extends PersonController<Customer> {
             me.setState(new Available());
             mec.updateMedicalExam(me.getId(),c.getId(),me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice());
             payment(c,me);
-            d.getMedicalExam(me.getIdDoctor()).remove(me); // consider adding a new in doctorDomainModel to remove the medical exam
+            doctorController.getMedicalExam(me.getIdDoctor()).remove(me); // consider adding a new in doctorDomainModel to remove the medical exam
 
             if(me.getStartTime().isBefore(LocalDateTime.now())){
                mec.refund(c.getId(),me);

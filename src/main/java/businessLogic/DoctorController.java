@@ -23,14 +23,14 @@ public class DoctorController extends PersonController<Doctor>{
      * @param name                          The name of the doctor
      * @param surname                       The surname of the doctor
      * @param dateOfBirth                   The date of birth of the doctor
-     *
      * @param medicalLicenseNumber          The medical license number of the doctor
+     * @param balance                       The balance of the doctor
      *
      * @return The CF of the newly created doctor
      * @throws Exception bubbles up exceptions of PeopleController::addPerson()
      */
-    public String addPerson(String name, String surname, String dateOfBirth, String medicalLicenseNumber) throws Exception {
-        Doctor d = new Doctor(name, surname, dateOfBirth, medicalLicenseNumber);
+    public String addPerson(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance) throws Exception {
+        Doctor d = new Doctor(name, surname, dateOfBirth, medicalLicenseNumber, balance);
         return super.addPerson(d);
     }
     /** modify the Medical exam start time

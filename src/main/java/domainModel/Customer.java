@@ -1,16 +1,15 @@
 package domainModel;
 
-import java.util.ArrayList;
 public class Customer extends Person{
     private int level;
 
     public Customer(String name, String surname, String dateOfBirth, int id, int level, double balance){
-        super(id, surname, dateOfBirth, name, balance);
+        super(id, name, surname, dateOfBirth, balance);
         this.level = level;
     }
 
-    public Customer(String name, String surname, String dateOfBirth, int level){
-        super(surname, dateOfBirth, name);
+    public Customer(String name, String surname, String dateOfBirth, int level, double balance){
+        super(name, surname, dateOfBirth, balance);
         this.level = level;
     }
 

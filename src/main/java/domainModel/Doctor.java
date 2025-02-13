@@ -10,8 +10,8 @@ public class Doctor extends Person {
         super(id, name, surname, dateOfBirth, balance);
         this.medicalLicenseNumber = medicalLicenseNumber;
     }
-    public Doctor(String name, String surname, String dateOfBirth, String medicalLicenseNumber) {
-        super(name, surname, dateOfBirth);
+    public Doctor(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance) {
+        super(name, surname, dateOfBirth, balance);
         this.medicalLicenseNumber = medicalLicenseNumber;
     }
     public String getMedicalLicenseNumber() {

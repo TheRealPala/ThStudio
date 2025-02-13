@@ -1,33 +1,32 @@
 package dao;
 
-import domainModel.Doctor;
+import domainModel.Person;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MariaDbDoctorDao implements DoctorDao{
+public class MariaDbPersonDao implements PersonDao{
     @Override
-    public Doctor get(Integer id) throws SQLException {
+    public Person get(Integer id) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        Doctor d = null;
+        Person p = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("select * from people natural join doctors where id = ?");
+            ps = con.prepareStatement("select * from people where id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
             if(!rs.next()) {
-                throw new RuntimeException("The Doctor looked for in not present in the database");
+                throw new RuntimeException("The person looked for in not present in the database");
             }
-            d = new Doctor(
-                rs.getString("name"),
-                rs.getString("surname"),
-                rs.getString("date_of_birth"),
-                rs.getInt("id"),
-                rs.getString("medical_license_number"),
-                rs.getDouble("balance")
+            p = new Person(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("surname"),
+                    rs.getString("date_of_birth"),
+                    rs.getDouble("balance")
             );
 
         } finally {
@@ -36,33 +35,32 @@ public class MariaDbDoctorDao implements DoctorDao{
             ps.close();
             Database.closeConnection(con);
         }
-        return d;
+        return p;
     }
 
     @Override
-    public List<Doctor> getAll() throws SQLException {
+    public List<Person> getAll() throws SQLException {
         Connection con = null;
         Statement stm = null;
         ResultSet rs = null;
-        List<Doctor> dList = new ArrayList<>();
+        List<Person> pList = new ArrayList<>();
         try {
             con = Database.getConnection();
             stm = con.createStatement();
-            rs = stm.executeQuery("select * from doctors");
+            rs = stm.executeQuery("select * from people");
             while (rs.next()) {
-                dList.add(
-                        new Doctor(
+                pList.add(
+                        new Person(
+                                rs.getInt("id"),
                                 rs.getString("name"),
                                 rs.getString("surname"),
                                 rs.getString("date_of_birth"),
-                                rs.getInt("id"),
-                                rs.getString("medical_license_number"),
                                 rs.getDouble("balance")
                         )
                 );
             }
-            if (dList.isEmpty()) {
-                throw new RuntimeException("There is no Doctors in the database");
+            if (pList.isEmpty()) {
+                throw new RuntimeException("There is no people in the database");
             }
 
         } finally {
@@ -71,28 +69,27 @@ public class MariaDbDoctorDao implements DoctorDao{
             stm.close();
             Database.closeConnection(con);
         }
-        return dList;
+        return pList;
     }
 
     @Override
-    public void insert(Doctor doctor) throws SQLException {
+    public void insert(Person person) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("insert into doctors (name, surname, date_of_birth, medical_license_number, balance) " +
-                    "values (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, doctor.getName());
-            ps.setString(2, doctor.getSurname());
-            ps.setString(3, doctor.getDateOfBirth());
-            ps.setString(4, doctor.getMedicalLicenseNumber());
-            ps.setDouble(5, doctor.getBalance());
+            ps = con.prepareStatement("insert into people (name, surname, date_of_birth, balance) " +
+                    "values (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, person.getName());
+            ps.setString(2, person.getSurname());
+            ps.setString(3, person.getDateOfBirth());
+            ps.setDouble(4, person.getBalance());
             ps.executeUpdate();
             //get generated id from dbms
             rs = ps.getGeneratedKeys();
             if (rs.next()){
-                doctor.setId(rs.getInt(1));
+                person.setId(rs.getInt(1));
             }
         } finally {
             assert rs != null: "ResultSet is null";
@@ -103,18 +100,17 @@ public class MariaDbDoctorDao implements DoctorDao{
     }
 
     @Override
-    public void update(Doctor doctor) throws SQLException {
+    public void update(Person person) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update doctors set name = ?, surname = ?, date_of_birth = ?, medical_license_number = ?, balance = ? where id = ?");
-            ps.setString(1, doctor.getName());
-            ps.setString(2, doctor.getSurname());
-            ps.setString(3, doctor.getDateOfBirth());
-            ps.setString(4, doctor.getMedicalLicenseNumber());
-            ps.setInt(5, doctor.getId());
-            ps.setDouble(6, doctor.getBalance());
+            ps = con.prepareStatement("update people set name = ?, surname = ?, date_of_birth = ?, balance = ? where id = ?");
+            ps.setString(1, person.getName());
+            ps.setString(2, person.getSurname());
+            ps.setString(3, person.getDateOfBirth());
+            ps.setDouble(4, person.getBalance());
+            ps.setInt(5, person.getId());
             ps.executeUpdate();
         } finally {
             assert ps != null: "preparedStatement is Null";
@@ -130,7 +126,7 @@ public class MariaDbDoctorDao implements DoctorDao{
         int rows = 0;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("delete from doctors where id = ?");
+            ps = con.prepareStatement("delete from people where id = ?");
             ps.setInt(1, id);
             rows = ps.executeUpdate();
         } finally {

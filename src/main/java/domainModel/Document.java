@@ -4,21 +4,21 @@ public class Document {
     private int id;
     private String title;
     private String path;
-    private Person owner;
-    private Person receiver;
-    private MedicalExam medicalExam;
+    private int ownerId;
+    private int receiverId;
+    private int medicalExamId;
 
-    public Document (int id, String title, String path, Person owner) {
+    public Document (int id, String title, String path, int ownerId) {
         this.id = id;
         this.title = title;
         this.path = path;
-        this.owner = owner;
+        this.ownerId = ownerId;
     }
 
-    public Document (String title, String path, Person owner) {
+    public Document (String title, String path, int ownerId) {
         this.title = title;
         this.path = path;
-        this.owner = owner;
+        this.ownerId = ownerId;
     }
 
     public int getId() {
@@ -45,27 +45,27 @@ public class Document {
         this.path = path;
     }
 
-    public Person getOwner() {
-        return owner;
+    public int getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwner(Person owner) {
-        this.owner = owner;
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
     }
 
-    public Person getReceiver() {
-        return receiver;
+    public int getReceiverId() {
+        return receiverId;
     }
 
-    public void setReceiver(Person receiver) {
-        this.receiver = receiver;
+    public void setReceiverId(int receiverId) {
+        this.receiverId = receiverId;
     }
 
-    public MedicalExam getMedicalExam() {
-        return medicalExam;
+    public int getMedicalExamId() {
+        return medicalExamId;
     }
 
-    public void setMedicalExam(MedicalExam medicalExam) {
-        this.medicalExam = medicalExam;
+    public void setMedicalExamId(int medicalExamId) {
+        this.medicalExamId = medicalExamId;
     }
 }

@@ -1,5 +1,6 @@
 package businessLogic;
 
+import dao.DoctorDao;
 import dao.MedicalExamDao;
 import domainModel.Doctor;
 import domainModel.MedicalExam;
@@ -19,9 +20,9 @@ public class MedicalExamController {
     private final PersonController<Doctor> doctorController;
     private CustomerController c;
 
-    public MedicalExamController(MedicalExamDao medicalExamDao, PersonController<Doctor> doctorController , CustomerController c) {
+    public MedicalExamController(MedicalExamDao medicalExamDao, DoctorDao d, CustomerController c) {
         this.medicalExamDao = medicalExamDao;
-        this.doctorController = doctorController;
+        this.doctorController = new DoctorController(d, this);
         this.c = c;
     }
 
@@ -141,7 +142,7 @@ public class MedicalExamController {
      */
     public List<MedicalExam> getDoctorExams(int idDoctor) throws Exception {
         return this.medicalExamDao.getDoctorExams(idDoctor);
-        
+
     }
 
     /**

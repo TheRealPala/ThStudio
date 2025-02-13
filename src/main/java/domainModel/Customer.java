@@ -4,8 +4,8 @@ import java.util.ArrayList;
 public class Customer extends Person{
     private int level;
 
-    public Customer(String name, String surname, String dateOfBirth, String iban, int id, int level){
-        super(id, surname, dateOfBirth , iban, name);
+    public Customer(String name, String surname, String dateOfBirth, String iban, int id, int level, double balance){
+        super(id, surname, dateOfBirth , iban, name, balance);
         this.level = level;
     }
 
@@ -20,6 +20,12 @@ public class Customer extends Person{
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public double getBalance(){return balance;}
+
+    public void setBalance(double balance){
+        this.balance=balance;
     }
 
 

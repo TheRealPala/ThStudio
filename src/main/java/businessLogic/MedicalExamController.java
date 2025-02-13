@@ -1,5 +1,6 @@
 package businessLogic;
 
+import dao.DoctorDao;
 import dao.MedicalExamDao;
 import domainModel.Doctor;
 import domainModel.MedicalExam;
@@ -17,10 +18,12 @@ import static java.util.Collections.unmodifiableList;
 public class MedicalExamController {
     private final MedicalExamDao medicalExamDao;
     private final PersonController<Doctor> doctorController;
+    private CustomerController c;
 
-    public MedicalExamController(MedicalExamDao medicalExamDao, PersonController<Doctor> doctorController) {
+    public MedicalExamController(MedicalExamDao medicalExamDao, DoctorDao d, CustomerController c) {
         this.medicalExamDao = medicalExamDao;
-        this.doctorController = doctorController;
+        this.doctorController = new DoctorController(d, this);
+        this.c = c;
     }
 
     /**
@@ -58,6 +61,22 @@ public class MedicalExamController {
         medicalExamDao.insert(medicalExam);
         return medicalExam.getId();
     }
+    public int addMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
+        Doctor doctor = doctorController.getPerson(idDoctor);
+        if (doctor == null)
+            throw new IllegalArgumentException("The specified doctor was not found");
+
+        // Check if the given doctor is not already occupied for the given time range
+        for (MedicalExam exam : medicalExamDao.getDoctorExams(idDoctor)) {
+            if ((exam.getStartTime().isBefore(endTime) || exam.getStartTime().equals(endTime))
+                    && (exam.getEndTime().isAfter(startTime) || exam.getEndTime().equals(startTime)))
+                throw new IllegalArgumentException("The given doctor is already occupied in the given time range (in course #" + exam.getId() + ")");
+        }
+
+        MedicalExam medicalExam = new MedicalExam(idDoctor, endTime, startTime, description, title, price, tags);
+        medicalExamDao.insert(medicalExam);
+        return medicalExam.getId();
+    }
 
     /**
      * Updates a medical exam
@@ -90,7 +109,7 @@ public class MedicalExamController {
      */
     public boolean removeMedicalExam(int ExamId) throws Exception {
         return medicalExamDao.delete(ExamId);
-        // TODO: add a notification to the customer ad a way to pay back the money
+
     }
 
     /**
@@ -122,7 +141,8 @@ public class MedicalExamController {
      * @throws Exception        If the doctor is not found or if the doctor doesn't have any medical exam
      */
     public List<MedicalExam> getDoctorExams(int idDoctor) throws Exception {
-        return unmodifiableList(this.medicalExamDao.getDoctorExams(idDoctor));
+        return this.medicalExamDao.getDoctorExams(idDoctor);
+
     }
 
     /**
@@ -157,5 +177,16 @@ public class MedicalExamController {
     public List<MedicalExam> search(Search search) throws Exception {
         return unmodifiableList(this.medicalExamDao.search(search));
     }
+    public void refund(int idCustomer, MedicalExam me) throws Exception {
+
+        if(idCustomer == me.getIdCustomer()){
+            c.getCustomer(idCustomer).setBalance(c.getCustomer(idCustomer).getBalance()+me.getPrice());
+
+        }
+        else{
+            throw new RuntimeException("not your exam");
+        }
+    }
+
 
 }

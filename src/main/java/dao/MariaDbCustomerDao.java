@@ -27,7 +27,8 @@ public class MariaDbCustomerDao implements CustomerDao {
                 rs.getString("date_of_birth"),
                 rs.getString("iban"),
                 rs.getInt("id"),
-                rs.getInt("level")
+                rs.getInt("level"),
+                rs.getDouble("balance")
             );
         } finally {
             assert rs != null: "ResultSet is Null";
@@ -56,7 +57,8 @@ public class MariaDbCustomerDao implements CustomerDao {
                         rs.getString("date_of_birth"),
                         rs.getString("iban"),
                         rs.getInt("id"),
-                        rs.getInt("level")
+                        rs.getInt("level"),
+                        rs.getDouble("balance")
                     )
                 );
             }
@@ -106,13 +108,14 @@ public class MariaDbCustomerDao implements CustomerDao {
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update customers set name = ?, surname = ?, date_of_birth = ?, iban = ?, level = ? where id = ?");
+            ps = con.prepareStatement("update customers set name = ?, surname = ?, date_of_birth = ?, iban = ?, level = ?,balance = ? where id = ?");
             ps.setString(1, customer.getName());
             ps.setString(2, customer.getSurname());
             ps.setString(3, customer.getDateOfBirth());
             ps.setString(4, customer.getIban());
             ps.setInt(5, customer.getLevel());
             ps.setInt(6, customer.getId());
+            ps.setDouble(7, customer.getBalance());
             ps.executeUpdate();
         } finally {
             assert ps != null: "preparedStatement is Null";

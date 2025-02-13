@@ -45,6 +45,17 @@ public class MedicalExam {
         this.title = title;
         this.price = price;
     }
+    public MedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime,
+                       String description, String title, double price, ArrayList<Tag> tags) {
+        this.tags = tags;
+        this.documents = new ArrayList<>();
+        this.idDoctor = idDoctor;
+        this.endTime = endTime;
+        this.startTime = startTime;
+        this.description = description;
+        this.title = title;
+        this.price = price;
+    }
 
     public String getTitle() {
         return title;

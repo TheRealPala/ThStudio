@@ -366,7 +366,6 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps.close();
             Database.closeConnection(con);
         }
-        // TODO:check if this need an exception in case of no result
     }
 
     @Override
@@ -399,7 +398,6 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                 tmp.setTags(tags);
                 mEList.add(tmp);
             }
-            //TODO:check if this need an exception in case of no result
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();

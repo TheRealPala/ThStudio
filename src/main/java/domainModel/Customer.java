@@ -4,13 +4,13 @@ import java.util.ArrayList;
 public class Customer extends Person{
     private int level;
 
-    public Customer(String name, String surname, String dateOfBirth, String iban, int id, int level, double balance){
-        super(id, surname, dateOfBirth , iban, name, balance);
+    public Customer(String name, String surname, String dateOfBirth, int id, int level, double balance){
+        super(id, surname, dateOfBirth, name, balance);
         this.level = level;
     }
 
-    public Customer(String name, String surname, String dateOfBirth, String iban, int level){
-        super(surname, dateOfBirth , iban, name);
+    public Customer(String name, String surname, String dateOfBirth, int level){
+        super(surname, dateOfBirth, name);
         this.level = level;
     }
 
@@ -22,11 +22,7 @@ public class Customer extends Person{
         this.level = level;
     }
 
-    public double getBalance(){return balance;}
 
-    public void setBalance(double balance){
-        this.balance=balance;
-    }
 
 
 

@@ -25,7 +25,6 @@ public class MariaDbCustomerDao implements CustomerDao {
                 rs.getString("name"),
                 rs.getString("surname"),
                 rs.getString("date_of_birth"),
-                rs.getString("iban"),
                 rs.getInt("id"),
                 rs.getInt("level"),
                 rs.getDouble("balance")
@@ -55,7 +54,6 @@ public class MariaDbCustomerDao implements CustomerDao {
                         rs.getString("name"),
                         rs.getString("surname"),
                         rs.getString("date_of_birth"),
-                        rs.getString("iban"),
                         rs.getInt("id"),
                         rs.getInt("level"),
                         rs.getDouble("balance")
@@ -81,13 +79,13 @@ public class MariaDbCustomerDao implements CustomerDao {
         ResultSet rs = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("insert into customers (name, surname, date_of_birth, iban, level) " +
+            ps = con.prepareStatement("insert into customers (name, surname, date_of_birth, level, balance) " +
                     "values (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, customer.getName());
             ps.setString(2, customer.getSurname());
             ps.setString(3, customer.getDateOfBirth());
-            ps.setString(4, customer.getIban());
-            ps.setInt(5, customer.getLevel());
+            ps.setInt(4, customer.getLevel() );
+            ps.setDouble(5, customer.getBalance());
             ps.executeUpdate();
             //get generated id from dbms
             rs = ps.getGeneratedKeys();
@@ -108,14 +106,13 @@ public class MariaDbCustomerDao implements CustomerDao {
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update customers set name = ?, surname = ?, date_of_birth = ?, iban = ?, level = ?,balance = ? where id = ?");
+            ps = con.prepareStatement("update customers set name = ?, surname = ?, date_of_birth = ?, level = ?, balance = ? where id = ?");
             ps.setString(1, customer.getName());
             ps.setString(2, customer.getSurname());
             ps.setString(3, customer.getDateOfBirth());
-            ps.setString(4, customer.getIban());
-            ps.setInt(5, customer.getLevel());
-            ps.setInt(6, customer.getId());
-            ps.setDouble(7, customer.getBalance());
+            ps.setInt(4, customer.getLevel());
+            ps.setInt(5, customer.getId());
+            ps.setDouble(6, customer.getBalance());
             ps.executeUpdate();
         } finally {
             assert ps != null: "preparedStatement is Null";

@@ -94,8 +94,17 @@ public class MariaDbDocumentDao implements DocumentDao {
             ps.setString(1, document.getTitle());
             ps.setString(2, document.getPath());
             ps.setInt(3, document.getOwnerId());
-            ps.setObject(4, document.getMedicalExamId());
-            ps.setObject(5, document.getReceiverId());
+
+            if (document.getMedicalExamId() != 0) {
+                ps.setInt(4, document.getMedicalExamId());
+            } else {
+                ps.setNull(4, document.getMedicalExamId());
+            }
+            if (document.getReceiverId() != 0) {
+                ps.setInt(5, document.getReceiverId());
+            } else {
+                ps.setNull(5, document.getReceiverId());
+            }
 
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
@@ -121,8 +130,16 @@ public class MariaDbDocumentDao implements DocumentDao {
             ps.setString(1, document.getTitle());
             ps.setString(2, document.getPath());
             ps.setInt(3, document.getOwnerId());
-            ps.setObject(4, document.getMedicalExamId());
-            ps.setObject(5, document.getReceiverId());
+            if (document.getMedicalExamId() != 0) {
+                ps.setInt(4, document.getMedicalExamId());
+            } else {
+                ps.setNull(4, document.getMedicalExamId());
+            }
+            if (document.getReceiverId() != 0) {
+                ps.setInt(5, document.getReceiverId());
+            } else {
+                ps.setNull(5, document.getReceiverId());
+            }
             ps.setInt(6, document.getId());
             ps.executeUpdate();
         } finally {

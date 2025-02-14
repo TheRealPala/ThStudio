@@ -1,9 +1,11 @@
 package businessLogic;
 
 import dao.DoctorDao;
+import dao.MariaDbNotificationDao;
 import dao.MedicalExamDao;
 import domainModel.Doctor;
 import domainModel.MedicalExam;
+import domainModel.Notification;
 import domainModel.Search.Search;
 import domainModel.State.State;
 import domainModel.Tags.Tag;
@@ -19,11 +21,13 @@ public class MedicalExamController {
     private final MedicalExamDao medicalExamDao;
     private final PersonController<Doctor> doctorController;
     private CustomerController c;
+    MariaDbNotificationDao notification = new MariaDbNotificationDao();
 
-    public MedicalExamController(MedicalExamDao medicalExamDao, DoctorDao d, CustomerController c) {
+    public MedicalExamController(MedicalExamDao medicalExamDao, DoctorDao d, CustomerController c, MariaDbNotificationDao nd) {
         this.medicalExamDao = medicalExamDao;
-        this.doctorController = new DoctorController(d, this);
+        this.doctorController = new DoctorController(d, this, nd);
         this.c = c;
+        notification = nd;
     }
 
     /**
@@ -98,6 +102,17 @@ public class MedicalExamController {
 
         MedicalExam medicalExam = new MedicalExam(idCustomer, idDoctor, endTime, startTime, description, title, price);
         this.medicalExamDao.update(medicalExam);
+    }
+
+    public void updateMedicalExam(int ExamId, int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, String s) throws Exception {
+        if (this.medicalExamDao.get(ExamId) == null)
+            throw new IllegalArgumentException("Medical Exam not found");
+
+        MedicalExam medicalExam = new MedicalExam(idCustomer, idDoctor, endTime, startTime, description, title, price);
+        this.medicalExamDao.update(medicalExam);
+        Notification nd = new Notification("esame modificato:"+s,idCustomer);
+        notification.insert(nd);
+
     }
 
     /**

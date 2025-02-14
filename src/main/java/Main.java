@@ -1,5 +1,3 @@
-import domainModel.Doctor;
-import domainModel.Document;
 import io.github.cdimascio.dotenv.Dotenv;
 import dao.*;
 public class Main {
@@ -12,9 +10,5 @@ public class Main {
         Database.setDbPassword(dotenv.get("DB_PASSWORD"));
         Database.setDbPort(dotenv.get("DB_PORT"));
         System.out.println(Database.testConnection(false, false));
-        PersonDao pDao = new MariaDbPersonDao();
-        DoctorDao dDao = new MariaDbDoctorDao(pDao);
-        Doctor d = new Doctor("nomeD", "cognomeD", "2000-10-02","123456", 3500.50);
-        dDao.insert(d);
     }
 }

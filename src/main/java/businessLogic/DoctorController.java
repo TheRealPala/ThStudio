@@ -216,9 +216,18 @@ public class DoctorController extends PersonController<Doctor>{
         Document document = new Document(title, path, ownerId);
         if(me.getState() instanceof Booked) {
             document.setReceiverId(receiverId); // or me.getIdCustomer()
+            Notification nd = new Notification("New document "+title+" by :"+ownerId,receiverId);
+            notification.insert(nd);
         }
         document.setMedicalExamId(me.getId());
         addDocument(document);
+    }
+    public void addDocumentToCustomer(String title, String path, int ownerId, int receiverId) throws Exception {
+        Document document = new Document(title, path, ownerId);
+        document.setReceiverId(receiverId);
+        addDocument(document);
+        Notification nd = new Notification("New document "+title+" by :"+ownerId,receiverId);
+        notification.insert(nd);
     }
 
 

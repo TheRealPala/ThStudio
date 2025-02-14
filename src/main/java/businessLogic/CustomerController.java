@@ -1,14 +1,9 @@
 package businessLogic;
 import java.time.LocalDateTime;
 import java.util.List;
-import dao.CustomerDao;
-import dao.DoctorDao;
-import dao.MariaDbNotificationDao;
-import dao.MedicalExamDao;
-import domainModel.Customer;
-import domainModel.Doctor;
-import domainModel.MedicalExam;
-import domainModel.Notification;
+
+import dao.*;
+import domainModel.*;
 import domainModel.Search.Search;
 import domainModel.State.Available;
 import domainModel.State.Booked;
@@ -18,12 +13,14 @@ public class CustomerController extends PersonController<Customer> {
     private DoctorController doctorController;
     private CustomerDao customerDao;
     private MariaDbNotificationDao notification;
-    public CustomerController(CustomerDao customer, MedicalExamDao me, DoctorDao d, CustomerDao customerDao,MariaDbNotificationDao nd) {
+    private MariaDbDocumentDao documentDao;
+    public CustomerController(CustomerDao customer, MedicalExamDao me, DoctorDao d, CustomerDao customerDao,MariaDbNotificationDao nd, MariaDbDocumentDao dd) {
         super(customer);
-        this.mec = new MedicalExamController(me ,d , this, nd);
-        this.doctorController = new DoctorController(d,mec,nd);
+        this.mec = new MedicalExamController(me ,d , this, nd, dd);
+        this.doctorController = new DoctorController(d,mec,nd,dd);
         this.customerDao = customerDao;
         notification =nd;
+        documentDao = dd;
 
 
 
@@ -156,6 +153,9 @@ public class CustomerController extends PersonController<Customer> {
 
     public List<Notification> getNotifications(int id) throws Exception {
         return notification.getNotificationsByReceiverId(id);
+    }
+    public List<Document> getDocuments(int id) throws Exception {
+        return documentDao.getByReceiver(id);
     }
 
 

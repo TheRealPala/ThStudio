@@ -11,7 +11,7 @@ public class Notification {
         this.receiverId = receiverId;
     }
 
-    public Notification(String title, int senderId, int receiverId) {
+    public Notification(String title, int receiverId) {
         this.title = title;
         this.receiverId = receiverId;
     }

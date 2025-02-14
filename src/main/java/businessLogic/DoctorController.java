@@ -1,8 +1,10 @@
 package businessLogic;
 
 import dao.DoctorDao;
+import dao.MariaDbDocumentDao;
 import dao.MariaDbNotificationDao;
 import domainModel.Doctor;
+import domainModel.Document;
 import domainModel.MedicalExam;
 import domainModel.Notification;
 import domainModel.State.Available;
@@ -17,11 +19,13 @@ public class DoctorController extends PersonController<Doctor>{
     private DoctorDao doctorDAO;
     private MedicalExamController mec;
     private MariaDbNotificationDao notification;
-    public DoctorController(DoctorDao doctorDAO, MedicalExamController mec, MariaDbNotificationDao nd) {
+    private MariaDbDocumentDao documentDao;
+    public DoctorController(DoctorDao doctorDAO, MedicalExamController mec, MariaDbNotificationDao nd, MariaDbDocumentDao dd) {
         super(doctorDAO);
         this.mec = mec;
         this.doctorDAO = doctorDAO;
         notification = nd;
+        documentDao = dd;
     }
 
     /**
@@ -202,6 +206,21 @@ public class DoctorController extends PersonController<Doctor>{
     public List<Notification> getNotifications(int id) throws Exception {
         return notification.getNotificationsByReceiverId(id);
     }
+    public List<Document> getDocuments(int id) throws Exception {
+        return documentDao.getByOwner(id);
+    }
+    private void addDocument(Document document) throws Exception {
+        documentDao.insert(document);
+    }
+    public void addDocumentToMedicalExam(String title, String path, int ownerId, int receiverId, MedicalExam me) throws Exception {
+        Document document = new Document(title, path, ownerId);
+        if(me.getState() instanceof Booked) {
+            document.setReceiverId(receiverId); // or me.getIdCustomer()
+        }
+        document.setMedicalExamId(me.getId());
+        addDocument(document);
+    }
+
 
 
 }

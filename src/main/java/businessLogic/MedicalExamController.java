@@ -1,6 +1,7 @@
 package businessLogic;
 
 import dao.DoctorDao;
+import dao.MariaDbDocumentDao;
 import dao.MariaDbNotificationDao;
 import dao.MedicalExamDao;
 import domainModel.Doctor;
@@ -23,11 +24,12 @@ public class MedicalExamController {
     private CustomerController c;
     MariaDbNotificationDao notification = new MariaDbNotificationDao();
 
-    public MedicalExamController(MedicalExamDao medicalExamDao, DoctorDao d, CustomerController c, MariaDbNotificationDao nd) {
+    public MedicalExamController(MedicalExamDao medicalExamDao, DoctorDao d, CustomerController c, MariaDbNotificationDao nd, MariaDbDocumentDao dd) {
         this.medicalExamDao = medicalExamDao;
-        this.doctorController = new DoctorController(d, this, nd);
+        this.doctorController = new DoctorController(d, this, nd, dd);
         this.c = c;
         notification = nd;
+
     }
 
     /**

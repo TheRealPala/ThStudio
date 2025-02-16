@@ -135,7 +135,9 @@ public class CustomerController extends PersonController<Customer> {
         else{
             if(me.getState()instanceof Booked && me.getIdCustomer() == c.getId()){
                 c.setBalance(c.getBalance()-me.getPrice());
+                customerDao.update(c);
                 d.setBalance(d.getBalance()+me.getPrice());
+                doctorController.updatePerson(d);
             }
             else {
                 throw new RuntimeException(" not your medical exam");

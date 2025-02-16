@@ -166,4 +166,56 @@ public class MariaDbDocumentDao implements DocumentDao {
         }
         return rows > 0;
     }
+    public List<Document> getByOwner(int id) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<Document> dList = new ArrayList<>();
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("select * from documents where id_owner = ?");
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                dList.add(this.parseDocument(rs));
+            }
+            if (dList.isEmpty()) {
+                throw new RuntimeException("There is no Customers in the database");
+            }
+        } catch (Exception e) {
+            throw new SQLException(e);
+        } finally {
+            assert rs != null : "ResultSet is Null";
+            rs.close();
+            ps.close();
+            Database.closeConnection(con);
+        }
+        return dList;
+    }
+    public List<Document> getByReceiver(int id) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<Document> dList = new ArrayList<>();
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("select * from documents where id_receiver = ?");
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                dList.add(this.parseDocument(rs));
+            }
+            if (dList.isEmpty()) {
+                throw new RuntimeException("There is no Customers in the database");
+            }
+        } catch (Exception e) {
+            throw new SQLException(e);
+        } finally {
+            assert rs != null : "ResultSet is Null";
+            rs.close();
+            ps.close();
+            Database.closeConnection(con);
+        }
+        return dList;
+    }
 }

@@ -137,7 +137,7 @@ public class CustomerController extends PersonController<Customer> {
                 c.setBalance(c.getBalance()-me.getPrice());
                 customerDao.update(c);
                 d.setBalance(d.getBalance()+me.getPrice());
-                doctorController.updatePerson(d);
+                doctorController.update(d);
             }
             else {
                 throw new RuntimeException(" not your medical exam");

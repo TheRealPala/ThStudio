@@ -26,7 +26,6 @@ public class DoctorController extends PersonController<Doctor>{
         this.doctorDAO = doctorDAO;
         notification = nd;
         documentDao = dd;
-        this.doctorDAO = doctorDAO;
 
     }
 
@@ -230,6 +229,9 @@ public class DoctorController extends PersonController<Doctor>{
         addDocument(document);
         Notification nd = new Notification("New document "+title+" by :"+ownerId,receiverId);
         notification.insert(nd);
+    }
+    public void update(Doctor doctor) throws Exception {
+        doctorDAO.update(doctor);
     }
 
 

@@ -1,11 +1,9 @@
 package businessLogic;
 import java.time.LocalDateTime;
 import java.util.List;
-import dao.CustomerDao;
-import dao.DoctorDao;
-import dao.MedicalExamDao;
-import domainModel.Customer;
-import domainModel.MedicalExam;
+
+import dao.*;
+import domainModel.*;
 import domainModel.Search.Search;
 import domainModel.State.Available;
 import domainModel.State.Booked;
@@ -14,11 +12,16 @@ public class CustomerController extends PersonController<Customer> {
     private MedicalExamController mec;
     private DoctorController doctorController;
     private CustomerDao customerDao;
-    public CustomerController(CustomerDao customer, MedicalExamDao me, DoctorDao d, CustomerDao customerDao) {
+    private MariaDbNotificationDao notification;
+    private MariaDbDocumentDao documentDao;
+    public CustomerController(CustomerDao customer, MedicalExamDao me, DoctorDao d, CustomerDao customerDao,MariaDbNotificationDao nd, MariaDbDocumentDao dd) {
         super(customer);
-        this.mec = new MedicalExamController(me ,d , this);
-        this.doctorController = new DoctorController(d,mec);
+        this.mec = new MedicalExamController(me ,d , this, nd, dd);
+        this.doctorController = new DoctorController(d,mec,nd,dd);
         this.customerDao = customerDao;
+        notification =nd;
+        documentDao = dd;
+
 
 
     }
@@ -77,12 +80,14 @@ public class CustomerController extends PersonController<Customer> {
         else{
             me.setState(new Booked());
             mec.updateMedicalExam(me.getId(),c.getId(),me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice());
-            payment(c,me);
-            //add a payment method
-            doctorController.getMedicalExam(me.getIdDoctor()).add(me); // consider adding a new in doctorDomainModel to add the medical exam
-            // notify the doctor
+            payment(c,me,me.getIdDoctor());
+
+            doctorController.getMedicalExam(me.getIdDoctor()).add(me);
+            Notification nd =new Notification("Booked exam "+ me.getTitle()+"by :"+c.getName(),me.getIdDoctor());
+            notification.insert(nd);
             return true;
         }
+
     }
     /** cancel a medical exam
      * @param me The medical exam
@@ -92,16 +97,17 @@ public class CustomerController extends PersonController<Customer> {
      */
     public boolean cancelMedicalExam(MedicalExam me, Customer c) throws Exception {
         if(me.getState() instanceof Booked && me.getIdCustomer()== c.getId()){
+            if(me.getStartTime().isBefore(LocalDateTime.now())){
+                mec.refund(c.getId(),me);    // may as well use de payment function
+            }
+            else {
+                System.out.println("no refund");
+            }
             me.setState(new Available());
             mec.updateMedicalExam(me.getId(),c.getId(),me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice());
-            payment(c,me);
-            doctorController.getMedicalExam(me.getIdDoctor()).remove(me); // consider adding a new in doctorDomainModel to remove the medical exam
 
-            if(me.getStartTime().isBefore(LocalDateTime.now())){
-               mec.refund(c.getId(),me);
-            }
-
-            //notify the doctor
+            Notification nd =new Notification("Deleted exam "+ me.getTitle()+"by :"+c.getName(),me.getIdDoctor());
+            notification.insert(nd);
             return true;
         }
         else{
@@ -121,14 +127,17 @@ public class CustomerController extends PersonController<Customer> {
      * @param me The medical exam
      * @throws Exception
      */
-    public void payment(Customer c, MedicalExam me) {
+    public void payment(Customer c, MedicalExam me, int id) throws Exception {
+        Doctor d = doctorController.getPerson(id);
         if(c.getBalance()< me.getPrice()){
             throw new RuntimeException(" not enough balance");
         }
         else{
             if(me.getState()instanceof Booked && me.getIdCustomer() == c.getId()){
                 c.setBalance(c.getBalance()-me.getPrice());
-                //TODO: pay the doctor
+                customerDao.update(c);
+                d.setBalance(d.getBalance()+me.getPrice());
+                doctorController.update(d);
             }
             else {
                 throw new RuntimeException(" not your medical exam");
@@ -142,6 +151,13 @@ public class CustomerController extends PersonController<Customer> {
      */
     public Customer getCustomer(int id) throws Exception {
         return this.customerDao.get(id);
+    }
+
+    public List<Notification> getNotifications(int id) throws Exception {
+        return notification.getNotificationsByReceiverId(id);
+    }
+    public List<Document> getDocuments(int id) throws Exception {
+        return documentDao.getByReceiver(id);
     }
 
 

@@ -26,6 +26,8 @@ public class DoctorController extends PersonController<Doctor>{
         this.doctorDAO = doctorDAO;
         notification = nd;
         documentDao = dd;
+        this.doctorDAO = doctorDAO;
+
     }
 
     /**

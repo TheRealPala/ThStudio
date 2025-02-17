@@ -160,12 +160,13 @@ public class MariaDbDocumentDao implements DocumentDao {
             ps.setInt(1, id);
             rows = ps.executeUpdate();
         } finally {
-            assert ps != null: "preparedStatement is Null";
+            assert ps != null : "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }
         return rows > 0;
     }
+
     public List<Document> getByOwner(int id) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
@@ -192,6 +193,7 @@ public class MariaDbDocumentDao implements DocumentDao {
         }
         return dList;
     }
+
     public List<Document> getByReceiver(int id) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;

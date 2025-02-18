@@ -39,18 +39,19 @@ public class DoctorController extends PersonController<Doctor> {
      * @return The CF of the newly created doctor
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
-    public String addPerson(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance) throws Exception {
+    public String addDoctor(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance) throws Exception {
         Doctor d = new Doctor(name, surname, dateOfBirth, medicalLicenseNumber, balance);
         return super.addPerson(d);
     }
 
-    public boolean modifyMedicalExam(int id, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
-        MedicalExam me = medicalExamController.getExam(id);
+    public boolean modifyMedicalExam(int medicalExamId, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags, State state) throws Exception {
+        boolean outcome = false;
+        MedicalExam me = medicalExamController.getExam(medicalExamId);
         if (me.getIdDoctor() == idDoctor && me.getStartTime().isAfter(LocalDateTime.now())) {
-            medicalExamController.updateMedicalExam(id, idDoctor, endTime, startTime, description, title, price, tags, me.getState());
-            return true;
-        } else
-            return false;
+            medicalExamController.updateMedicalExam(medicalExamId, endTime, startTime, description, title, price, tags, state);
+            outcome = true;
+        }
+        return outcome;
     }
 
     /**
@@ -59,24 +60,29 @@ public class DoctorController extends PersonController<Doctor> {
      * @param me the medical exam
      * @param id the id of the doctor
      * @return true if the deletion was successful, false otherwise
-     * @throws Exception
      */
     public boolean deleteMedicalExam(MedicalExam me, int id) throws Exception {
+        boolean outcome = false;
         if (me.getIdDoctor() == id && me.getStartTime().isBefore(LocalDateTime.now())) {
-            if (me.getState().getState().equals("Booked")) {
+            if (me.getState() instanceof Booked) {
                 if (me.getStartTime().isBefore(LocalDateTime.now())) {
                     String s = "The medical exam has been canceled";
                     State state = new Available();
-                    medicalExamController.refund(me.getIdCustomer(), me);
-                    medicalExamController.updateMedicalExam(me.getId(),
-                            me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice(),me.getTags(),state );
-
+                    //refund
+                    double price = me.getPrice();
+                    Customer customer = this.customerDao.get(me.getIdCustomer());
+                    Doctor doctor = this.doctorDao.get(me.getIdDoctor());
+                    doctor.setBalance(doctor.getBalance() - price);
+                    customer.setBalance(customer.getBalance() + price);
+                    this.customerDao.update(customer);
+                    this.doctorDao.update(doctor);
+                    medicalExamController.updateMedicalExam(me.getId(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice(),me.getTags(),state );
                 }
             }
             medicalExamController.removeMedicalExam(me.getId());
-            return true;
-        } else
-            return false;
+            outcome = true;
+        }
+        return outcome;
     }
 
     /**
@@ -88,11 +94,9 @@ public class DoctorController extends PersonController<Doctor> {
      * @param description the description of the medical exam
      * @param title       the title of the medical exam
      * @param price       the price of the medical exam
-     * @param tags        the tags of the medical exam
-     * @throws Exception
      */
-    public void createMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
-        medicalExamController.addMedicalExam(idDoctor, endTime, startTime, description, title, price, tags);
+    public void createMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price) throws Exception {
+        medicalExamController.addMedicalExam(idDoctor, endTime, startTime, description, title, price);
     }
 
     /**
@@ -100,7 +104,6 @@ public class DoctorController extends PersonController<Doctor> {
      *
      * @param id the id of the doctor
      * @return the list of medical exams
-     * @throws Exception
      */
     public List<MedicalExam> getMedicalExam(int id) throws Exception {
         return medicalExamController.getDoctorExams(id);
@@ -150,15 +153,14 @@ public class DoctorController extends PersonController<Doctor> {
      */
 
     public boolean modifyCustomerLevel(int customerId, int level) throws Exception {
-
-        Customer c = this.customerDao.get(customerId);
-        if (c.getLevel() != level) {
-            c.setLevel(level);
-            customerDao.update(c);
-            return true;
-        } else {
-            return false;
+        Customer customer = this.customerDao.get(customerId);
+        boolean outcome = false;
+        if (customer.getLevel() != level) {
+            customer.setLevel(level);
+            customerDao.update(customer);
+            outcome = true;
         }
+        return outcome;
     }
 
 }

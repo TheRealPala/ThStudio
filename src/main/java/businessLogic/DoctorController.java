@@ -4,6 +4,7 @@ import dao.*;
 import domainModel.*;
 import domainModel.State.Available;
 import domainModel.State.Booked;
+import domainModel.State.State;
 import domainModel.Tags.Tag;
 
 import java.time.LocalDateTime;
@@ -43,126 +44,11 @@ public class DoctorController extends PersonController<Doctor> {
         return super.addPerson(d);
     }
 
-    /**
-     * modify the Medical exam start time
-     *
-     * @param me the medical exam
-     * @param t  the new start time
-     * @param id the id of the doctor
-     * @return true if the modification was successful, false otherwise
-     */
-
-    public boolean modifyMedicalExamStartTime(MedicalExam me, LocalDateTime t, int id) throws Exception {
-
-        if (me.getStartTime().isBefore(LocalDateTime.now()) && me.getIdDoctor() == id && me.getEndTime().isAfter(t)) {
-            if (me.getState() instanceof Booked) {
-                String s = "The start time of the medical exam has been modified to " + t;
-                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
-                        me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice(), s);
-
-            } else {
-                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
-                        me.getIdDoctor(), me.getEndTime(), t, me.getDescription(), me.getTitle(), me.getPrice());
-            }
-
+    public boolean modifyMedicalExam(int id, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
+        MedicalExam me = medicalExamController.getExam(id);
+        if (me.getIdDoctor() == idDoctor && me.getStartTime().isAfter(LocalDateTime.now())) {
+            medicalExamController.updateMedicalExam(id, idDoctor, endTime, startTime, description, title, price, tags, me.getState());
             return true;
-        } else {
-            System.out.println("no modification ");
-        }
-        return false;
-    }
-
-    /**
-     * modify the Medical exam end time
-     *
-     * @param me the medical exam
-     * @param t  the new end time
-     * @param id the id of the doctor
-     * @return true if the modification was successful, false otherwise
-     */
-    public boolean modifyMedicalExamEndTime(MedicalExam me, LocalDateTime t, int id) throws Exception {
-        if (me.getEndTime().isBefore(LocalDateTime.now()) && me.getIdDoctor() == id && me.getStartTime().isBefore(t)) {
-            if (me.getState() instanceof Booked) {
-                String s = "The end time of the medical exam has been modified to " + t;
-                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
-                        me.getIdDoctor(), t, me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice(), s);
-            } else {
-                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
-                        me.getIdDoctor(), t, me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice());
-            }
-
-            return true;
-        } else
-            return false;
-    }
-
-    /**
-     * modify the Medical exam description
-     *
-     * @param me the medical exam
-     * @param s  the new description
-     * @param id the id of the doctor
-     * @return true if the modification was successful, false otherwise
-     */
-    public boolean modifyMedicalExamDescription(MedicalExam me, String s, int id) throws Exception {
-        if (me.getIdDoctor() == id && me.getStartTime().isBefore(LocalDateTime.now())) {
-            if (me.getState() instanceof Booked) {
-                String s1 = "The description of the medical exam has been modified to " + s;
-                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
-                        me.getIdDoctor(), me.getEndTime(), me.getStartTime(), s, me.getTitle(), me.getPrice(), s1);
-            }
-            medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
-                    me.getIdDoctor(), me.getEndTime(), me.getStartTime(), s, me.getTitle(), me.getPrice());
-
-            return true;
-        } else
-            return false;
-    }
-
-    /**
-     * modify the Medical exam title
-     *
-     * @param me the medical exam
-     * @param s  the new title
-     * @param id the id of the doctor
-     * @return true if the modification was successful, false otherwise
-     * @throws Exception
-     */
-    public boolean modifyMedicalExamTitle(MedicalExam me, String s, int id) throws Exception {
-        if (me.getIdDoctor() == id && me.getStartTime().isBefore(LocalDateTime.now())) {
-            if (me.getState() instanceof Booked) {
-                String s1 = "The title of the medical exam has been modified to " + s;
-                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
-                        me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), s, me.getPrice(), s1);
-            }
-            medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
-                    me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), s, me.getPrice());
-
-            return true;
-        } else
-            return false;
-    }
-
-    /**
-     * modify the Medical exam price
-     *
-     * @param me the medical exam
-     * @param d  the new price
-     * @param id the id of the doctor
-     * @return true if the modification was successful, false otherwise
-     * @throws Exception
-     */
-
-    public boolean modifyMedicalExamPrice(MedicalExam me, double d, int id) throws Exception {
-        if (me.getIdDoctor() == id && me.getStartTime().isBefore(LocalDateTime.now())) {
-            if (me.getState() instanceof Available) {
-                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
-                        me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), d);
-                return true;
-            } else {
-                System.out.println("The medical exam is already booked");
-                return false;
-            }
         } else
             return false;
     }
@@ -180,9 +66,11 @@ public class DoctorController extends PersonController<Doctor> {
             if (me.getState().getState().equals("Booked")) {
                 if (me.getStartTime().isBefore(LocalDateTime.now())) {
                     String s = "The medical exam has been canceled";
-                    medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
-                            me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice(), s);
+                    State state = new Available();
                     medicalExamController.refund(me.getIdCustomer(), me);
+                    medicalExamController.updateMedicalExam(me.getId(),
+                            me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice(),me.getTags(),state );
+
                 }
             }
             medicalExamController.removeMedicalExam(me.getId());

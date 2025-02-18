@@ -60,4 +60,13 @@ public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
      * @throws Exception        If something goes wrong
      */
     public List<MedicalExam> search(Search search) throws Exception;
+
+    /**
+     * Change the state of an exam
+     *
+     * @param  me               The exam's ID
+     * @param idCustomer        The customer's ID
+     * @throws Exception        If something goes wrong
+     */
+    public void bookMedicalExam(MedicalExam me, int idCustomer) throws Exception;
 }

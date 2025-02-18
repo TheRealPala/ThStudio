@@ -20,11 +20,10 @@ public class MedicalExam {
     private ArrayList<Document> documents;
     private ArrayList<Tag> tags;
 
-    public MedicalExam(int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime,
+    public MedicalExam(int idDoctor, LocalDateTime startTime, LocalDateTime endTime,
                        String description, String title, double price) {
         this.tags = new ArrayList<>();
         this.documents = new ArrayList<>();
-        this.idCustomer = idCustomer;
         this.idDoctor = idDoctor;
         this.endTime = endTime;
         this.startTime = startTime;
@@ -33,11 +32,10 @@ public class MedicalExam {
         this.price = price;
     }
 
-    public MedicalExam(int id, int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime,
+    public MedicalExam(int id, int idDoctor, LocalDateTime startTime, LocalDateTime endTime,
                        String description, String title, double price) {
         this.tags = new ArrayList<>();
         this.documents = new ArrayList<>();
-        this.idCustomer = idCustomer;
         this.idDoctor = idDoctor;
         this.endTime = endTime;
         this.startTime = startTime;

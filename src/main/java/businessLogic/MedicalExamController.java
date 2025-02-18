@@ -13,7 +13,7 @@ import domainModel.Tags.Tag;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Objects;
 import static java.util.Collections.unmodifiableList;
 
 
@@ -34,53 +34,24 @@ public class MedicalExamController {
 
     }
 
-    /**
-     * Adds a new medical exam to the list
-     *
-     * @param idCustomer  The id of the customer
-     * @param idDoctor    The id of the doctor
-     * @param endTime     The end time of the medical exam
-     * @param startTime   The start time of the medical exam
-     * @param description The description of the medical exam
-     * @param title       The title of the medical exam
-     * @param price       The price of the medical exam
-     * @param tags        The tags of the medical exam
-     * @return The id of the newly created medical exam
-     * @throws Exception                Bubbles up exceptions of MedicalExamDAO::insert()
-     * @throws IllegalArgumentException If the doctor is already occupied in the given time range or if the doctor is not found
-     */
-    public int addMedicalExam(int idCustomer, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
-        Doctor doctor = doctorController.getPerson(idDoctor);
-        if (doctor == null)
-            throw new IllegalArgumentException("The specified doctor was not found");
-
-        // Check if the given doctor is not already occupied for the given time range
-        for (MedicalExam exam : medicalExamDao.getDoctorExams(idDoctor)) {
+    private void checkDateTimeBounds(List<MedicalExam> medicalExams, LocalDateTime startTime,
+                                     LocalDateTime endTime) throws IllegalArgumentException {
+        for (MedicalExam exam : medicalExams) {
             if ((exam.getStartTime().isBefore(endTime) || exam.getStartTime().equals(endTime))
                     && (exam.getEndTime().isAfter(startTime) || exam.getEndTime().equals(startTime)))
                 throw new IllegalArgumentException("The given doctor is already occupied in the given time range (in course #" + exam.getId() + ")");
         }
-
-        MedicalExam medicalExam = new MedicalExam(idCustomer, idDoctor, endTime, startTime, description, title, price);
-        medicalExam.setTags(tags);
-
-        medicalExamDao.insert(medicalExam);
-        return medicalExam.getId();
     }
 
-    public int addMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
+    public int addMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description,
+                              String title, double price) throws Exception {
         Doctor doctor = doctorController.getPerson(idDoctor);
         if (doctor == null)
             throw new IllegalArgumentException("The specified doctor was not found");
 
         // Check if the given doctor is not already occupied for the given time range
-        for (MedicalExam exam : medicalExamDao.getDoctorExams(idDoctor)) {
-            if ((exam.getStartTime().isBefore(endTime) || exam.getStartTime().equals(endTime))
-                    && (exam.getEndTime().isAfter(startTime) || exam.getEndTime().equals(startTime)))
-                throw new IllegalArgumentException("The given doctor is already occupied in the given time range (in course #" + exam.getId() + ")");
-        }
-
-        MedicalExam medicalExam = new MedicalExam(idDoctor, endTime, startTime, description, title, price, tags);
+        checkDateTimeBounds(medicalExamDao.getDoctorExams(idDoctor), startTime, endTime);
+        MedicalExam medicalExam = new MedicalExam(idDoctor, startTime, endTime, description, title, price);
         medicalExamDao.insert(medicalExam);
         return medicalExam.getId();
     }
@@ -88,72 +59,76 @@ public class MedicalExamController {
     /**
      * Updates a medical exam
      *
-     * @param ExamId      The id of the medical exam
-     * @param idDoctor    The id of the doctor
+     * @param examId      The id of the medical exam
      * @param endTime     The end time of the medical exam
      * @param startTime   The start time of the medical exam
      * @param description The description of the medical exam
      * @param title       The title of the medical exam
      * @param price       The price of the medical exam
-     * @throws Exception If the medical exam is not found, bubbles up exceptions of MedicalExamDAO::update()
+     * @param tags        The tags of the medical exam
+     * @param state       The param of the medical exam
+     * @throws Exception If the medical exam is not found, bubbles up exceptions to MedicalExamDAO::update()
      */
 
-    public void updateMedicalExam(int ExamId, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags,State state) throws Exception {
-        MedicalExam medicalExam = this.medicalExamDao.get(ExamId);
-        if (medicalExam == null)
-            throw new IllegalArgumentException("Medical Exam not found");
-        String s = "esame modificato: ";
-
-
-        if(medicalExam.getState() == state && medicalExam.getPrice() == price && medicalExam.getStartTime() == startTime && medicalExam.getEndTime() == endTime && medicalExam.getDescription().equals(description) && medicalExam.getTitle().equals(title) && medicalExam.getTags().equals(tags)){
+    public void updateMedicalExam(int examId, LocalDateTime endTime, LocalDateTime startTime, String description,
+                                  String title, double price, ArrayList<Tag> tags, State state) throws Exception {
+        MedicalExam medicalExam = this.medicalExamDao.get(examId);
+        if (medicalExam.getPrice() == price && medicalExam.getStartTime() == startTime && medicalExam.getEndTime() == endTime && medicalExam.getDescription().equals(description) && medicalExam.getTitle().equals(title) && medicalExam.getTags().equals(tags)) {
             System.out.println("nothing to update");
-        }
-        else{
-            if(medicalExam.getStartTime() != startTime){
-                if(medicalExam.getStartTime().isBefore(LocalDateTime.now())){
-                    throw new RuntimeException("exam already started");
-                }
-                s += "the start time has been changed";
-            }
-            if(medicalExam.getEndTime() != endTime){
-                if(medicalExam.getEndTime().isBefore(LocalDateTime.now())&& endTime.isBefore(startTime)){
-                    throw new RuntimeException("illegal update");
-                }
+        } else {
+            StringBuilder s = new StringBuilder("esame modificato: \n");
+            if (medicalExam.getStartTime().isEqual(startTime) || medicalExam.getEndTime().isEqual(endTime)) {
+                boolean isDateBoundValid = true;
 
+                if (medicalExam.getStartTime() != startTime) {
+                    if (medicalExam.getStartTime().isBefore(LocalDateTime.now())) {
+                        throw new RuntimeException("exam already started");
+                    }
+                    s.append("the start time has been changed\n");
+                }
+                if (medicalExam.getEndTime() != endTime) {
+                    if (medicalExam.getEndTime().isBefore(LocalDateTime.now()) && endTime.isBefore(startTime)) {
+                        throw new RuntimeException("illegal update");
+                    }
+
+                }
             }
-            if(medicalExam.getPrice() != price){
-                if(price < 0){
+
+            if (medicalExam.getPrice() != price) {
+                if (price <= 0) {
                     throw new RuntimeException("illegal price");
                 }
-                if (medicalExam.getState() instanceof Booked){
+                if (medicalExam.getState() instanceof Booked) {
                     throw new RuntimeException("exam already booked");
                 }
-                s += "the price has been changed";
+                s.append("the price has been changed\n");
             }
-            if(medicalExam.getDescription() != description){
-                s += "the description has been changed";
+            if (!state.equals(medicalExam.getState())) {
+                medicalExam.setState(state);
+                s.append("the state has been changed\n");
             }
-            if (medicalExam.getTitle() != title){
-                s += "the title has been changed";
+            if (!Objects.equals(medicalExam.getDescription(), description)) {
+                s.append("the description has been changed\n");
             }
-            if(medicalExam.getTags() != tags){
-                s += "the tags have been changed";
+            if (!Objects.equals(medicalExam.getTitle(), title)) {
+                s.append("the title has been changed\n");
             }
+            if (medicalExam.getTags() != tags) {
+                s.append("the tags have been changed\n");
+            }
+            medicalExam.setTags(tags);
+            medicalExam.setPrice(price);
+            medicalExam.setStartTime(startTime);
+            medicalExam.setEndTime(endTime);
+            medicalExam.setDescription(description);
+            medicalExam.setTitle(title);
+
+            if (medicalExam.getState() instanceof Booked) {
+                Notification nd = new Notification("esame modificato:" + s, medicalExam.getIdCustomer());  // o array di notifiche con ogni cambiamento o singola stringa con tutti i cambiamenti
+                notification.insert(nd);
+            }
+            this.medicalExamDao.update(medicalExam);
         }
-        medicalExam.setTags(tags);
-        medicalExam.setPrice(price);
-        medicalExam.setStartTime(startTime);
-        medicalExam.setEndTime(endTime);
-        medicalExam.setDescription(description);
-        medicalExam.setTitle(title);
-
-
-        if(medicalExam.getState() instanceof Booked ){
-            Notification nd = new Notification("esame modificato:" + s,medicalExam.getIdCustomer());  // o array di notifiche con ogni cambiamento o singola stringa con tutti i cambiamenti
-            notification.insert(nd);
-        }
-        this.medicalExamDao.update(medicalExam);
-
     }
 
     /**
@@ -161,7 +136,7 @@ public class MedicalExamController {
      *
      * @param ExamId The id of the medical exam
      * @return True if the medical exam is deleted, false otherwise
-     * @throws Exception If the medical exam is not found, bubbles up exceptions of MedicalExamDAO::delete()
+     * @throws Exception If the medical exam is not found, bubbles up exceptions to MedicalExamDAO::delete()
      */
     public boolean removeMedicalExam(int ExamId) throws Exception {
         return medicalExamDao.delete(ExamId);
@@ -233,15 +208,5 @@ public class MedicalExamController {
         return unmodifiableList(this.medicalExamDao.search(search));
     }
 
-    public void refund(int idCustomer, MedicalExam me) throws Exception {
-        if (idCustomer == me.getIdCustomer()) {
-            Customer customer = c.getCustomer(idCustomer);
-            c.updatePerson(customer);                // da modificare cogliendo i controller e mettendo il dao
-
-        } else {
-            throw new RuntimeException("not your exam");
-        }
-    }
-
-
+    //attach and detach tags and make a revision of single controllers responsabilities
 }

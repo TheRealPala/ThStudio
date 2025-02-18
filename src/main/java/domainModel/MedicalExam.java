@@ -13,7 +13,6 @@ public class MedicalExam {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private final int idDoctor;
-    private String stateExtraInfo;
     private int idCustomer;
     private int id;
     private double price;
@@ -34,25 +33,33 @@ public class MedicalExam {
 
     public MedicalExam(int id, int idDoctor, LocalDateTime startTime, LocalDateTime endTime,
                        String description, String title, double price) {
+        this.id = id;
+        this.idDoctor = idDoctor;
+        this.endTime = endTime;
+        this.startTime = startTime;
+        this.description = description;
+        this.title = title;
+        this.price = price;
         this.tags = new ArrayList<>();
         this.documents = new ArrayList<>();
-        this.idDoctor = idDoctor;
-        this.endTime = endTime;
-        this.startTime = startTime;
-        this.description = description;
-        this.title = title;
-        this.price = price;
     }
-    public MedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime,
-                       String description, String title, double price, ArrayList<Tag> tags) {
-        this.tags = tags;
-        this.documents = new ArrayList<>();
+    public MedicalExam(int id, int idDoctor, int idCustomer, LocalDateTime startTime, LocalDateTime endTime,
+                       String description, String title, double price, State state) {
+        this.id = id;
         this.idDoctor = idDoctor;
         this.endTime = endTime;
         this.startTime = startTime;
         this.description = description;
         this.title = title;
         this.price = price;
+        this.tags = new ArrayList<>();
+        this.documents = new ArrayList<>();
+        this.idCustomer=idCustomer;
+        this.state = state;
+    }
+
+    public MedicalExam(MedicalExam me) {
+        this(me.getId(), me.getIdDoctor(), me.getIdCustomer(), me.getStartTime(), me.getEndTime(), me.getDescription(), me.getTitle(), me.getPrice(), me.getState());
     }
 
     public String getTitle() {
@@ -93,14 +100,6 @@ public class MedicalExam {
 
     public void setIdCustomer(int idCustomer) {
         this.idCustomer = idCustomer;
-    }
-
-    public String getStateExtraInfo() {
-        return stateExtraInfo;
-    }
-
-    public void setStateExtraInfo(String stateExtraInfo) {
-        this.stateExtraInfo = stateExtraInfo;
     }
 
     public int getIdDoctor() {

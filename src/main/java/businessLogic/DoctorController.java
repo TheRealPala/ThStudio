@@ -1,10 +1,7 @@
 package businessLogic;
 
 import dao.*;
-import domainModel.Doctor;
-import domainModel.Document;
-import domainModel.MedicalExam;
-import domainModel.Notification;
+import domainModel.*;
 import domainModel.State.Available;
 import domainModel.State.Booked;
 import domainModel.Tags.Tag;
@@ -14,19 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DoctorController extends PersonController<Doctor> {
-    private DoctorDao doctorDAO;
-    private MedicalExamController mec;
-    private NotificationDao notification;
+    private DoctorDao doctorDao;
+    private MedicalExamController medicalExamController;
+    private NotificationDao notificationDao;
     private DocumentDao documentDao;
+    private CustomerDao customerDao;
 
-    public DoctorController(DoctorDao doctorDAO, MedicalExamController mec,
-                            NotificationDao nd, DocumentDao dd) {
-        super(doctorDAO);
-        this.mec = mec;
-        this.doctorDAO = doctorDAO;
-        notification = nd;
-        documentDao = dd;
-
+    public DoctorController(DoctorDao doctorDao, MedicalExamController medicalExamController,
+                            NotificationDao notificationDao, DocumentDao documentDao, CustomerDao customerDao ) {
+        super(doctorDao);
+        this.medicalExamController = medicalExamController;
+        this.doctorDao = doctorDao;
+        this.notificationDao = notificationDao;
+        this.documentDao = documentDao;
+        this.customerDao = customerDao;
     }
 
     /**
@@ -59,11 +57,11 @@ public class DoctorController extends PersonController<Doctor> {
         if (me.getStartTime().isBefore(LocalDateTime.now()) && me.getIdDoctor() == id && me.getEndTime().isAfter(t)) {
             if (me.getState() instanceof Booked) {
                 String s = "The start time of the medical exam has been modified to " + t;
-                mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
                         me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice(), s);
 
             } else {
-                mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
                         me.getIdDoctor(), me.getEndTime(), t, me.getDescription(), me.getTitle(), me.getPrice());
             }
 
@@ -86,10 +84,10 @@ public class DoctorController extends PersonController<Doctor> {
         if (me.getEndTime().isBefore(LocalDateTime.now()) && me.getIdDoctor() == id && me.getStartTime().isBefore(t)) {
             if (me.getState() instanceof Booked) {
                 String s = "The end time of the medical exam has been modified to " + t;
-                mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
                         me.getIdDoctor(), t, me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice(), s);
             } else {
-                mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
                         me.getIdDoctor(), t, me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice());
             }
 
@@ -110,10 +108,10 @@ public class DoctorController extends PersonController<Doctor> {
         if (me.getIdDoctor() == id && me.getStartTime().isBefore(LocalDateTime.now())) {
             if (me.getState() instanceof Booked) {
                 String s1 = "The description of the medical exam has been modified to " + s;
-                mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
                         me.getIdDoctor(), me.getEndTime(), me.getStartTime(), s, me.getTitle(), me.getPrice(), s1);
             }
-            mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+            medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
                     me.getIdDoctor(), me.getEndTime(), me.getStartTime(), s, me.getTitle(), me.getPrice());
 
             return true;
@@ -134,10 +132,10 @@ public class DoctorController extends PersonController<Doctor> {
         if (me.getIdDoctor() == id && me.getStartTime().isBefore(LocalDateTime.now())) {
             if (me.getState() instanceof Booked) {
                 String s1 = "The title of the medical exam has been modified to " + s;
-                mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
                         me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), s, me.getPrice(), s1);
             }
-            mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+            medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
                     me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), s, me.getPrice());
 
             return true;
@@ -158,7 +156,7 @@ public class DoctorController extends PersonController<Doctor> {
     public boolean modifyMedicalExamPrice(MedicalExam me, double d, int id) throws Exception {
         if (me.getIdDoctor() == id && me.getStartTime().isBefore(LocalDateTime.now())) {
             if (me.getState() instanceof Available) {
-                mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
                         me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), d);
                 return true;
             } else {
@@ -179,15 +177,15 @@ public class DoctorController extends PersonController<Doctor> {
      */
     public boolean deleteMedicalExam(MedicalExam me, int id) throws Exception {
         if (me.getIdDoctor() == id && me.getStartTime().isBefore(LocalDateTime.now())) {
-            if (me.getState().equals("Booked")) {
+            if (me.getState().getState().equals("Booked")) {
                 if (me.getStartTime().isBefore(LocalDateTime.now())) {
                     String s = "The medical exam has been canceled";
-                    mec.updateMedicalExam(me.getId(), me.getIdCustomer(),
+                    medicalExamController.updateMedicalExam(me.getId(), me.getIdCustomer(),
                             me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice(), s);
-                    mec.refund(me.getIdCustomer(), me);
+                    medicalExamController.refund(me.getIdCustomer(), me);
                 }
             }
-            mec.removeMedicalExam(me.getId());
+            medicalExamController.removeMedicalExam(me.getId());
             return true;
         } else
             return false;
@@ -206,7 +204,7 @@ public class DoctorController extends PersonController<Doctor> {
      * @throws Exception
      */
     public void createMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags) throws Exception {
-        mec.addMedicalExam(idDoctor, endTime, startTime, description, title, price, tags);
+        medicalExamController.addMedicalExam(idDoctor, endTime, startTime, description, title, price, tags);
     }
 
     /**
@@ -217,11 +215,11 @@ public class DoctorController extends PersonController<Doctor> {
      * @throws Exception
      */
     public List<MedicalExam> getMedicalExam(int id) throws Exception {
-        return mec.getDoctorExams(id);
+        return medicalExamController.getDoctorExams(id);
     }
 
     public List<Notification> getNotifications(int id) throws Exception {
-        return notification.getNotificationsByReceiverId(id);
+        return notificationDao.getNotificationsByReceiverId(id);
     }
 
     public List<Document> getDocuments(int id) throws Exception {
@@ -237,7 +235,7 @@ public class DoctorController extends PersonController<Doctor> {
         if (me.getState() instanceof Booked) {
             document.setReceiverId(receiverId); // or me.getIdCustomer()
             Notification nd = new Notification("New document " + title + " by :" + ownerId, receiverId);
-            notification.insert(nd);
+            notificationDao.insert(nd);
         }
         document.setMedicalExamId(me.getId());
         addDocument(document);
@@ -248,12 +246,31 @@ public class DoctorController extends PersonController<Doctor> {
         document.setReceiverId(receiverId);
         addDocument(document);
         Notification nd = new Notification("New document " + title + " by :" + ownerId, receiverId);
-        notification.insert(nd);
+        notificationDao.insert(nd);
     }
 
     public void update(Doctor doctor) throws Exception {
-        doctorDAO.update(doctor);
+        doctorDao.update(doctor);
     }
 
+    /**
+     * Modify the level of the customer
+     *
+     * @param customerId    customer id
+     * @param level The new level
+     * @return true if the level is modified, false otherwise
+     */
+
+    public boolean modifyCustomerLevel(int customerId, int level) throws Exception {
+
+        Customer c = this.customerDao.get(customerId);
+        if (c.getLevel() != level) {
+            c.setLevel(level);
+            customerDao.update(c);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }

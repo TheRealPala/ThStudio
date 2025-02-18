@@ -1,6 +1,7 @@
 package businessLogic;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import dao.*;
@@ -9,24 +10,23 @@ import domainModel.Search.Search;
 import domainModel.State.Available;
 import domainModel.State.Booked;
 
+import static java.util.Collections.unmodifiableList;
+
 public class CustomerController extends PersonController<Customer> {
-    private final MedicalExamController medicalExamController;
-    private final DoctorController doctorController;
     private final CustomerDao customerDao;
     private final NotificationDao notificationDao;
     private final DocumentDao documentDao;
     private final MedicalExamDao medicalExamDao;
+    private final DoctorDao doctorDao;
 
-    public CustomerController(MedicalExamController medicalExamController, DoctorController doctorController,
-                              CustomerDao customerDao, MedicalExamDao medicalExamDao,
+    public CustomerController(CustomerDao customerDao, MedicalExamDao medicalExamDao, DoctorDao doctorDao,
                               NotificationDao notificationDao, DocumentDao documentDao) {
         super(customerDao);
-        this.medicalExamController = medicalExamController;
-        this.doctorController = doctorController;
         this.customerDao = customerDao;
         this.medicalExamDao = medicalExamDao;
         this.notificationDao = notificationDao;
         this.documentDao = documentDao;
+        this.doctorDao = doctorDao;
     }
 
     /**
@@ -45,27 +45,6 @@ public class CustomerController extends PersonController<Customer> {
         return super.addPerson(c);
     }
 
-    //TODO MOVE INTO DOCTOR CONTROLLER
-    /**
-     * Modify the level of the customer
-     *
-     * @param customerId    customer id
-     * @param level The new level
-     * @return true if the level is modified, false otherwise
-     */
-
-    public boolean modifyCustomerLevel(int customerId, int level) throws Exception {
-
-        Customer c = this.customerDao.get(customerId);
-        if (c.getLevel() != level) {
-            c.setLevel(level);
-            customerDao.update(c);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     /**
      * search for the medical exams
      *
@@ -73,7 +52,7 @@ public class CustomerController extends PersonController<Customer> {
      * @return The list of the medical exams
     */
     public List<MedicalExam> searchMedicalExam(Search search) throws Exception {
-        return medicalExamController.search(search);
+        return unmodifiableList(this.medicalExamDao.search(search));
     }
 
     /**
@@ -81,43 +60,58 @@ public class CustomerController extends PersonController<Customer> {
      *
      * @param medicalExamId The medical exam id
      * @param customerId The customer id
-     * @return true if the medical exam is booked, false otherwise
-    */
+     * @return true if the medical exam is canceled, false otherwise
+     */
     public boolean bookMedicalExam(int medicalExamId, int customerId) throws Exception {
         MedicalExam me = this.medicalExamDao.get(medicalExamId);
         Customer c = this.customerDao.get(customerId);
         if (me.getState() instanceof Booked) {
-            return false;
+            throw new RuntimeException("The exam you want to book is already booked");
+        }
+        if (c.getBalance() < me.getPrice()) {
+            throw new RuntimeException("not enough money");
         } else {
             me.setState(new Booked());
-            //TODO L'id del cliente non deve essere nel costruttore dell'esame medico (un esame medico che ancora non è stato prenotato, non ha nessun cliente)
-            //riparti da qui
-            medicalExamController.updateMedicalExam(me.getId(), c.getId(), me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice());
-            payExam(c, me);
+            this.medicalExamDao.bookMedicalExam(me, customerId);
+            //pay exam
+            Doctor d = this.doctorDao.get(me.getIdDoctor());
+            c.setBalance(c.getBalance() - me.getPrice());
+            customerDao.update(c);
+            d.setBalance(d.getBalance() + me.getPrice());
+            doctorDao.update(d);
             Notification nd = new Notification("Booked exam " + me.getTitle() + "by :" + c.getName(), me.getIdDoctor());
             notificationDao.insert(nd);
-            return true;
         }
-
+        return true;
     }
 
     /**
      * cancel a medical exam
      *
-     * @param me The medical exam
-     * @param c  The customer
+     * @param medicalExamId The medical exam id
+     * @param customerId  The customer id
      * @return true if the medical exam is canceled, false otherwise
     */
-    public boolean cancelMedicalExam(MedicalExam me, Customer c) throws Exception {
+    public boolean cancelMedicalExam(int medicalExamId, int customerId) throws Exception {
+        MedicalExam me = this.medicalExamDao.get(medicalExamId);
+        Customer c = this.customerDao.get(customerId);
+        if (me.getIdCustomer() != c.getId()) {
+            throw new RuntimeException("Unauthorized request");
+        }
         if (me.getState() instanceof Booked && me.getIdCustomer() == c.getId()) {
             if (me.getStartTime().isBefore(LocalDateTime.now())) {
-                medicalExamController.refund(c.getId(), me);    // may as well use the payment function
+                //refund
+                double medicalExamPrice = me.getPrice();
+                Doctor d = this.doctorDao.get(me.getIdDoctor());
+                d.setBalance(d.getBalance() - medicalExamPrice);
+                c.setBalance(c.getBalance() + medicalExamPrice);
+                this.doctorDao.update(d);
+                this.customerDao.update(c);
             } else {
                 System.out.println("no refund");
             }
             me.setState(new Available());
-            medicalExamController.updateMedicalExam(me.getId(), c.getId(), me.getIdDoctor(), me.getEndTime(), me.getStartTime(), me.getDescription(), me.getTitle(), me.getPrice());
-
+            this.medicalExamDao.update(me);
             Notification nd = new Notification("Deleted exam " + me.getTitle() + "by :" + c.getName(), me.getIdDoctor());
             notificationDao.insert(nd);
             return true;
@@ -129,33 +123,11 @@ public class CustomerController extends PersonController<Customer> {
     /**
      * get the list of the medical exams
      *
-     * @param c The customer
+     * @param customerId The customer
      * @return The list of the medical exams
     */
-    public List<MedicalExam> examList(int c) throws Exception {
-        return this.medicalExamController.getCustomerExams(c);
-    }
-
-    /**
-     * payment of the medical exam
-     *
-     * @param c  The customer
-     * @param me The medical exam
-     */
-    public void payExam(Customer c, MedicalExam me) throws Exception {
-        Doctor d = doctorController.getPerson(me.getIdDoctor());
-        if (c.getBalance() < me.getPrice()) {
-            throw new RuntimeException("not enough money");
-        } else {
-            if (me.getState() instanceof Booked && me.getIdCustomer() == c.getId()) {
-                c.setBalance(c.getBalance() - me.getPrice());
-                customerDao.update(c);
-                d.setBalance(d.getBalance() + me.getPrice());
-                doctorController.update(d);
-            } else {
-                throw new RuntimeException(" not your medical exam");
-            }
-        }
+    public List<MedicalExam> getCustomerExams(int customerId) throws Exception {
+        return this.medicalExamDao.getCustomerExams(customerId);
     }
 
     /**
@@ -175,10 +147,4 @@ public class CustomerController extends PersonController<Customer> {
     public List<Document> getDocuments(int id) throws Exception {
         return documentDao.getByReceiver(id);
     }
-
-
-    // add search of the medical exams
-    //add book medical exams, and a payment method, notify the doctor
-    // add cancel medical exams, and notify the doctor, and define a policy for the refund
-    // add a way to get the list of the medical exams
 }

@@ -122,7 +122,6 @@ public class MedicalExamController {
      */
     public boolean removeMedicalExam(int ExamId) throws Exception {
         return medicalExamDao.delete(ExamId);
-
     }
 
     /**

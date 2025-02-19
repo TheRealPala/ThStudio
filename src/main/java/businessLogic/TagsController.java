@@ -31,9 +31,9 @@ public class TagsController {
                     TagZone tagZone = new TagZone(tag);
                     this.tagDao.insert(tagZone);
                     return this.tagDao.get(stringTag);
-                case "Subject":
-                    TagSubject tagSubject = new TagSubject(tag);
-                    this.tagDao.insert(tagSubject);
+                case "Type":
+                    TagType tagVisitType = new TagType(tag);
+                    this.tagDao.insert(tagVisitType);
                     return this.tagDao.get(stringTag);
                 case "Online":
                     TagIsOnline tagIsOnline = new TagIsOnline(tag);

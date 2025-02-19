@@ -58,10 +58,6 @@ public class MedicalExam {
         this.state = state;
     }
 
-    public MedicalExam(MedicalExam me) {
-        this(me.getId(), me.getIdDoctor(), me.getIdCustomer(), me.getStartTime(), me.getEndTime(), me.getDescription(), me.getTitle(), me.getPrice(), me.getState());
-    }
-
     public String getTitle() {
         return title;
     }

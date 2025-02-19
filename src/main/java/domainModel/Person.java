@@ -70,4 +70,8 @@ public class Person {
     public void setBalance(double balance){
         this.balance = balance;
     }
+
+    public String getFullName() {
+        return name + " " + surname;
+    }
 }

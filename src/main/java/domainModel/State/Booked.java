@@ -1,16 +1,17 @@
 package domainModel.State;
 
-public class Booked extends State {
+import java.time.LocalDateTime;
 
-    public Booked(){
+public class Booked extends State {
+    private final LocalDateTime bookedTime;
+    public Booked(LocalDateTime bookedTime){
         this.state = "Booked";
+        this.bookedTime = bookedTime;
     }
 
     @Override
     public String getExtraInfo(){
-        return null;
+        return this.bookedTime.toString();
     }
-
-
 
 }

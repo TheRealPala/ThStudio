@@ -1,118 +1,140 @@
 package businessLogic;
 
+import dao.CustomerDao;
+import dao.DoctorDao;
+import dao.NotificationDao;
+import domainModel.Doctor;
+import domainModel.Notification;
 import domainModel.State.*;
 import domainModel.Customer;
 import domainModel.MedicalExam;
 import dao.MedicalExamDao;
-
-import java.util.List;
-import java.util.Objects;
 import java.time.LocalDateTime;
 
 public class StateController {
-    private final MedicalExamController medicalExamController;
-    private final CustomerController customerController;
     private final MedicalExamDao medicalExamDao;
+    private final CustomerDao customerDao;
+    private final DoctorDao doctorDao;
+    private final NotificationDao notificationDao;
 
-    public StateController(MedicalExamController medicalExamController, CustomerController customerController, MedicalExamDao medicalExamDao) {
-        this.medicalExamController = medicalExamController;
-        this.customerController = customerController;
+
+    public StateController(MedicalExamDao medicalExamDao, CustomerDao customerDao,
+                           DoctorDao doctorDao, NotificationDao notificationDao) {
         this.medicalExamDao = medicalExamDao;
-    }
-
-     /**
-      * Book a medical exam for a customer
-      *
-      * @param customerId        The id of the customer
-      * @param ExamId            The id of the medical exam
-      * @throws                  Exception If the customer or the medical exam is not found
-      */
-     public void bookMedicalExam(int customerId, int ExamId) throws Exception{
-        MedicalExam medicalExam = medicalExamController.getExam(ExamId);
-        Customer customer = customerController.getPerson(customerId);
-        if (customer == null) throw new IllegalArgumentException("The given customer does not exist.");
-        if (medicalExam == null) throw new IllegalArgumentException("The given medical exam does not exist.");
-
-        if (Objects.equals(medicalExam.getStateExtraInfo(), customerId)){
-            throw new RuntimeException("The given customer is already booked for this exem");
-        }
-
-        if (!Objects.equals(medicalExam.getState(), "Available")){
-            throw new RuntimeException("You cannot book this exam");
-        }
-        
-        for (MedicalExam m: this.getCustomerBookedExam(customerId)){
-            if ((m.getStartTime().isBefore(medicalExam.getEndTime()) || m.getStartTime().equals(medicalExam.getEndTime()))
-                    && (m.getEndTime().isAfter(medicalExam.getStartTime()) || m.getEndTime().equals(medicalExam.getStartTime())))
-                throw new RuntimeException("The given customer is already occupied in the given time range (in course #" + m.getId() + ")");
-        }
-
-        Booked book = new Booked();
-
-        this.medicalExamDao.changeState(ExamId, book);
-    }
-
-    public void cancelMedicalExamBooking(int customerId, int ExamId) throws Exception{
-        MedicalExam medicalExam = medicalExamController.getExam(ExamId);
-        Customer customer = customerController.getPerson(customerId);
-        if (customer == null) throw new IllegalArgumentException("The given customer does not exist.");
-        if (medicalExam == null) throw new IllegalArgumentException("The given medical exam does not exist.");
-
-        if (!Objects.equals(medicalExam.getState(), "Booked")){
-            throw new RuntimeException("You cannot cancel this exam because it is not booked");
-        }
-
-        if (!Objects.equals(medicalExam.getStateExtraInfo(), customerId)){
-            throw new RuntimeException("The given customer is not booked for this exam");
-        }
-
-        this.medicalExamDao.changeState(ExamId, new Available());
+        this.customerDao = customerDao;
+        this.doctorDao = doctorDao;
+        this.notificationDao = notificationDao;
     }
 
     /**
-     * Cancel a medical exam
+     * a client book a medical exam
      *
-     * @param ExamId            The id of the medical exam
-     * @throws Exception        If the medical exam is not found or if it is already completed
+     * @param medicalExamId The medical exam id
+     * @param customerId The customer id
+     * @return true if the medical exam is canceled, false otherwise
      */
-    public void deleteMedicalExam(int ExamId) throws Exception{
-        MedicalExam medicalExam = medicalExamController.getExam(ExamId);
-        if (medicalExam == null) throw new IllegalArgumentException("The given medical exam does not exist.");
+    public boolean bookMedicalExam(int medicalExamId, int customerId) throws Exception {
+        MedicalExam me = this.medicalExamDao.get(medicalExamId);
+        Customer c = this.customerDao.get(customerId);
+        if (me.getState() instanceof Booked) {
+            throw new RuntimeException("The exam you want to book is already booked");
+        }
+        if (c.getBalance() < me.getPrice()) {
+            throw new RuntimeException("not enough money");
+        } else {
+            me.setState(new Booked(LocalDateTime.now()));
+            this.medicalExamDao.bookMedicalExam(me, customerId);
+            //pay exam
+            Doctor d = this.doctorDao.get(me.getIdDoctor());
+            c.setBalance(c.getBalance() - me.getPrice());
+            customerDao.update(c);
+            d.setBalance(d.getBalance() + me.getPrice());
+            doctorDao.update(d);
+            Notification nd = new Notification("Booked exam " + me.getTitle() + "by :" + c.getName(), me.getIdDoctor());
+            notificationDao.insert(nd);
+        }
+        return true;
+    }
 
-        if (Objects.equals(medicalExam.getState(), "Completed")){
-            throw new RuntimeException("You cannot cancel a exam that is already completed");
+    /**
+     * cancel a medical exam booking
+     *
+     * @param medicalExamId The medical exam id
+     * @param customerId  The customer id
+     * @return true, if the medical exam booking is canceled, raise up RuntimeExceptions otherwise
+     */
+    public boolean cancelMedicalExamBooking(int medicalExamId, int customerId) throws Exception {
+        MedicalExam me = this.medicalExamDao.get(medicalExamId);
+        Customer c = this.customerDao.get(customerId);
+        if (me.getIdCustomer() != c.getId()) {
+            throw new RuntimeException("Unauthorized request");
+        }
+        if (!(me.getState() instanceof Booked)){
+            throw new RuntimeException("Can't cancel a booking for an exam which is not booked");
+        }
+        if (LocalDateTime.now().isAfter(me.getStartTime())) {
+            throw new RuntimeException("Can't cancel an exam already started");
+        }
+        //refund
+        double medicalExamPrice = me.getPrice();
+        Doctor d = this.doctorDao.get(me.getIdDoctor());
+        d.setBalance(d.getBalance() - medicalExamPrice);
+        c.setBalance(c.getBalance() + medicalExamPrice);
+        this.doctorDao.update(d);
+        this.customerDao.update(c);
+
+        me.setState(new Available());
+        this.medicalExamDao.changeState(me.getId(), me.getState());
+        Notification nd = new Notification("Deleted exam booking" + me.getTitle() + "by :" + c.getName(), d.getId());
+        notificationDao.insert(nd);
+        return true;
+    }
+
+    /**
+     * cancel a medical exam
+     *
+     * @param medicalExamId The medical exam id
+     * @param doctorId  The doctor id
+     * @return true, if the medical exam is canceled, raise up RuntimeExceptions otherwise
+     */
+    public boolean cancelMedicalExam(int medicalExamId, int doctorId) throws Exception {
+        MedicalExam me = this.medicalExamDao.get(medicalExamId);
+        Doctor d = this.doctorDao.get(doctorId);
+        if (me.getIdDoctor() != d.getId()) {
+            throw new RuntimeException("Unauthorized request");
+        }
+        if (LocalDateTime.now().isAfter(me.getStartTime())) {
+            throw new RuntimeException("Can't cancel an exam already started");
         }
 
-        LocalDateTime ldt = LocalDateTime.now();
-        this.medicalExamDao.changeState(ExamId, new Deleted(ldt));
+        if (me.getState() instanceof Booked){
+            double medicalExamPrice = me.getPrice();
+            Customer c = this.customerDao.get(me.getIdCustomer());
+            d.setBalance(d.getBalance() - medicalExamPrice);
+            c.setBalance(c.getBalance() + medicalExamPrice);
+            this.doctorDao.update(d);
+            this.customerDao.update(c);
+            Notification nd = new Notification("Deleted exam " + me.getTitle() + "by :" + d.getName(), c.getId());
+            notificationDao.insert(nd);
+        }
+
+        me.setState(new Deleted(LocalDateTime.now()));
+        this.medicalExamDao.changeState(me.getId(), me.getState());
+        return true;
     }
 
     /**
      * Complete a medical exam
      *
-     * @param ExamId            The id of the medical exam
+     * @param examId            The id of the medical exam
      * @throws Exception        If the medical exam is not found or if it is already completed
      */
-    public void completeMedicalExam(int ExamId) throws Exception{
-        MedicalExam medicalExam = medicalExamController.getExam(ExamId);
-        if (medicalExam == null) throw new IllegalArgumentException("The given medical exam does not exist.");
-
-        if (Objects.equals(medicalExam.getState(), "Completed")){
-            throw new RuntimeException("The exam is already completed");
+    public void completeMedicalExam(int examId) throws Exception{
+        MedicalExam medicalExam = medicalExamDao.get(examId);
+        if (!(medicalExam.getState() instanceof Booked)) {
+            throw new RuntimeException("Can't mark an exam as complete if is not in booked state");
         }
-
-        LocalDateTime ldt = LocalDateTime.now();
-        this.medicalExamDao.changeState(ExamId, new Completed(ldt));
-    }
-
-    /**
-     * Get all the exam booked by a customer.
-     *
-     * @param customerId        The id of the customer
-     * @throws Exception        If the customer is not found or if doesn't have any booked exam
-     */
-    private List<MedicalExam> getCustomerBookedExam(int customerId) throws Exception {
-        return medicalExamDao.getCustomerBookedExams(customerId);
+        this.medicalExamDao.changeState(examId, new Completed(LocalDateTime.now()));
     }
 
 }

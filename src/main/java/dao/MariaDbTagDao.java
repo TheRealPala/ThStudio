@@ -1,5 +1,6 @@
 package dao;
 
+import domainModel.MedicalExam;
 import domainModel.Tags.Tag;
 import domainModel.Tags.TagIsOnline;
 import domainModel.Tags.TagZone;
@@ -9,17 +10,18 @@ import java.util.ArrayList;
 
 public class MariaDbTagDao implements TagDao{
     @Override
-    public void attachTagToMedicalExam(Integer idExam, Tag tagToAttach) throws SQLException {
+    public void attachTagToMedicalExam(MedicalExam medicalExam, Tag tagToAttach) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
             ps = con.prepareStatement("insert into medical_exams_tags (id_medical_exam, tag, tag_type) " +
                     "values (?, ?, ?)");
-            ps.setInt(1, idExam);
+            ps.setInt(1, medicalExam.getId());
             ps.setString(2, tagToAttach.getTag());
             ps.setString(3, tagToAttach.getTagType());
             ps.executeUpdate();
+            medicalExam.addTag(tagToAttach);
         } finally {
             assert ps != null: "PreparedStatement is null";
             ps.close();
@@ -28,7 +30,7 @@ public class MariaDbTagDao implements TagDao{
     }
 
     @Override
-    public boolean detachTagFromMedicalExam(Integer idExam, Tag tagToDetach) throws SQLException {
+    public boolean detachTagFromMedicalExam(MedicalExam medicalExam, Tag tagToDetach) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         int rows = 0;
@@ -37,8 +39,9 @@ public class MariaDbTagDao implements TagDao{
             ps = con.prepareStatement("delete from medical_exams_tags where tag = ? and tag_type = ? and id_medical_exam = ?");
             ps.setString(1, tagToDetach.getTag());
             ps.setString(2, tagToDetach.getTagType());
-            ps.setInt(3, idExam);
+            ps.setInt(3, medicalExam.getId());
             rows = ps.executeUpdate();
+            medicalExam.removeTag(tagToDetach);
         } finally {
             assert ps != null: "preparedStatement is Null";
             ps.close();

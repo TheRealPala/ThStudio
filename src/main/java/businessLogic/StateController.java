@@ -129,7 +129,7 @@ public class StateController {
      * @param examId            The id of the medical exam
      * @throws Exception        If the medical exam is not found or if it is already completed
      */
-    public void completeMedicalExam(int examId) throws Exception{
+    public void markMedicalExamAsComplete(int examId) throws Exception{
         MedicalExam medicalExam = medicalExamDao.get(examId);
         if (!(medicalExam.getState() instanceof Booked)) {
             throw new RuntimeException("Can't mark an exam as complete if is not in booked state");

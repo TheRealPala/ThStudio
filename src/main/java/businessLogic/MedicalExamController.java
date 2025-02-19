@@ -5,6 +5,7 @@ import domainModel.Doctor;
 import domainModel.MedicalExam;
 import domainModel.Notification;
 import domainModel.Search.Search;
+import domainModel.State.Available;
 import domainModel.State.Booked;
 import domainModel.State.State;
 import domainModel.Tags.Tag;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import static java.util.Collections.unmodifiableList;
 
 
@@ -37,15 +39,6 @@ public class MedicalExamController {
         }
     }
 
-    public boolean addMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price) throws Exception {
-        Doctor doctor = doctorDao.get(idDoctor);
-        checkDateTimeBounds(medicalExamDao.getDoctorExams(doctor.getId()), startTime, endTime);
-        MedicalExam medicalExam = new MedicalExam(doctor.getId(), startTime, endTime, description, title, price);
-        medicalExamDao.insert(medicalExam);
-        return true;
-    }
-
-
     /**
      * Updates a medical exam
      *
@@ -61,7 +54,7 @@ public class MedicalExamController {
      */
 
     private void updateLogicForMedicalExam(int examId, LocalDateTime endTime, LocalDateTime startTime, String description,
-                                  String title, double price, ArrayList<Tag> tags, State state) throws Exception {
+                                           String title, double price, ArrayList<Tag> tags, State state) throws Exception {
         MedicalExam medicalExam = this.medicalExamDao.get(examId);
         if (medicalExam.getPrice() == price && medicalExam.getStartTime() == startTime && medicalExam.getEndTime() == endTime && medicalExam.getDescription().equals(description) && medicalExam.getTitle().equals(title) && medicalExam.getTags().equals(tags)) {
             System.out.println("nothing to update");
@@ -129,6 +122,15 @@ public class MedicalExamController {
         }
     }
 
+    public boolean addMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price) throws Exception {
+        Doctor doctor = doctorDao.get(idDoctor);
+        checkDateTimeBounds(medicalExamDao.getDoctorExams(doctor.getId()), startTime, endTime);
+        MedicalExam medicalExam = new MedicalExam(doctor.getId(), startTime, endTime, description, title, price);
+        medicalExam.setState(new Available());
+        medicalExamDao.insert(medicalExam);
+        return true;
+    }
+
     public boolean updateMedicalExam(int medicalExamId, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags, State state) throws Exception {
         boolean outcome = false;
         MedicalExam me = medicalExamDao.get(medicalExamId);
@@ -140,25 +142,14 @@ public class MedicalExamController {
     }
 
     /**
-     * Delete a medical exam
-     *
-     * @param ExamId The id of the medical exam
-     * @return True if the medical exam is deleted, false otherwise
-     * @throws Exception If the medical exam is not found, bubbles up exceptions to MedicalExamDAO::delete()
-     */
-    public boolean removeMedicalExam(int ExamId) throws Exception {
-        return medicalExamDao.delete(ExamId);
-    }
-
-    /**
      * Return the given medical exam
      *
-     * @param ExamId The id of the medical exam
+     * @param examId The id of the medical exam
      * @return The medical exam
      * @throws Exception If the medical exam is not found
      */
-    public MedicalExam getExam(int ExamId) throws Exception {
-        return medicalExamDao.get(ExamId);
+    public MedicalExam getExam(int examId) throws Exception {
+        return medicalExamDao.get(examId);
     }
 
     /**
@@ -216,5 +207,4 @@ public class MedicalExamController {
         return unmodifiableList(this.medicalExamDao.search(search));
     }
 
-    //attach and detach tags
 }

@@ -1,5 +1,4 @@
 package businessLogic;
-import java.util.List;
 import dao.*;
 import domainModel.*;
 
@@ -16,7 +15,7 @@ public class CustomerController extends PersonController<Customer> {
      *
      * @param name        The name of the customer
      * @param surname     The surname of the customer
-     * @param dateOfBirth The date of birth of the customer
+     * @param dateOfBirth The birthdate of the customer
      * @param level       The level of the customer
      * @param balance     The balance of the customer
      * @return The CF of the newly created customer

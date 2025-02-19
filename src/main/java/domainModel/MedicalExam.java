@@ -141,4 +141,12 @@ public class MedicalExam {
     public void setPrice(double price) {
         this.price = price;
     }
+
+    public void addTag(Tag tagToAdd) {
+        this.tags.add(tagToAdd);
+    }
+
+    public void removeTag(Tag tagToRemove) {
+        this.tags.remove(tagToRemove);
+    }
 }

@@ -10,12 +10,14 @@ import com.thstudio.project.domainModel.Doctor;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.*;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 
 class DoctorControllerTest {
     private static DoctorController doctorController;
 
     @BeforeAll
-     static void setDatabaseSettings() {
+    static void setDatabaseSettings() {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
         Database.setDbHost(dotenv.get("DB_HOST"));
         Database.setDbName(dotenv.get("DB_NAME_DEFAULT"));
@@ -50,4 +52,9 @@ class DoctorControllerTest {
         assertEquals(doctorToAdd, updatedDoctor);
     }
 
+    @AfterEach
+    void flushDb() throws SQLException {
+        Connection connection = Database.getConnection();
+        connection.prepareStatement("delete from people").executeUpdate();
+    }
 }

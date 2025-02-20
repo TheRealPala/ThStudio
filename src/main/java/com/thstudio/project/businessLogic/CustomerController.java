@@ -38,12 +38,14 @@ public class CustomerController extends PersonController<Customer> {
     }
 
     /**
-     * Modify the level of the customer
+     * get the customer
      *
-     * @param customerId    customer id
-     * @param level The new level
-     * @return true if the level is modified, false otherwise
+     * @param customer The new customer
      */
+    public void updateCustomer(Customer customer) throws Exception {
+        this.customerDao.update(customer);
+    }
+
 
     public boolean modifyCustomerLevel(int customerId, int level) throws Exception {
         Customer customer = this.customerDao.get(customerId);

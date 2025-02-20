@@ -44,10 +44,23 @@ class CustomerControllerTest {
         Customer customerToAdd = customerController.addCustomer("Marco", "Rossi", "2000-10-01", 1, 1000);
         assertEquals(customerToAdd.getLevel(), customerController.getPerson(customerToAdd.getId()).getLevel());
         customerToAdd.setLevel(customerToAdd.getLevel() + 1);
-        customerController.modifyCustomerLevel(customerToAdd.getId(), customerToAdd.getLevel());
+        assertTrue(customerController.modifyCustomerLevel(customerToAdd.getId(), customerToAdd.getLevel()));
         Customer updatedCustomer = customerController.getCustomer(customerToAdd.getId());
         assertNotNull(updatedCustomer);
         assertEquals(updatedCustomer.getLevel(), customerToAdd.getLevel());
+    }
+
+    @Test
+    void updateCustomer() throws Exception {
+        Customer customerToAdd = customerController.addCustomer("Marco", "Rossi", "2000-10-01", 1, 1000);
+        customerToAdd.setName("Luigi");
+        customerToAdd.setSurname("Bianchi");
+        customerToAdd.setDateOfBirth("2003-08-22");
+        customerToAdd.setLevel(2);
+        customerToAdd.setBalance(350.55);
+        customerController.updateCustomer(customerToAdd);
+        Customer updatedCustomer = customerController.getCustomer(customerToAdd.getId());
+        assertEquals(customerToAdd, updatedCustomer);
     }
 
 

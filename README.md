@@ -32,3 +32,6 @@ Software engineering project
 - Move into the project's root (the one with the pom.xml file)
 - Install all the maven dependencies: `mvn install`
 - Useful command: If you got some problem with the maven dependencies, you can try to clean the maven cache: `mvn clean install -U` or reinstall all the dependencies: `mvn dependency:purge-local-repository`
+
+### Test
+To run all the unit test of the project, run : `mvn test`

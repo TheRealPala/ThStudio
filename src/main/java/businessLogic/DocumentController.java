@@ -11,6 +11,7 @@ import domainModel.Person;
 import domainModel.State.Booked;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class DocumentController {
@@ -43,11 +44,21 @@ public class DocumentController {
         return this.documentDao.getByOwner(ownerId);
     }
 
-    public void sendDocument(int documentId, int receiverId) throws Exception {
-        Document document = this.documentDao.get(documentId);
+    public void sendDocument(Document document, int receiverId) throws Exception {
+        boolean isAlreadyPersisted = true;
+        try {
+            this.documentDao.get(document.getId());
+        } catch (Exception e) {
+            System.err.println("The document you want to send is not present in the db");
+           isAlreadyPersisted = false;
+        }
         document.setReceiverId(receiverId);
         Person documentOwner = this.personDao.get(document.getOwnerId());
-        this.documentDao.update(document);
+        if (isAlreadyPersisted) {
+            this.documentDao.update(document);
+        } else {
+            this.documentDao.insert(document);
+        }
         Notification nd = new Notification("New document " + document.getTitle() + " by :" + documentOwner.getFullName(), receiverId);
         this.notificationDao.insert(nd);
     }

@@ -37,4 +37,17 @@ class DoctorControllerTest {
         assertEquals(doctorToAdd, addedDoctor);
     }
 
+    @Test
+    void updateDoctor() throws Exception {
+        Doctor doctorToAdd = doctorController.addDoctor("Marco", "Rossi", "2000-10-01", "ddd", 1000);
+        doctorToAdd.setName("Luigi");
+        doctorToAdd.setSurname("Bianchi");
+        doctorToAdd.setDateOfBirth("2003-08-22");
+        doctorToAdd.setMedicalLicenseNumber("eee");
+        doctorToAdd.setBalance(350.55);
+        doctorController.updateDoctor(doctorToAdd);
+        Doctor updatedDoctor = doctorController.getDoctor(doctorToAdd.getId());
+        assertEquals(doctorToAdd, updatedDoctor);
+    }
+
 }

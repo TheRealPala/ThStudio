@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS `customers`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `customers` (
   `id` int(11) NOT NULL,
-  `level` varchar(100) DEFAULT NULL,
+  `level` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `customers_people_fk` FOREIGN KEY (`id`) REFERENCES `people` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -55,11 +55,11 @@ DROP TABLE IF EXISTS `doctors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `doctors` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `medical_license_number` varchar(100) DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `medical_license_number` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `doctors_people_fk` FOREIGN KEY (`id`) REFERENCES `people` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -79,20 +79,20 @@ DROP TABLE IF EXISTS `documents`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `documents` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `path` varchar(255) NOT NULL,
-  `id_medical_exam` int(11) DEFAULT NULL,
-  `id_owner` int(11) NOT NULL,
+  `id_medical_exam` int(11) NOT NULL,
+  `id_owner` int(11) DEFAULT NULL,
   `id_receiver` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  KEY `documents_medical_exams_fk` (`id_medical_exam`),
   KEY `documents_customers_fk` (`id_receiver`),
   KEY `documents_doctors_fk` (`id_owner`),
-  KEY `documents_medical_exams_fk` (`id_medical_exam`),
-  CONSTRAINT `documents_medical_exams_fk` FOREIGN KEY (`id_medical_exam`) REFERENCES `medical_exams` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `documents_onwer_fk` FOREIGN KEY (`id_owner`) REFERENCES `people` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `documents_receiver_fk` FOREIGN KEY (`id_receiver`) REFERENCES `people` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `documents_customers_fk` FOREIGN KEY (`id_receiver`) REFERENCES `customers` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `documents_doctors_fk` FOREIGN KEY (`id_owner`) REFERENCES `doctors` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `documents_medical_exams_fk` FOREIGN KEY (`id_medical_exam`) REFERENCES `medical_exams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -114,20 +114,20 @@ DROP TABLE IF EXISTS `medical_exams`;
 CREATE TABLE `medical_exams` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL,
-  `description` varchar(300) DEFAULT NULL,
+  `description` varchar(300) NOT NULL,
   `start_time` datetime NOT NULL,
-  `end_time` datetime DEFAULT NULL,
+  `end_time` datetime NOT NULL,
   `price` float NOT NULL CHECK (`price` >= 0),
   `state` text NOT NULL,
   `state_extra_info` text DEFAULT NULL,
   `id_customer` int(11) DEFAULT NULL,
-  `id_doctor` int(11) DEFAULT NULL,
+  `id_doctor` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `medical_exams__customers_fk` (`id_customer`),
-  KEY `medical_exams__trainers_fk` (`id_doctor`),
-  CONSTRAINT `medical_exams__customers_fk` FOREIGN KEY (`id_customer`) REFERENCES `customers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `medical_exams__trainers_fk` FOREIGN KEY (`id_doctor`) REFERENCES `doctors` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  KEY `medical_exams_customers_fk` (`id_customer`),
+  KEY `medical_exams_doctors_fk` (`id_doctor`),
+  CONSTRAINT `medical_exams_customers_fk` FOREIGN KEY (`id_customer`) REFERENCES `customers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `medical_exams_doctors_fk` FOREIGN KEY (`id_doctor`) REFERENCES `doctors` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -167,32 +167,6 @@ LOCK TABLES `medical_exams_tags` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `notifications`
---
-
-DROP TABLE IF EXISTS `notifications`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `notifications` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
-  `id_receiver` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `notifications_receiver_fk` (`id_receiver`),
-  CONSTRAINT `notifications_receiver_fk` FOREIGN KEY (`id_receiver`) REFERENCES `people` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `notifications`
---
-
-LOCK TABLES `notifications` WRITE;
-/*!40000 ALTER TABLE `notifications` DISABLE KEYS */;
-/*!40000 ALTER TABLE `notifications` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `people`
 --
 
@@ -206,7 +180,7 @@ CREATE TABLE `people` (
   `date_of_birth` date NOT NULL,
   `balance` double NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -250,4 +224,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-14 16:28:34
+-- Dump completed on 2025-02-20 13:57:45

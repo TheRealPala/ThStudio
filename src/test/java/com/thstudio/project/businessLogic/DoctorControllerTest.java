@@ -1,0 +1,33 @@
+package com.thstudio.project.businessLogic;
+
+import com.thstudio.project.dao.DoctorDao;
+import com.thstudio.project.dao.Database;
+import com.thstudio.project.dao.MariaDbDoctorDao;
+import com.thstudio.project.dao.MariaDbPersonDao;
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.thstudio.project.domainModel.Doctor;
+import io.github.cdimascio.dotenv.Dotenv;
+import org.junit.jupiter.api.*;
+
+
+class DoctorControllerTest {
+    private static DoctorController doctorController;
+
+    @BeforeAll
+     static void setDatabaseSettings() {
+        Dotenv dotenv = Dotenv.configure().directory("config").load();
+        Database.setDbHost(dotenv.get("DB_HOST"));
+        Database.setDbName(dotenv.get("DB_NAME_DEFAULT"));
+        Database.setDbTestName(dotenv.get("DB_NAME_TEST"));
+        Database.setDbUser(dotenv.get("DB_USER"));
+        Database.setDbPassword(dotenv.get("DB_PASSWORD"));
+        Database.setDbPort(dotenv.get("DB_PORT"));
+        assertTrue((Database.testConnection(true, false)));
+        DoctorDao customerDao = new MariaDbDoctorDao(new MariaDbPersonDao());
+        doctorController = new DoctorController(customerDao);
+    }
+
+
+
+}

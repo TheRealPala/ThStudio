@@ -28,6 +28,13 @@ class DoctorControllerTest {
         doctorController = new DoctorController(customerDao);
     }
 
-
+    @Test
+    void addDoctor() throws Exception {
+        Doctor doctorToAdd = doctorController.addDoctor("Marco", "Rossi", "2000-10-01", "ddd", 1000);
+        assertNotNull(doctorToAdd);
+        assertNotEquals(doctorToAdd.getId(), 0);
+        Doctor addedDoctor = doctorController.getPerson(doctorToAdd.getId());
+        assertEquals(doctorToAdd, addedDoctor);
+    }
 
 }

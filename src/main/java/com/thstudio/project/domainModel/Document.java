@@ -1,5 +1,7 @@
 package com.thstudio.project.domainModel;
 
+import java.util.Objects;
+
 public class Document {
     private int id;
     private String title;
@@ -67,5 +69,14 @@ public class Document {
 
     public void setMedicalExamId(int medicalExamId) {
         this.medicalExamId = medicalExamId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Document document = (Document) o;
+        return getId() == document.getId() && getOwnerId() == document.getOwnerId() && getReceiverId() == document.getReceiverId() && getMedicalExamId() == document.getMedicalExamId() && Objects.equals(getTitle(), document.getTitle()) && Objects.equals(getPath(), document.getPath());
     }
 }

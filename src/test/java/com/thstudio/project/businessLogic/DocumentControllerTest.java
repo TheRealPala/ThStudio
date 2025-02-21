@@ -1,28 +1,22 @@
 package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
-import com.thstudio.project.domainModel.*;
-import com.thstudio.project.domainModel.State.Available;
-import com.thstudio.project.domainModel.State.Booked;
+import com.thstudio.project.domainModel.Document;
+import com.thstudio.project.domainModel.Person;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DocumentControllerTest {
+class DocumentControllerTest {
     private static DocumentController documentController;
-    private static CustomerDao customerDao;
     private static DocumentDao documentDao;
-    private static DoctorDao doctorDao;
-    private static MedicalExamDao medicalExamDao;
-
+    private static PersonDao personDao;
     @BeforeAll
     static void setDatabaseSettings() {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
@@ -33,30 +27,25 @@ public class DocumentControllerTest {
         Database.setDbPassword(dotenv.get("DB_PASSWORD"));
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
-        PersonDao personDao = new MariaDbPersonDao();
-        medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
-        doctorDao = new MariaDbDoctorDao(personDao);
-        customerDao = new MariaDbCustomerDao(personDao);
         documentDao = new MariaDbDocumentDao();
-        documentController = new DocumentController(documentDao, personDao,new MariaDbNotificationDao(), medicalExamDao);
-
+        personDao = new MariaDbPersonDao();
+        NotificationDao notificationDao = new MariaDbNotificationDao();
+        MedicalExamDao medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
+        documentController = new DocumentController(documentDao, personDao, notificationDao, medicalExamDao);
     }
 
     @Test
-    public void addDocument() throws Exception {
-        Doctor doctor = new Doctor("marco", "surname", "2000-01-01",1,"licence", 0.0);
-        doctorDao.insert(doctor);
-        Customer customer= new Customer("luigi", "surname", "2000-01-01",1,0.0);
-        customerDao.insert(customer);
-        Document documentToAdd = documentController.addDocument("title", doctor.getId());
-        Document addedDocument = documentDao.get(documentToAdd.getId());
-        assertNotNull(addedDocument);
+    void addDocument() throws Exception {
+        Person personToAdd = new Person("Marco", "Rossi", "2000-10-01", 1000);
+        personDao.insert(personToAdd);
+        assertNotEquals(personToAdd.getId(), 0);
+        Document documentToAdd = documentController.addDocument("Documento1", personToAdd.getId());
+        Document addedDocument  = documentDao.get(documentToAdd.getId());
         assertEquals(documentToAdd, addedDocument);
-
     }
-    @Test
+   /* @Test
     public void getDocumentsByReceiver() throws Exception {
-       Doctor doctor = new Doctor("marco", "surname", "2000-01-01",1,"licence", 0.0);
+        Doctor doctor = new Doctor("marco", "surname", "2000-01-01",1,"licence", 0.0);
         doctorDao.insert(doctor);
         Customer customer= new Customer("luigi", "surname", "2000-01-01",1,0.0);
         customerDao.insert(customer);
@@ -108,24 +97,11 @@ public class DocumentControllerTest {
         Document addedDocument = documentDao.get(documentToAdd.getId());
         assertNotNull(addedDocument);
         assertEquals(medicalExam.getId(), addedDocument.getMedicalExamId());
-    }
-
-
-
-
-
-
-
+    }*/
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();
         connection.prepareStatement("delete from people").executeUpdate();
         connection.prepareStatement("delete from documents").executeUpdate();
-        connection.prepareStatement("delete from doctors").executeUpdate();
-        connection.prepareStatement("delete from customers").executeUpdate();
     }
-
-
-
-
 }

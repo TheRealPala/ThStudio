@@ -3,8 +3,11 @@ package com.thstudio.project.domainModel;
 import com.thstudio.project.domainModel.State.State;
 import com.thstudio.project.domainModel.Tags.Tag;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MedicalExam {
     private String title;
@@ -19,36 +22,36 @@ public class MedicalExam {
     private ArrayList<Document> documents;
     private ArrayList<Tag> tags;
 
-    public MedicalExam(int idDoctor, LocalDateTime startTime, LocalDateTime endTime,
+    public MedicalExam(int idDoctor, String startTime, String endTime,
                        String description, String title, double price) {
         this.tags = new ArrayList<>();
         this.documents = new ArrayList<>();
         this.idDoctor = idDoctor;
-        this.endTime = endTime;
-        this.startTime = startTime;
+        this.startTime = this.parseDate(startTime);
+        this.endTime = this.parseDate(endTime);
         this.description = description;
         this.title = title;
         this.price = price;
     }
 
-    public MedicalExam(int id, int idDoctor, LocalDateTime startTime, LocalDateTime endTime,
+    public MedicalExam(int id, int idDoctor, String startTime, String endTime,
                        String description, String title, double price) {
         this.id = id;
         this.idDoctor = idDoctor;
-        this.endTime = endTime;
-        this.startTime = startTime;
+        this.startTime = this.parseDate(startTime);
+        this.endTime = this.parseDate(endTime);
         this.description = description;
         this.title = title;
         this.price = price;
         this.tags = new ArrayList<>();
         this.documents = new ArrayList<>();
     }
-    public MedicalExam(int id, int idDoctor, int idCustomer, LocalDateTime startTime, LocalDateTime endTime,
+    public MedicalExam(int id, int idDoctor, int idCustomer, String startTime, String endTime,
                        String description, String title, double price, State state) {
         this.id = id;
         this.idDoctor = idDoctor;
-        this.endTime = endTime;
-        this.startTime = startTime;
+        this.startTime = this.parseDate(startTime);
+        this.endTime = this.parseDate(endTime);
         this.description = description;
         this.title = title;
         this.price = price;
@@ -56,6 +59,10 @@ public class MedicalExam {
         this.documents = new ArrayList<>();
         this.idCustomer=idCustomer;
         this.state = state;
+    }
+
+    private LocalDateTime parseDate(String date) {
+        return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     public String getTitle() {
@@ -148,5 +155,14 @@ public class MedicalExam {
 
     public void removeTag(Tag tagToRemove) {
         this.tags.remove(tagToRemove);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MedicalExam that = (MedicalExam) o;
+        return getIdDoctor() == that.getIdDoctor() && getIdCustomer() == that.getIdCustomer() && getId() == that.getId() && Double.compare(getPrice(), that.getPrice()) == 0 && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getDescription(), that.getDescription()) && Objects.equals(getState(), that.getState()) && Objects.equals(getStartTime(), that.getStartTime()) && Objects.equals(getEndTime(), that.getEndTime()) && Objects.equals(getDocuments(), that.getDocuments()) && Objects.equals(getTags(), that.getTags());
     }
 }

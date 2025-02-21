@@ -126,7 +126,7 @@ public class MariaDbDocumentDao implements DocumentDao {
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update documents set title = ?, path = ?, id_owner = ?, id_receiver = ?, id_medical_exam = ? where id = ?");
+            ps = con.prepareStatement("update documents set title = ?, path = ?, id_owner = ?, id_medical_exam = ?, id_receiver = ? where id = ?");
             ps.setString(1, document.getTitle());
             ps.setString(2, document.getPath());
             ps.setInt(3, document.getOwnerId());

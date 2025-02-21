@@ -1,7 +1,5 @@
 package com.thstudio.project.domainModel;
 
-import java.util.Objects;
-
 public class Doctor extends Person {
     private String medicalLicenseNumber;
 

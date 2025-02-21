@@ -31,11 +31,10 @@ public class MedicalExamController {
 
     private void checkDateTimeBounds(List<MedicalExam> medicalExams, LocalDateTime startTime,
                                      LocalDateTime endTime) throws IllegalArgumentException {
-        boolean outcome = true;
         for (MedicalExam exam : medicalExams) {
-            if ((exam.getStartTime().isBefore(endTime) || exam.getStartTime().equals(endTime))
-                    && (exam.getEndTime().isAfter(startTime) || exam.getEndTime().equals(startTime)))
-                throw new IllegalArgumentException("The given doctor is already occupied in the given time range (in course #" + exam.getId() + ")");
+            if ( (startTime.isAfter(exam.getStartTime()) && startTime.isBefore(exam.getEndTime())) || (endTime.isAfter(exam.getStartTime()) && endTime.isBefore(exam.getEndTime())) ) {
+                throw new IllegalArgumentException("The given doctor is already occupied in the given time range");
+            }
         }
     }
 
@@ -125,10 +124,14 @@ public class MedicalExamController {
     public MedicalExam addMedicalExam(int idDoctor, String title, String description, String startTime, String endTime, double price) throws Exception {
         Doctor doctor = doctorDao.get(idDoctor);
         MedicalExam medicalExam = new MedicalExam(doctor.getId(), startTime, endTime, description, title, price);
+        List<MedicalExam> medicalExams = new ArrayList<>();
         try {
-            checkDateTimeBounds(medicalExamDao.getDoctorExams(doctor.getId()), medicalExam.getStartTime(), medicalExam.getEndTime());
+            medicalExams = medicalExamDao.getDoctorExams(doctor.getId());
         } catch (RuntimeException e) {
             System.out.println("The doctor has not exam, therefore is free in the time specified");
+        }
+        if (!medicalExams.isEmpty()) {
+            checkDateTimeBounds(medicalExams, medicalExam.getStartTime(), medicalExam.getEndTime());
         }
         medicalExam.setState(new Available());
         medicalExamDao.insert(medicalExam);

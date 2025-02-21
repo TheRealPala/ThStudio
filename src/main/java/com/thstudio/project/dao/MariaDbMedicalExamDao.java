@@ -7,6 +7,7 @@ import com.thstudio.project.domainModel.Tags.Tag;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,11 +39,13 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     }
 
     private MedicalExam parseMedicalExam(ResultSet rs) throws SQLException {
+        LocalDateTime startTime = LocalDateTime.parse(rs.getString("start_time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"));
+        LocalDateTime endTime = LocalDateTime.parse(rs.getString("end_time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"));
         MedicalExam me = new MedicalExam(
                 rs.getInt("id"),
                 rs.getInt("id_doctor"),
-                rs.getTimestamp("start_time").toLocalDateTime(),
-                rs.getTimestamp("end_time").toLocalDateTime(),
+                startTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                endTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 rs.getString("description"),
                 rs.getString("title"),
                 rs.getDouble("price")
@@ -125,16 +128,16 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps.setString(1, m.getTitle());
             ps.setString(2, m.getDescription());
             ps.setString(3, m.getStartTime().toString());
-            ps.setString(3, m.getEndTime().toString());
-            ps.setDouble(4, m.getPrice());
-            ps.setString(5, (m.getState()).getState());
-            ps.setString(6, m.getState().getExtraInfo());
+            ps.setString(4, m.getEndTime().toString());
+            ps.setDouble(5, m.getPrice());
+            ps.setString(6, (m.getState()).getState());
+            ps.setString(7, m.getState().getExtraInfo());
             if (m.getIdCustomer() != 0) {
-                ps.setInt(7, m.getIdCustomer());
+                ps.setInt(8, m.getIdCustomer());
             } else {
-                ps.setNull(7, m.getIdCustomer());
+                ps.setNull(8, m.getIdCustomer());
             }
-            ps.setInt(8, m.getIdDoctor());
+            ps.setInt(9, m.getIdDoctor());
             ps.executeUpdate();
             //get generated id from dbms
             rs = ps.getGeneratedKeys();

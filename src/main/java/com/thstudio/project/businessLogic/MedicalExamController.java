@@ -122,13 +122,17 @@ public class MedicalExamController {
         }
     }
 
-    public boolean addMedicalExam(int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price) throws Exception {
+    public MedicalExam addMedicalExam(int idDoctor, String title, String description, String startTime, String endTime, double price) throws Exception {
         Doctor doctor = doctorDao.get(idDoctor);
-        checkDateTimeBounds(medicalExamDao.getDoctorExams(doctor.getId()), startTime, endTime);
         MedicalExam medicalExam = new MedicalExam(doctor.getId(), startTime, endTime, description, title, price);
+        try {
+            checkDateTimeBounds(medicalExamDao.getDoctorExams(doctor.getId()), medicalExam.getStartTime(), medicalExam.getEndTime());
+        } catch (RuntimeException e) {
+            System.out.println("The doctor has not exam, therefore is free in the time specified");
+        }
         medicalExam.setState(new Available());
         medicalExamDao.insert(medicalExam);
-        return true;
+        return medicalExam;
     }
 
     public boolean updateMedicalExam(int medicalExamId, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags, State state) throws Exception {

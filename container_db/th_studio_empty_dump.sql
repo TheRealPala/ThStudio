@@ -79,19 +79,19 @@ DROP TABLE IF EXISTS `documents`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `documents` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `path` varchar(255) NOT NULL,
-  `id_medical_exam` int(11) NOT NULL,
-  `id_owner` int(11) DEFAULT NULL,
+  `id_medical_exam` int(11) DEFAULT NULL,
+  `id_owner` int(11) NOT NULL,
   `id_receiver` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `documents_medical_exams_fk` (`id_medical_exam`),
   KEY `documents_customers_fk` (`id_receiver`),
   KEY `documents_doctors_fk` (`id_owner`),
-  CONSTRAINT `documents_customers_fk` FOREIGN KEY (`id_receiver`) REFERENCES `customers` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `documents_doctors_fk` FOREIGN KEY (`id_owner`) REFERENCES `doctors` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `documents_medical_exams_fk` FOREIGN KEY (`id_medical_exam`) REFERENCES `medical_exams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `documents_medical_exams_fk` FOREIGN KEY (`id_medical_exam`) REFERENCES `medical_exams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `documents_owner_fk` FOREIGN KEY (`id_owner`) REFERENCES `people` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `documents_receiver_fk` FOREIGN KEY (`id_receiver`) REFERENCES `people` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -116,7 +116,7 @@ CREATE TABLE `medical_exams` (
   `title` varchar(100) NOT NULL,
   `description` varchar(300) NOT NULL,
   `start_time` datetime NOT NULL,
-  `end_time` datetime NOT NULL,
+  `end_time` datetime DEFAULT NULL,
   `price` float NOT NULL CHECK (`price` >= 0),
   `state` text NOT NULL,
   `state_extra_info` text DEFAULT NULL,
@@ -224,4 +224,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-20 13:57:45
+-- Dump completed on 2025-02-21 14:09:40

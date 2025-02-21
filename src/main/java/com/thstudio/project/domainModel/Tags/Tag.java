@@ -1,5 +1,7 @@
 package com.thstudio.project.domainModel.Tags;
 
+import java.util.Objects;
+
 public class Tag {
     protected String tag;
     protected String tagType;
@@ -18,5 +20,14 @@ public class Tag {
 
     public void setTagType(String tagType) {
         this.tagType = tagType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Tag tag1 = (Tag) o;
+        return Objects.equals(getTag(), tag1.getTag()) && Objects.equals(getTagType(), tag1.getTagType());
     }
 }

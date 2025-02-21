@@ -29,10 +29,11 @@ public class DocumentController {
         this.medicalExamDao = medicalExamDao;
     }
 
-    private void addDocument(String title, int ownerId) throws Exception {
+    public Document addDocument(String title, int ownerId) throws Exception {
         Person person = personDao.get(ownerId);
         Document document = new Document(title, this.baseDocumentPath + title, person.getId());
         this.documentDao.insert(document);
+        return document;
     }
 
     public List<Document> getDocumentsByReceiver(int receiverId) throws Exception {

@@ -1,8 +1,7 @@
 package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
-import com.thstudio.project.domainModel.Document;
-import com.thstudio.project.domainModel.Person;
+import com.thstudio.project.domainModel.*;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,6 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.List;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,6 +19,9 @@ class DocumentControllerTest {
     private static DocumentController documentController;
     private static DocumentDao documentDao;
     private static PersonDao personDao;
+    private static DoctorDao doctorDao;
+    private static CustomerDao customerDao;
+    private static MedicalExamDao medicalExamDao;
     @BeforeAll
     static void setDatabaseSettings() {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
@@ -29,8 +34,10 @@ class DocumentControllerTest {
         assertTrue((Database.testConnection(true, false)));
         documentDao = new MariaDbDocumentDao();
         personDao = new MariaDbPersonDao();
+        doctorDao = new MariaDbDoctorDao(personDao);
+        customerDao = new MariaDbCustomerDao(personDao);
         NotificationDao notificationDao = new MariaDbNotificationDao();
-        MedicalExamDao medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
+        medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
         documentController = new DocumentController(documentDao, personDao, notificationDao, medicalExamDao);
     }
 
@@ -43,7 +50,7 @@ class DocumentControllerTest {
         Document addedDocument  = documentDao.get(documentToAdd.getId());
         assertEquals(documentToAdd, addedDocument);
     }
-   /* @Test
+   @Test
     public void getDocumentsByReceiver() throws Exception {
         Doctor doctor = new Doctor("marco", "surname", "2000-01-01",1,"licence", 0.0);
         doctorDao.insert(doctor);
@@ -86,22 +93,51 @@ class DocumentControllerTest {
     }
     @Test
     public void attachDocumentToMedicalExam() throws Exception {
-        Doctor doctor = new Doctor("marco", "surname", "2000-01-01",1,"licence", 0.0);
-        doctorDao.insert(doctor);
-        Document documentToAdd = documentController.addDocument("title", doctor.getId());
-        LocalDateTime startTime = LocalDateTime.of(2026, 1, 1, 12, 40);
-        LocalDateTime endTime = LocalDateTime.of(2026, 1, 1, 13, 40);
-        MedicalExam medicalExam = new MedicalExam(doctor.getId(),startTime, endTime, "description", "title", 30.5);
+
+        Doctor doctor1 = new Doctor("marco", "surname", "2000-01-01","licence", 0.0);
+        doctorDao.insert(doctor1);
+        MedicalExam medicalExam1 = new MedicalExam(doctor1.getId(),"2026-01-01 12:40:00","2026-01-01 13:40:00", "description", "title", 30.5);
+        medicalExamDao.insert(medicalExam1);
+        Document document1 = new Document("title","path", doctor1.getId());
+        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    documentController.attachDocumentToMedicalExam(document1.getId(), medicalExam1.getId());
+                }
+        );
+                assertEquals(thrown.getMessage(), "The Document looked for in not present in the database");
+        // se il documento non è nel db
+
+
+
+        // controllare la notifica
+        Document documentDb = documentController.addDocument("title", doctor1.getId());
+        Doctor doctor2 = new Doctor("marco", "surname", "2000-01-01",2,"licence", 0.0);
+        doctorDao.insert(doctor2);
+        Document documentToAdd = documentController.addDocument("title", doctor2.getId());
+        MedicalExam medicalExam = new MedicalExam(doctor2.getId(),"2026-01-01 12:40:00","2026-01-01 13:40:00", "description", "title", 30.5);
         medicalExamDao.insert(medicalExam);
         documentController.attachDocumentToMedicalExam(documentToAdd.getId(), medicalExam.getId());
-        Document addedDocument = documentDao.get(documentToAdd.getId());
-        assertNotNull(addedDocument);
-        assertEquals(medicalExam.getId(), addedDocument.getMedicalExamId());
-    }*/
+        assertEquals(documentDao.get(documentToAdd.getId()).getMedicalExamId(),medicalExam.getId());  // due medical exam a cui è stato attaccato lo stesso documento uno tramite attach e uno con add
+        // documento già presente nel db
+
+        RuntimeException thrown1 = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    documentController.attachDocumentToMedicalExam(documentDb.getId(), medicalExam.getId());
+                }
+        );
+        assertEquals(thrown1.getMessage(), "Can't attach a document to a medicalExam which is not yours");
+
+
+
+    }
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();
         connection.prepareStatement("delete from people").executeUpdate();
         connection.prepareStatement("delete from documents").executeUpdate();
+        connection.prepareStatement("delete from medical_exams").executeUpdate();
+        connection.prepareStatement("delete from tags").executeUpdate();
+
+
     }
 }

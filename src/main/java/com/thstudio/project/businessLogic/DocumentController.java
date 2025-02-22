@@ -11,6 +11,7 @@ import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.domainModel.State.Booked;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class DocumentController {
@@ -63,7 +64,7 @@ public class DocumentController {
         this.notificationDao.insert(nd);
     }
 
-    public void attachDocumentToMedicalExam(int documentId, int medicalExamId) throws Exception {
+public void attachDocumentToMedicalExam(int documentId, int medicalExamId) throws Exception, SQLException {
         MedicalExam medicalExam = this.medicalExamDao.get(medicalExamId);
         Document document = this.documentDao.get(documentId);
         if (medicalExam.getIdDoctor() != document.getOwnerId()) {
@@ -77,6 +78,6 @@ public class DocumentController {
             notificationDao.insert(nd);
         }
         document.setMedicalExamId(medicalExam.getId());
-        this.documentDao.update(document);
+        documentDao.update(document);
     }
 }

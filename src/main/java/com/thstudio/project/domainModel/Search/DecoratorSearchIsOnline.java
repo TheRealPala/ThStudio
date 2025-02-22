@@ -10,6 +10,6 @@ public class DecoratorSearchIsOnline extends BaseDecoratorSearch {
 
     @Override
     public String getSearchQuery() {
-        return super.getSearchQuery() + " AND L.idLesson IN (SELECT idLesson FROM lessonsTags WHERE tagType = 'Online' AND tag = ? )";
+        return super.getSearchQuery() + " AND m.id IN (SELECT id_medical_exam FROM medical_exams_tags WHERE tag_type = 'Online' AND tag = ?)";
     }
 }

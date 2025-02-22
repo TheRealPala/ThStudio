@@ -386,7 +386,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
     }
 
     @Override
-    public void deleteBookMedicalExam(MedicalExam me) throws Exception {
+    public void deleteBookedMedicalExam(MedicalExam me) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         try {

@@ -87,7 +87,7 @@ public class StateController {
         this.customerDao.update(c);
 
         me.setState(new Available());
-        this.medicalExamDao.deleteBookMedicalExam(me);
+        this.medicalExamDao.deleteBookedMedicalExam(me);
         Notification nd = new Notification("Deleted exam booking " + me.getTitle() + " by:" + c.getName(), d.getId());
         notificationDao.insert(nd);
         return true;
@@ -101,8 +101,8 @@ public class StateController {
      * @return true, if the medical exam is canceled, raise up RuntimeExceptions otherwise
      */
     public boolean cancelMedicalExam(int medicalExamId, int doctorId) throws Exception {
-        MedicalExam me = this.medicalExamDao.get(medicalExamId);
         Doctor d = this.doctorDao.get(doctorId);
+        MedicalExam me = this.medicalExamDao.get(medicalExamId);
         if (me.getIdDoctor() != d.getId()) {
             throw new RuntimeException("Unauthorized request");
         }
@@ -117,12 +117,12 @@ public class StateController {
             c.setBalance(c.getBalance() + medicalExamPrice);
             this.doctorDao.update(d);
             this.customerDao.update(c);
-            Notification nd = new Notification("Deleted exam " + me.getTitle() + "by :" + d.getName(), c.getId());
+            Notification nd = new Notification("Deleted exam " + me.getTitle() + " by:" + d.getName(), c.getId());
             notificationDao.insert(nd);
         }
 
         me.setState(new Deleted(LocalDateTime.now()));
-        this.medicalExamDao.changeState(me.getId(), me.getState());
+        this.medicalExamDao.deleteBookedMedicalExam(me);
         return true;
     }
 

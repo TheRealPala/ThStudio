@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +19,7 @@ class NotificationControllerTest {
     private static NotificationController notificationController;
     private static DoctorDao doctorDao;
     private static NotificationDao notificationDao;
+
     @BeforeAll
     static void setDatabaseSettings() {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
@@ -31,7 +33,7 @@ class NotificationControllerTest {
         PersonDao personDao = new MariaDbPersonDao();
         doctorDao = new MariaDbDoctorDao(personDao);
         notificationDao = new MariaDbNotificationDao();
-        notificationController = new NotificationController(notificationDao);
+        notificationController = new NotificationController(notificationDao, personDao);
     }
 
     @Test
@@ -45,6 +47,48 @@ class NotificationControllerTest {
         assertEquals(notificationList.getFirst(), notificationToInsert);
     }
 
+    @Test
+    void getMoreThanOneNotificationByReceiver() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        Notification firstNotificationToAdd = new Notification("Titolo notifica", doctor.getId());
+        Notification secondNotificationToAdd = new Notification("Titolo seconda notifica", doctor.getId());
+        List<Notification> notificationsToAdd = new ArrayList<>();
+        notificationsToAdd.add(firstNotificationToAdd);
+        notificationsToAdd.add(secondNotificationToAdd);
+        for (Notification notificationToAdd : notificationsToAdd) {
+            notificationDao.insert(notificationToAdd);
+        }
+        List<Notification> addedNotifications = notificationController.getNotificationsByReceiverId(doctor.getId());
+        assertEquals(notificationsToAdd.size(), addedNotifications.size());
+        for (int i = 0; i < notificationsToAdd.size(); ++i) {
+            assertEquals(notificationsToAdd.get(i), addedNotifications.get(i));
+        }
+    }
+
+    @Test
+    void getNoNotifications() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    notificationController.getNotificationsByReceiverId(doctor.getId());
+                }
+        );
+        assertEquals(thrown.getMessage(), "The receiver has not notifications");
+    }
+
+    @Test
+    void getNotificationsForAnUnknownReceiver() throws Exception {
+        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    notificationController.getNotificationsByReceiverId(1);
+                }
+        );
+        assertEquals(thrown.getMessage(), "The person looked for in not present in the database");
+    }
 
     @AfterEach
     void flushDb() throws SQLException {

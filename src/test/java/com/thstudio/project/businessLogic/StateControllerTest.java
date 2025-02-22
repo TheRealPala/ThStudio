@@ -66,6 +66,11 @@ class StateControllerTest {
         MedicalExam bookedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId());
         assertInstanceOf(Booked.class, bookedMedicalExam.getState());
         assertEquals(bookedMedicalExam.getIdCustomer(), customer.getId());
+        //check of payment
+        Customer customerAfterPayment = customerDao.get(customer.getId());
+        Doctor doctorAfterPayment = doctorDao.get(doctor.getId());
+        assertEquals(customer.getBalance() - bookedMedicalExam.getPrice(), customerAfterPayment.getBalance());
+        assertEquals(doctor.getBalance() + bookedMedicalExam.getPrice(), doctorAfterPayment.getBalance());
         //check gen of notification
         Notification bookedNotification = notificationDao.getNotificationsByReceiverId(doctor.getId()).getFirst();
         assertEquals(bookedNotification.getTitle(), "Booked exam " + bookedMedicalExam.getTitle() + " by:" + customer.getName());
@@ -109,6 +114,95 @@ class StateControllerTest {
         );
         assertEquals(thrown.getMessage(), "not enough money");
     }
+
+    @Test
+    void cancelMedicalExamBooking() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        customerDao.insert(customer);
+        assertNotEquals(customer.getId(), 0);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
+        assertTrue(stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), customer.getId()));
+        MedicalExam deletedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId());
+        assertEquals(deletedMedicalExam.getIdCustomer(), 0);
+        assertInstanceOf(Available.class, deletedMedicalExam.getState());
+        //check of payment
+        Customer customerAfterRefund = customerDao.get(customer.getId());
+        Doctor doctorAfterRefund = doctorDao.get(doctor.getId());
+        assertEquals(customer.getBalance(), customerAfterRefund.getBalance());
+        assertEquals(doctor.getBalance(), doctorAfterRefund.getBalance());
+        //check gen of notification
+        Notification deletedBookingNotification = notificationDao.getNotificationsByReceiverId(doctor.getId()).get(1);
+        assertEquals(deletedBookingNotification.getTitle(), "Deleted exam booking " + deletedMedicalExam.getTitle() + " by:" + customer.getName());
+
+    }
+
+    @Test
+    void cancelMedicalExamOfADifferentCustomer() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        customerDao.insert(customer);
+        assertNotEquals(customer.getId(), 0);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
+        Customer otherCustomer = new Customer("Marco", "Rossi", "2000-05-04", 2, 500);
+        customerDao.insert(otherCustomer);
+        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), otherCustomer.getId());
+                }
+        );
+        assertEquals(thrown.getMessage(), "Unauthorized request");
+    }
+
+    @Test
+    void cancelNotBookedMedicalExam() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        customerDao.insert(customer);
+        assertNotEquals(customer.getId(), 0);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        assertNotEquals(addedMedicalExam.getId(), 0);
+        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), customer.getId());
+                }
+        );
+        assertEquals(thrown.getMessage(), "Can't cancel a booking for an exam which is not booked");
+    }
+
+    @Test
+    void cancelAlreadyStartedMedicalExam() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        customerDao.insert(customer);
+        assertNotEquals(customer.getId(), 0);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
+        MedicalExam bookedExam = medicalExamController.getExam(addedMedicalExam.getId());
+        bookedExam.setStartTime(LocalDateTime.now());
+        bookedExam.setEndTime(LocalDateTime.now().plusHours(1));
+        medicalExamController.updateMedicalExam(bookedExam);
+        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), customer.getId());
+                }
+        );
+        assertEquals(thrown.getMessage(), "Can't cancel an exam already started");
+    }
+
    /* @Test
     void addMedicalExam() throws Exception {
         Doctor doctorToAdd = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);

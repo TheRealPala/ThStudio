@@ -10,7 +10,6 @@ import com.thstudio.project.domainModel.Notification;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.domainModel.State.Booked;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.List;
 
 public class DocumentController {
@@ -29,10 +28,11 @@ public class DocumentController {
         this.medicalExamDao = medicalExamDao;
     }
 
-    private void addDocument(String title, int ownerId) throws Exception {
+    public Document addDocument(String title, int ownerId) throws Exception {
         Person person = personDao.get(ownerId);
         Document document = new Document(title, this.baseDocumentPath + title, person.getId());
         this.documentDao.insert(document);
+        return document;
     }
 
     public List<Document> getDocumentsByReceiver(int receiverId) throws Exception {
@@ -49,8 +49,9 @@ public class DocumentController {
             this.documentDao.get(document.getId());
         } catch (Exception e) {
             System.err.println("The document you want to send is not present in the db");
-           isAlreadyPersisted = false;
+            isAlreadyPersisted = false;
         }
+        this.personDao.get(receiverId);
         document.setReceiverId(receiverId);
         Person documentOwner = this.personDao.get(document.getOwnerId());
         if (isAlreadyPersisted) {
@@ -76,6 +77,6 @@ public class DocumentController {
             notificationDao.insert(nd);
         }
         document.setMedicalExamId(medicalExam.getId());
-        this.documentDao.update(document);
+        documentDao.update(document);
     }
 }

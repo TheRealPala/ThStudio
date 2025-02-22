@@ -1,5 +1,6 @@
 package com.thstudio.project.domainModel;
 
+import com.thstudio.project.domainModel.State.Available;
 import com.thstudio.project.domainModel.State.State;
 import com.thstudio.project.domainModel.Tags.Tag;
 
@@ -32,6 +33,7 @@ public class MedicalExam {
         this.description = description;
         this.title = title;
         this.price = price;
+        this.state = new Available();
     }
 
     public MedicalExam(int id, int idDoctor, String startTime, String endTime,
@@ -83,6 +85,9 @@ public class MedicalExam {
 
     public ArrayList<Document> getDocuments() {
         return documents;
+    }
+    public void addDocument(Document document){
+        this.documents.add(document);
     }
 
     public void setDocuments(ArrayList<Document> documents) {

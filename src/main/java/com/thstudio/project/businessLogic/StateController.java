@@ -137,6 +137,9 @@ public class StateController {
         if (!(medicalExam.getState() instanceof Booked)) {
             throw new RuntimeException("Can't mark an exam as complete if is not in booked state");
         }
+        if (LocalDateTime.now().isBefore(medicalExam.getEndTime())) {
+            throw new RuntimeException("Can't mark an exam as complete if is not finished");
+        }
         this.medicalExamDao.changeState(examId, new Completed(LocalDateTime.now()));
     }
 

@@ -7,6 +7,7 @@ import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.domainModel.Notification;
 import com.thstudio.project.domainModel.State.Available;
 import com.thstudio.project.domainModel.State.Booked;
+import com.thstudio.project.domainModel.State.Completed;
 import com.thstudio.project.domainModel.State.Deleted;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
@@ -25,6 +26,7 @@ class StateControllerTest {
     private static DoctorDao doctorDao;
     private static CustomerDao customerDao;
     private static NotificationDao notificationDao;
+
     @BeforeAll
     static void setDatabaseSettings() {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
@@ -327,287 +329,58 @@ class StateControllerTest {
         assertEquals(thrown.getMessage(), "Can't cancel an exam already started");
     }
 
-   /* @Test
-    void addMedicalExam() throws Exception {
-        Doctor doctorToAdd = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
-        MedicalExam medicalExamToAdd = stateController.addMedicalExam(doctorToAdd.getId(), 0, "Titolo Visita", "Chek-up", "2000-10-01 15:30:00", "2000-10-01 16:30:00", 1000);
-        assertNotEquals(medicalExamToAdd.getId(), 0);
-        MedicalExam medicalExamAdded = stateController.getExam(medicalExamToAdd.getId());
-        assertEquals(medicalExamAdded, medicalExamToAdd);
+    @Test
+    void markMedicalExamAsComplete() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        customerDao.insert(customer);
+        assertNotEquals(customer.getId(), 0);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-01-01 15:30:00", "2025-01-01 16:30:00", 1000);
+        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
+        stateController.markMedicalExamAsComplete(addedMedicalExam.getId());
+        MedicalExam completedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId());
+        assertInstanceOf(Completed.class, completedMedicalExam.getState());
     }
 
     @Test
-    void addMedicalExamOfANonExistingDoctor() {
+    void markUnbookedMedicalExamAsComplete() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        customerDao.insert(customer);
+        assertNotEquals(customer.getId(), 0);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2024-10-01 15:30:00", "2024-10-01 16:30:00", 1000);
+        assertNotEquals(addedMedicalExam.getId(), 0);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    stateController.addMedicalExam(1, 0, "Titolo Visita", "Chek-up", "2000-10-01 15:30:00", "2000-10-01 16:30:00", 1000);
+                    stateController.markMedicalExamAsComplete(addedMedicalExam.getId());;
                 }
         );
-        assertEquals(thrown.getMessage(), "The Doctor looked for in not present in the database");
-
+        assertEquals(thrown.getMessage(), "Can't mark an exam as complete if is not in booked state");
     }
 
     @Test
-    void addMedicalExamWhenTheDoctorIsBusy() throws Exception {
-        Doctor doctorToAdd = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
-        MedicalExam firstMedicalExam = stateController.addMedicalExam(doctorToAdd.getId(), 0,  "Titolo Visita", "Chek-up", "2000-10-01 15:30:00", "2000-10-01 16:30:00", 1000);
-        assertNotEquals(firstMedicalExam, 0);
-        IllegalArgumentException thrown = assertThrowsExactly(IllegalArgumentException.class,
-                () -> {
-                    stateController.addMedicalExam(doctorToAdd.getId(), 0,  "Titolo Seconda Visita", "Dieta", "2000-10-01 15:45:00", "2000-10-01 17:30:00", 1000);
-                }
-        );
-        assertEquals(thrown.getMessage(), "The given doctor is already occupied in the given time range");
-    }
-
-    @Test
-    void updateMedicalExam() throws Exception {
-        Doctor doctorToAdd = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
-        MedicalExam medicalExam = stateController.addMedicalExam(doctorToAdd.getId(), 0, "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
-        assertNotEquals(medicalExam.getId(), 0);
-
-        medicalExam.setTitle("Titolo Modificato");
-        medicalExam.setDescription("Anamnesi dopo primo check");
-        medicalExam.setStartTimeFromString("2025-10-01 16:30:00");
-        medicalExam.setEndTimeFromString("2025-10-01 17:30:00");
-        medicalExam.setPrice(2000);
-        boolean outcomeUpdate = stateController.updateMedicalExam(medicalExam);
-        assertTrue(outcomeUpdate);
-    }
-
-    @Test
-    void updateMedicalExamWhenDoctorIsBusy() throws Exception {
-        Doctor doctorToAdd = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
-        MedicalExam firstMedicalExam = stateController.addMedicalExam(doctorToAdd.getId(), 0, "Visita 1", "Rilevazioni antropometriche", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 300);
-        assertNotEquals(firstMedicalExam.getId(), 0);
-        MedicalExam secondMedicalExam = stateController.addMedicalExam(doctorToAdd.getId(), 0,  "Visita 2", "Seduta chinesiologica", "2025-10-01 16:30:00", "2025-10-01 17:30:00", 500);
-        secondMedicalExam.setStartTimeFromString("2025-10-01 16:00:00");
-        IllegalArgumentException thrown = assertThrowsExactly(IllegalArgumentException.class,
-                () -> {
-                    stateController.updateMedicalExam(secondMedicalExam);
-                }
-        );
-        assertEquals(thrown.getMessage(), "The given doctor is already occupied in the given time range");
-    }
-
-    @Test
-    void updateMedicalExamAfterStartTime() throws Exception {
-        Doctor doctorToAdd = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
-        LocalDateTime now = LocalDateTime.now();
-        MedicalExam medicalExam = stateController.addMedicalExam(doctorToAdd.getId(), 0,  "Visita 1", "Rilevazioni antropometriche",
-                now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                now.plusHours(5).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), 300);
-
-        medicalExam.setTitle("Titolo Modificato");
+    void markUnfinishedMedicalExamAsComplete() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        customerDao.insert(customer);
+        assertNotEquals(customer.getId(), 0);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    stateController.updateMedicalExam(medicalExam);
+                    stateController.markMedicalExamAsComplete(addedMedicalExam.getId());;
                 }
         );
-        assertEquals(thrown.getMessage(), "Forbidden! Can't update an exam already started");
+        assertEquals(thrown.getMessage(), "Can't mark an exam as complete if is not finished");
     }
-
-    @Test
-    void getMedicalExamByState() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
-        customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
-
-        ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
-        addedMedicalExams.add(stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000));
-        addedMedicalExams.add(stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Seconda Visita", "Dieta", "2025-10-01 16:30:00", "2025-10-01 17:30:00", 1000));
-        for (MedicalExam addedMedicalExam : addedMedicalExams) {
-            assertNotEquals(addedMedicalExam.getId(), 0);
-        }
-        assertEquals(addedMedicalExams.size(), stateController.getExamsByState(new Available()).size());
-
-        LocalDateTime now = LocalDateTime.now();
-        for (MedicalExam addedMedicalExam: addedMedicalExams) {
-            addedMedicalExam.setState(new Booked(now));
-            stateController.updateMedicalExam(addedMedicalExam);
-        }
-
-        assertEquals(addedMedicalExams.size(), stateController.getExamsByState(new Booked(now)).size());
-    }
-
-    @Test
-    void searchByOnlineTag() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
-        customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
-
-        ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
-        addedMedicalExams.add(stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000));
-        addedMedicalExams.add(stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Seconda Visita", "Dieta", "2025-10-01 16:30:00", "2025-10-01 17:30:00", 1000));
-        MedicalExam firstMedicalExam = addedMedicalExams.getFirst();
-        MedicalExam secondMedicalExam = addedMedicalExams.get(1);
-
-        Tag isOnlineTag = new TagIsOnline("yes");
-        Tag inPersonTag = new TagIsOnline("no");
-        tagDao.insert(isOnlineTag);
-        tagDao.insert(inPersonTag);
-        tagDao.attachTagToMedicalExam(firstMedicalExam, isOnlineTag);
-        tagDao.attachTagToMedicalExam(secondMedicalExam, inPersonTag);
-
-        Search onlineExamSearch = new DecoratorSearchIsOnline(new SearchConcrete(), "yes");
-        List<MedicalExam> onlineExams = stateController.search(onlineExamSearch);
-        assertEquals(onlineExams.size(), 1);
-
-        Search inPersonExamSearch = new DecoratorSearchIsOnline(new SearchConcrete(), "no");
-        List<MedicalExam> inPersonExams = stateController.search(inPersonExamSearch);
-        assertEquals(inPersonExams.size(), 1);
-    }
-
-    @Test
-    void searchByPrice() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
-        customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
-
-        stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
-        stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Seconda Visita", "Dieta", "2025-10-01 16:30:00", "2025-10-01 17:30:00", 5000);
-
-        Search priceBelowOrEqualToOneThousandSearch = new DecoratorSearchPrice(new SearchConcrete(), 1000);
-        List<MedicalExam> examsBelowOneThousand = stateController.search(priceBelowOrEqualToOneThousandSearch);
-        assertEquals(examsBelowOneThousand.size(), 1);
-
-        Search priceBelowOrEqualToFiveThousandSearch = new DecoratorSearchPrice(new SearchConcrete(), 5000);
-        List<MedicalExam> examsBelowFiveThousand = stateController.search(priceBelowOrEqualToFiveThousandSearch);
-        assertEquals(examsBelowFiveThousand.size(), 2);
-    }
-
-    @Test
-    void searchByStartTime() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
-        customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
-
-        stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-01-01 15:30:00", "2025-01-01 16:30:00", 1000);
-        stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Seconda Visita", "Dieta", "2025-02-01 16:30:00", "2025-02-01 17:30:00", 5000);
-
-        Search startAfterOrInJanuarySearch = new DecoratorSearchStartTime(new SearchConcrete(), "2025-01-01 00:00:00");
-        List<MedicalExam> examsAfterOrInJanuary = stateController.search(startAfterOrInJanuarySearch);
-        assertEquals(examsAfterOrInJanuary.size(), 2);
-        
-        Search startAfterOrInFebruarySearch = new DecoratorSearchStartTime(new SearchConcrete(), "2025-02-01 00:00:00");
-        List<MedicalExam> examsAfterOrInFebruary = stateController.search(startAfterOrInFebruarySearch);
-        assertEquals(examsAfterOrInFebruary.size(), 1);
-        
-    }
-
-    @Test
-    void searchByState() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
-        customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
-
-        ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
-        addedMedicalExams.add(stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000));
-        addedMedicalExams.add(stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Seconda Visita", "Dieta", "2025-10-01 16:30:00", "2025-10-01 17:30:00", 1000));
-        for (MedicalExam addedMedicalExam : addedMedicalExams) {
-            assertNotEquals(addedMedicalExam, 0);
-        }
-        Search examsAvailableSearch = new DecoratorSearchState(new SearchConcrete(), new Available().getState());
-        assertEquals(addedMedicalExams.size(), stateController.search(examsAvailableSearch).size());
-
-        LocalDateTime now = LocalDateTime.now();
-        for (MedicalExam addedMedicalExam: addedMedicalExams) {
-            addedMedicalExam.setState(new Booked(now));
-            stateController.updateMedicalExam(addedMedicalExam);
-        }
-
-        Search examsBookedSearch = new DecoratorSearchState(new SearchConcrete(), new Booked(now).getState());
-        assertEquals(addedMedicalExams.size(), stateController.search(examsBookedSearch).size());
-    }
-
-    @Test
-    void searchByTypeTag() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
-        customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
-
-        ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
-        addedMedicalExams.add(stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000));
-        addedMedicalExams.add(stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Seconda Visita", "Dieta", "2025-10-01 16:30:00", "2025-10-01 17:30:00", 1000));
-        MedicalExam firstMedicalExam = addedMedicalExams.getFirst();
-        MedicalExam secondMedicalExam = addedMedicalExams.get(1);
-
-        Tag checkUpTypeTag = new TagType("Check-up");
-        Tag firstVisitTag = new TagType("First visit");
-        tagDao.insert(checkUpTypeTag);
-        tagDao.insert(firstVisitTag);
-
-        tagDao.attachTagToMedicalExam(firstMedicalExam, checkUpTypeTag);
-        tagDao.attachTagToMedicalExam(secondMedicalExam, firstVisitTag);
-
-        Search checkUpTagSearch  = new DecoratorSearchType(new SearchConcrete(), "Check-up");
-        List<MedicalExam> checkUpExams = stateController.search(checkUpTagSearch);
-        assertEquals(checkUpExams.size(), 1);
-
-        Search firstVisitExamSearch = new DecoratorSearchType(new SearchConcrete(), "First visit");
-        List<MedicalExam> firstVisitExams = stateController.search(firstVisitExamSearch);
-        assertEquals(firstVisitExams.size(), 1);
-    }
-
-    @Test
-    void searchByZoneTag() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
-        customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
-
-        ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
-        addedMedicalExams.add(stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000));
-        addedMedicalExams.add(stateController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Seconda Visita", "Dieta", "2025-10-01 16:30:00", "2025-10-01 17:30:00", 1000));
-        MedicalExam firstMedicalExam = addedMedicalExams.getFirst();
-        MedicalExam secondMedicalExam = addedMedicalExams.get(1);
-
-        Tag milanZoneTag = new TagZone("Milan");
-        Tag florenceZoneTag = new TagZone("Florence");
-        tagDao.insert(milanZoneTag);
-        tagDao.insert(florenceZoneTag);
-
-        tagDao.attachTagToMedicalExam(firstMedicalExam, milanZoneTag);
-        tagDao.attachTagToMedicalExam(secondMedicalExam, florenceZoneTag);
-
-        Search milanZoneSearch  = new DecoratorSearchZone(new SearchConcrete(), "Milan");
-        List<MedicalExam> milanExams = stateController.search(milanZoneSearch);
-        assertEquals(milanExams.size(), 1);
-
-        Search florenceZoneSearch = new DecoratorSearchZone(new SearchConcrete(), "Florence");
-        List<MedicalExam> florenceExams = stateController.search(florenceZoneSearch);
-        assertEquals(florenceExams.size(), 1);
-    }*/
 
     @AfterEach
     void flushDb() throws SQLException {

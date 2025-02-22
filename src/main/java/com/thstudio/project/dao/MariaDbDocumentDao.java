@@ -8,7 +8,7 @@ import java.util.List;
 
 public class MariaDbDocumentDao implements DocumentDao {
 
-    private Document parseDocument(ResultSet rs) throws Exception {
+    private Document parseDocument(ResultSet rs) throws SQLException {
         Document d = null;
         d = new Document(
                 rs.getInt("id"),
@@ -41,10 +41,10 @@ public class MariaDbDocumentDao implements DocumentDao {
             ps.setInt(1, id);
             rs = ps.executeQuery();
             if (!rs.next()) {
-                throw new RuntimeException("The Customer looked for in not present in the database");
+                throw new RuntimeException("The Document looked for in not present in the database");
             }
             d = parseDocument(rs);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new SQLException(e);
         } finally {
             assert rs != null : "ResultSet is Null";
@@ -69,7 +69,7 @@ public class MariaDbDocumentDao implements DocumentDao {
                 dList.add(this.parseDocument(rs));
             }
             if (dList.isEmpty()) {
-                throw new RuntimeException("There is no Customers in the database");
+                throw new RuntimeException("There is no Documents in the database");
             }
         } catch (Exception e) {
             throw new SQLException(e);
@@ -126,7 +126,7 @@ public class MariaDbDocumentDao implements DocumentDao {
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update documents set title = ?, path = ?, id_owner = ?, id_medical_exam = ?, id_receiver = ? where id = ?");
+            ps = con.prepareStatement("update documents set title = ?, path = ?, id_owner = ?, id_medical_exam = ? ,id_receiver = ? where id = ?");
             ps.setString(1, document.getTitle());
             ps.setString(2, document.getPath());
             ps.setInt(3, document.getOwnerId());
@@ -181,9 +181,9 @@ public class MariaDbDocumentDao implements DocumentDao {
                 dList.add(this.parseDocument(rs));
             }
             if (dList.isEmpty()) {
-                throw new RuntimeException("There is no Customers in the database");
+                throw new RuntimeException("There is no Documents in the database for this owner");
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new SQLException(e);
         } finally {
             assert rs != null : "ResultSet is Null";
@@ -208,9 +208,9 @@ public class MariaDbDocumentDao implements DocumentDao {
                 dList.add(this.parseDocument(rs));
             }
             if (dList.isEmpty()) {
-                throw new RuntimeException("There is no Customers in the database");
+                throw new RuntimeException("There is no Documents in the database for this receiver");
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new SQLException(e);
         } finally {
             assert rs != null : "ResultSet is Null";

@@ -170,4 +170,12 @@ public class MedicalExam {
         MedicalExam that = (MedicalExam) o;
         return getIdDoctor() == that.getIdDoctor() && getIdCustomer() == that.getIdCustomer() && getId() == that.getId() && Double.compare(getPrice(), that.getPrice()) == 0 && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getDescription(), that.getDescription()) && Objects.equals(getState(), that.getState()) && Objects.equals(getStartTime(), that.getStartTime()) && Objects.equals(getEndTime(), that.getEndTime()) && Objects.equals(getDocuments(), that.getDocuments()) && Objects.equals(getTags(), that.getTags());
     }
+
+    public void setStartTimeFromString(String startTime) {
+        this.startTime = this.parseDate(startTime);
+    }
+
+    public void setEndTimeFromString(String endTime) {
+        this.endTime = this.parseDate(endTime);
+    }
 }

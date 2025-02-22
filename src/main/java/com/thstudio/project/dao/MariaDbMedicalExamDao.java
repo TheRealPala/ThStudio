@@ -21,15 +21,15 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
 
     private void setMedicalExamState(ResultSet rs, MedicalExam m) throws SQLException {
         if (Objects.equals(rs.getString("state"), "Booked")) {
-            LocalDateTime ldt = rs.getTimestamp("stateExtraInfo").toLocalDateTime();
+            LocalDateTime ldt = rs.getTimestamp("state_extra_info").toLocalDateTime();
             Booked booked = new Booked(ldt);
             m.setState(booked);
         } else if (Objects.equals(rs.getString("state"), "Cancelled")) {
-            LocalDateTime ldt = rs.getTimestamp("stateExtraInfo").toLocalDateTime();
+            LocalDateTime ldt = rs.getTimestamp("state_extra_info").toLocalDateTime();
             Deleted deleted = new Deleted(ldt);
             m.setState(deleted);
         } else if (Objects.equals(rs.getString("state"), "Completed")) {
-            LocalDateTime ldt = rs.getTimestamp("stateExtraInfo").toLocalDateTime();
+            LocalDateTime ldt = rs.getTimestamp("state_extra_info").toLocalDateTime();
             Completed completed = new Completed(ldt);
             m.setState(completed);
         } else {
@@ -164,15 +164,15 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps.setString(3, m.getStartTime().toString());
             ps.setString(4, m.getEndTime().toString());
             ps.setDouble(5, m.getPrice());
-            ps.setString(5, (m.getState()).getState());
-            ps.setString(6, m.getState().getExtraInfo());
+            ps.setString(6, (m.getState()).getState());
+            ps.setString(7, m.getState().getExtraInfo());
             if (m.getIdCustomer() != 0) {
-                ps.setInt(7, m.getIdCustomer());
+                ps.setInt(8, m.getIdCustomer());
             } else {
-                ps.setNull(7, m.getIdCustomer());
+                ps.setNull(8, m.getIdCustomer());
             }
-            ps.setInt(8, m.getIdDoctor());
-            ps.setInt(9, m.getId());
+            ps.setInt(9, m.getIdDoctor());
+            ps.setInt(10, m.getId());
             ps.executeUpdate();
         } finally {
             assert ps != null : "preparedStatement is Null";
@@ -376,6 +376,26 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps.setInt(1, me.getIdCustomer());
             ps.setString(2, me.getState().getState());
             ps.setObject(3, me.getState().getExtraInfo());
+            ps.setObject(4, me.getId());
+            ps.executeUpdate();
+        } finally {
+            assert ps != null : "preparedStatement is Null";
+            ps.close();
+            Database.closeConnection(con);
+        }
+    }
+
+    @Override
+    public void deleteBookMedicalExam(MedicalExam me) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("update medical_exams set id_customer = ?, state = ?, state_extra_info = ? where id = ?");
+            ps.setNull(1, me.getIdCustomer());
+            ps.setString(2, me.getState().getState());
+            ps.setObject(3, me.getState().getExtraInfo());
+            ps.setObject(4, me.getId());
             ps.executeUpdate();
         } finally {
             assert ps != null : "preparedStatement is Null";

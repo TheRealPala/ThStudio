@@ -76,5 +76,5 @@ public interface MedicalExamDao extends DAO<MedicalExam, Integer>{
      * @param  me               The exam's ID
      * @throws Exception        If something goes wrong
      */
-    public void deleteBookMedicalExam(MedicalExam me) throws Exception;
+    public void deleteBookedMedicalExam(MedicalExam me) throws Exception;
 }

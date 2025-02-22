@@ -4,6 +4,7 @@ import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.Doctor;
 import com.thstudio.project.domainModel.MedicalExam;
+import com.thstudio.project.domainModel.Notification;
 import com.thstudio.project.domainModel.Search.*;
 import com.thstudio.project.domainModel.State.Available;
 import com.thstudio.project.domainModel.State.Booked;
@@ -30,6 +31,7 @@ class StateControllerTest {
     private static MedicalExamController medicalExamController;
     private static DoctorDao doctorDao;
     private static CustomerDao customerDao;
+    private static NotificationDao notificationDao;
     @BeforeAll
     static void setDatabaseSettings() {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
@@ -45,10 +47,11 @@ class StateControllerTest {
         PersonDao personDao = new MariaDbPersonDao();
         customerDao = new MariaDbCustomerDao(personDao);
         doctorDao = new MariaDbDoctorDao(personDao);
-        NotificationDao notificationDao = new MariaDbNotificationDao();
+        notificationDao = new MariaDbNotificationDao();
         stateController = new StateController(medicalExamDao, customerDao, doctorDao, notificationDao);
         medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao);
     }
+
     @Test
     void bookMedicalExam() throws Exception {
         Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
@@ -59,12 +62,53 @@ class StateControllerTest {
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
         assertNotEquals(addedMedicalExam.getId(), 0);
-        stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId());
+        assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
         MedicalExam bookedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId());
         assertInstanceOf(Booked.class, bookedMedicalExam.getState());
         assertEquals(bookedMedicalExam.getIdCustomer(), customer.getId());
+        //check gen of notification
+        Notification bookedNotification = notificationDao.getNotificationsByReceiverId(doctor.getId()).getFirst();
+        assertEquals(bookedNotification.getTitle(), "Booked exam " + bookedMedicalExam.getTitle() + " by:" + customer.getName());
     }
 
+    @Test
+    void bookMedicalExamAlreadyBooked() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        customerDao.insert(customer);
+        assertNotEquals(customer.getId(), 0);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
+
+        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId());
+                }
+        );
+        assertEquals(thrown.getMessage(), "The exam you want to book is already booked");
+    }
+
+    @Test
+    void bookTooExpensiveMedicalExam() throws Exception {
+        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 100);
+        customerDao.insert(customer);
+        assertNotEquals(customer.getId(), 0);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        assertNotEquals(addedMedicalExam.getId(), 0);
+
+        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId());
+                }
+        );
+        assertEquals(thrown.getMessage(), "not enough money");
+    }
    /* @Test
     void addMedicalExam() throws Exception {
         Doctor doctorToAdd = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);

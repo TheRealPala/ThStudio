@@ -53,7 +53,7 @@ public class StateController {
             customerDao.update(c);
             d.setBalance(d.getBalance() + me.getPrice());
             doctorDao.update(d);
-            Notification nd = new Notification("Booked exam " + me.getTitle() + "by :" + c.getName(), me.getIdDoctor());
+            Notification nd = new Notification("Booked exam " + me.getTitle() + " by:" + c.getName(), me.getIdDoctor());
             notificationDao.insert(nd);
         }
         return true;

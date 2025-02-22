@@ -181,9 +181,9 @@ public class MariaDbDocumentDao implements DocumentDao {
                 dList.add(this.parseDocument(rs));
             }
             if (dList.isEmpty()) {
-                throw new RuntimeException("There is no Document in the database");
+                throw new RuntimeException("There is no Documents in the database for this owner");
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new SQLException(e);
         } finally {
             assert rs != null : "ResultSet is Null";
@@ -208,9 +208,9 @@ public class MariaDbDocumentDao implements DocumentDao {
                 dList.add(this.parseDocument(rs));
             }
             if (dList.isEmpty()) {
-                throw new RuntimeException("There is no Documents in the database");
+                throw new RuntimeException("There is no Documents in the database for this receiver");
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new SQLException(e);
         } finally {
             assert rs != null : "ResultSet is Null";

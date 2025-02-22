@@ -384,5 +384,24 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             Database.closeConnection(con);
         }
     }
+
+    @Override
+    public void deleteBookMedicalExam(MedicalExam me) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("update medical_exams set id_customer = ?, state = ?, state_extra_info = ? where id = ?");
+            ps.setNull(1, me.getIdCustomer());
+            ps.setString(2, me.getState().getState());
+            ps.setObject(3, me.getState().getExtraInfo());
+            ps.setObject(4, me.getId());
+            ps.executeUpdate();
+        } finally {
+            assert ps != null : "preparedStatement is Null";
+            ps.close();
+            Database.closeConnection(con);
+        }
+    }
 }
 

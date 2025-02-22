@@ -143,11 +143,13 @@ public class MariaDbNotificationDao implements NotificationDao {
             ps = con.prepareStatement("select * from notifications where id_receiver = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            if (!rs.next()) {
-                throw new RuntimeException("The Notification looked for in not present in the database");
+            while(rs.next()) {
+                nList.add(parseNotification(rs));
             }
-            nList.add(parseNotification(rs));
-        } catch (Exception e) {
+            if (nList.isEmpty()){
+                throw new RuntimeException("The receiver has not notifications");
+            }
+        } catch (SQLException e) {
             throw new SQLException(e);
         } finally {
             assert rs != null : "ResultSet is Null";

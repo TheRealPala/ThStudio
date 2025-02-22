@@ -87,8 +87,8 @@ public class StateController {
         this.customerDao.update(c);
 
         me.setState(new Available());
-        this.medicalExamDao.changeState(me.getId(), me.getState());
-        Notification nd = new Notification("Deleted exam booking" + me.getTitle() + "by :" + c.getName(), d.getId());
+        this.medicalExamDao.deleteBookMedicalExam(me);
+        Notification nd = new Notification("Deleted exam booking " + me.getTitle() + " by:" + c.getName(), d.getId());
         notificationDao.insert(nd);
         return true;
     }

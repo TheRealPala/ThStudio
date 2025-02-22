@@ -45,7 +45,7 @@ public class DocumentController {
         return this.documentDao.getByOwner(ownerId);
     }
 
-    public void sendDocument(Document document, int receiverId) throws Exception {
+    public void sendDocument(Document document, int receiverId) throws Exception, SQLException {
         boolean isAlreadyPersisted = true;
         try {
             this.documentDao.get(document.getId());
@@ -53,6 +53,7 @@ public class DocumentController {
             System.err.println("The document you want to send is not present in the db");
            isAlreadyPersisted = false;
         }
+        Person receiver = this.personDao.get(receiverId);
         document.setReceiverId(receiverId);
         Person documentOwner = this.personDao.get(document.getOwnerId());
         if (isAlreadyPersisted) {

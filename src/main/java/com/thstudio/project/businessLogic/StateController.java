@@ -53,7 +53,7 @@ public class StateController {
             customerDao.update(c);
             d.setBalance(d.getBalance() + me.getPrice());
             doctorDao.update(d);
-            Notification nd = new Notification("Booked exam " + me.getTitle() + "by :" + c.getName(), me.getIdDoctor());
+            Notification nd = new Notification("Booked exam " + me.getTitle() + " by:" + c.getName(), me.getIdDoctor());
             notificationDao.insert(nd);
         }
         return true;
@@ -87,8 +87,8 @@ public class StateController {
         this.customerDao.update(c);
 
         me.setState(new Available());
-        this.medicalExamDao.changeState(me.getId(), me.getState());
-        Notification nd = new Notification("Deleted exam booking" + me.getTitle() + "by :" + c.getName(), d.getId());
+        this.medicalExamDao.deleteBookMedicalExam(me);
+        Notification nd = new Notification("Deleted exam booking " + me.getTitle() + " by:" + c.getName(), d.getId());
         notificationDao.insert(nd);
         return true;
     }

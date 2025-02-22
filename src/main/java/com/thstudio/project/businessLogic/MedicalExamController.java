@@ -47,15 +47,14 @@ public class MedicalExamController {
      * @param description The description of the medical exam
      * @param title       The title of the medical exam
      * @param price       The price of the medical exam
-     * @param tags        The tags of the medical exam
      * @param state       The param of the medical exam
      * @throws Exception If the medical exam is not found, bubbles up exceptions to MedicalExamDAO::update()
      */
 
-    private void updateLogicForMedicalExam(int examId, LocalDateTime endTime, LocalDateTime startTime, String description,
-                                           String title, double price, ArrayList<Tag> tags, State state) throws Exception {
+    private void updateLogicForMedicalExam(int examId, LocalDateTime startTime, LocalDateTime endTime, String description,
+                                           String title, double price, State state) throws Exception {
         MedicalExam medicalExam = this.medicalExamDao.get(examId);
-        if (medicalExam.getPrice() == price && medicalExam.getStartTime() == startTime && medicalExam.getEndTime() == endTime && medicalExam.getDescription().equals(description) && medicalExam.getTitle().equals(title) && medicalExam.getTags().equals(tags)) {
+        if (medicalExam.getPrice() == price && medicalExam.getStartTime() == startTime && medicalExam.getEndTime() == endTime && medicalExam.getDescription().equals(description) && medicalExam.getTitle().equals(title)) {
             System.out.println("nothing to update");
         } else {
 
@@ -108,22 +107,21 @@ public class MedicalExamController {
                 s.append("the title has been changed\n");
             }
 
-            if (medicalExam.getTags() != tags) {
-                s.append("the tags have been changed\n");
-                medicalExam.setTags(tags);
-            }
-
             if (medicalExam.getState() instanceof Booked) {
-                Notification nd = new Notification("esame modificato:" + s, medicalExam.getIdCustomer());  // o array di notifiche con ogni cambiamento o singola stringa con tutti i cambiamenti
+                if (medicalExam.getIdCustomer() == 0) {
+                    throw new RuntimeException("Inconsistency in the database");
+                }
+                Notification nd = new Notification("esame modificato:" + s, medicalExam.getIdCustomer());
                 notificationDao.insert(nd);
             }
             this.medicalExamDao.update(medicalExam);
         }
     }
 
-    public MedicalExam addMedicalExam(int idDoctor, String title, String description, String startTime, String endTime, double price) throws Exception {
+    public MedicalExam addMedicalExam(int idDoctor, int idCustomer, String title, String description, String startTime, String endTime, double price) throws Exception {
         Doctor doctor = doctorDao.get(idDoctor);
         MedicalExam medicalExam = new MedicalExam(doctor.getId(), startTime, endTime, description, title, price);
+        medicalExam.setIdCustomer(idCustomer);
         List<MedicalExam> medicalExams = new ArrayList<>();
         try {
             medicalExams = medicalExamDao.getDoctorExams(doctor.getId());
@@ -138,14 +136,15 @@ public class MedicalExamController {
         return medicalExam;
     }
 
-    public boolean updateMedicalExam(int medicalExamId, int idDoctor, LocalDateTime endTime, LocalDateTime startTime, String description, String title, double price, ArrayList<Tag> tags, State state) throws Exception {
-        boolean outcome = false;
-        MedicalExam me = medicalExamDao.get(medicalExamId);
-        if (me.getIdDoctor() == idDoctor && me.getStartTime().isAfter(LocalDateTime.now())) {
-            this.updateLogicForMedicalExam(medicalExamId, endTime, startTime, description, title, price, tags, state);
-            outcome = true;
+    public boolean updateMedicalExam(MedicalExam medicalExam) throws Exception {
+        MedicalExam me = medicalExamDao.get(medicalExam.getId());
+
+        if (!me.getStartTime().isAfter(LocalDateTime.now())) {
+            throw new RuntimeException("Forbidden! Can't update an exam already started");
         }
-        return outcome;
+        this.updateLogicForMedicalExam(medicalExam.getId(), medicalExam.getStartTime(), medicalExam.getEndTime(), medicalExam.getDescription(), medicalExam.getTitle(),
+                medicalExam.getPrice(), medicalExam.getState());
+        return true;
     }
 
     /**
@@ -200,7 +199,7 @@ public class MedicalExamController {
      * @throws Exception If there are no medical exams
      */
     public List<MedicalExam> getExamsByState(State state) throws Exception {
-        return unmodifiableList(this.medicalExamDao.getExamsByState(state.toString()));
+        return unmodifiableList(this.medicalExamDao.getExamsByState(state.getState()));
     }
 
     /**

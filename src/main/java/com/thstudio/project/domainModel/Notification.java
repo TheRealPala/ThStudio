@@ -1,5 +1,7 @@
 package com.thstudio.project.domainModel;
 
+import java.util.Objects;
+
 public class Notification {
     private int id;
     private String title;
@@ -38,5 +40,14 @@ public class Notification {
 
     public void setReceiverId(int receiverId) {
         this.receiverId = receiverId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Notification that = (Notification) o;
+        return getId() == that.getId() && getReceiverId() == that.getReceiverId() && Objects.equals(getTitle(), that.getTitle());
     }
 }

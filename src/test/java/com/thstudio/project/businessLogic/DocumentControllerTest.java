@@ -22,6 +22,7 @@ class DocumentControllerTest {
     private static DoctorDao doctorDao;
     private static CustomerDao customerDao;
     private static MedicalExamDao medicalExamDao;
+    private static NotificationDao notificationDao;
     @BeforeAll
     static void setDatabaseSettings() {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
@@ -36,9 +37,10 @@ class DocumentControllerTest {
         personDao = new MariaDbPersonDao();
         doctorDao = new MariaDbDoctorDao(personDao);
         customerDao = new MariaDbCustomerDao(personDao);
-        NotificationDao notificationDao = new MariaDbNotificationDao();
+        notificationDao = new MariaDbNotificationDao();
         medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
         documentController = new DocumentController(documentDao, personDao, notificationDao, medicalExamDao);
+
     }
 
     @Test
@@ -58,10 +60,22 @@ class DocumentControllerTest {
         customerDao.insert(customer);
         Document documentToAdd = documentController.addDocument("title", doctor.getId());
         documentToAdd.setReceiverId(customer.getId());
+        documentDao.update(documentToAdd);
         List<Document> addedDocuments = documentController.getDocumentsByReceiver(customer.getId());
         assertNotNull(addedDocuments);
         assertTrue(addedDocuments.contains(documentToAdd));
         assertEquals(documentToAdd, addedDocuments.get(0));
+        //controllo dell' eccezione
+        Customer customer2= new Customer("luigi", "surname", "2000-01-01",2,0.0);
+        customerDao.insert(customer2);
+
+         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    documentController.getDocumentsByReceiver(customer2.getId());
+                }
+            );
+         assertEquals(thrown.getMessage(), "There is no Documents in the database for this receiver" );
+
     }
     @Test
     public void getDocumentsByOwner() throws Exception {
@@ -72,24 +86,39 @@ class DocumentControllerTest {
         assertNotNull(addedDocuments);
         assertTrue(addedDocuments.contains(documentToAdd));
         assertEquals(documentToAdd, addedDocuments.get(0));
+        //controllo dell' eccezione
+        Doctor doctor2 = new Doctor("marco", "surname", "2000-01-01",2,"licence", 0.0);
+        doctorDao.insert(doctor2);
+        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    documentController.getDocumentsByOwner(doctor2.getId());
+                }
+        );
+        assertEquals(thrown.getMessage(), "There is no Documents in the database for this owner" );
     }
     @Test
     public void sendDocument() throws Exception {
-        Doctor doctor = new Doctor("marco", "surname", "2000-01-01",1,"licence", 0.0);
+        Doctor doctor = new Doctor("marco", "surname", "2000-01-01","licence", 0.0);
         doctorDao.insert(doctor);
         Customer customer= new Customer("luigi", "surname", "2000-01-01",1,0.0);
         customerDao.insert(customer);
         Document documentToAdd = documentController.addDocument("title", doctor.getId());
+
         documentController.sendDocument(documentToAdd, customer.getId());
         Document addedDocument = documentDao.get(documentToAdd.getId());
         assertNotNull(addedDocument);
         assertEquals(customer.getId(), addedDocument.getReceiverId());
+        assertEquals(notificationDao.getNotificationsByReceiverId(customer.getId()).get(0).getTitle(), "New document " + documentToAdd.getTitle() + " by :" + doctor.getFullName());
+        Customer customer1= new Customer("luigi", "surname", "2000-01-01",2,0.0);
+        RuntimeException thrown1 = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    documentController.sendDocument(documentToAdd, customer1.getId());
+                }
+        );
+        assertEquals(thrown1.getMessage(), "The person looked for in not present in the database");
+        // verifico che il customer sia nel db
 
-        Document documentToAdd2 = new Document("title2","path", doctor.getId());
-        documentController.sendDocument(documentToAdd2, customer.getId());
-        Document addedDocument2 = documentDao.get(documentToAdd2.getId());
-        assertNotNull(addedDocument2);
-        assertEquals(customer.getId(), addedDocument2.getReceiverId());  // verifico che il document non immesso nel db sia stato inserito
+
     }
     @Test
     public void attachDocumentToMedicalExam() throws Exception {
@@ -104,7 +133,7 @@ class DocumentControllerTest {
                     documentController.attachDocumentToMedicalExam(document1.getId(), medicalExam1.getId());
                 }
         );
-                assertEquals(thrown.getMessage(), "The Document looked for in not present in the database");
+        assertEquals(thrown.getMessage(), "The Document looked for in not present in the database");
         // se il documento non è nel db
 
 
@@ -137,6 +166,7 @@ class DocumentControllerTest {
         connection.prepareStatement("delete from documents").executeUpdate();
         connection.prepareStatement("delete from medical_exams").executeUpdate();
         connection.prepareStatement("delete from tags").executeUpdate();
+        connection.prepareStatement("delete from notifications").executeUpdate();
 
 
     }

@@ -376,6 +376,7 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
             ps.setInt(1, me.getIdCustomer());
             ps.setString(2, me.getState().getState());
             ps.setObject(3, me.getState().getExtraInfo());
+            ps.setObject(4, me.getId());
             ps.executeUpdate();
         } finally {
             assert ps != null : "preparedStatement is Null";

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -167,7 +166,5 @@ class DocumentControllerTest {
         connection.prepareStatement("delete from medical_exams").executeUpdate();
         connection.prepareStatement("delete from tags").executeUpdate();
         connection.prepareStatement("delete from notifications").executeUpdate();
-
-
     }
 }

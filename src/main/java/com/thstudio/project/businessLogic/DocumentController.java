@@ -10,8 +10,6 @@ import com.thstudio.project.domainModel.Notification;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.domainModel.State.Booked;
 import io.github.cdimascio.dotenv.Dotenv;
-
-import java.sql.SQLException;
 import java.util.List;
 
 public class DocumentController {
@@ -45,15 +43,15 @@ public class DocumentController {
         return this.documentDao.getByOwner(ownerId);
     }
 
-    public void sendDocument(Document document, int receiverId) throws Exception, SQLException {
+    public void sendDocument(Document document, int receiverId) throws Exception {
         boolean isAlreadyPersisted = true;
         try {
             this.documentDao.get(document.getId());
         } catch (Exception e) {
             System.err.println("The document you want to send is not present in the db");
-           isAlreadyPersisted = false;
+            isAlreadyPersisted = false;
         }
-        Person receiver = this.personDao.get(receiverId);
+        this.personDao.get(receiverId);
         document.setReceiverId(receiverId);
         Person documentOwner = this.personDao.get(document.getOwnerId());
         if (isAlreadyPersisted) {
@@ -65,7 +63,7 @@ public class DocumentController {
         this.notificationDao.insert(nd);
     }
 
-public void attachDocumentToMedicalExam(int documentId, int medicalExamId) throws Exception, SQLException {
+    public void attachDocumentToMedicalExam(int documentId, int medicalExamId) throws Exception {
         MedicalExam medicalExam = this.medicalExamDao.get(medicalExamId);
         Document document = this.documentDao.get(documentId);
         if (medicalExam.getIdDoctor() != document.getOwnerId()) {

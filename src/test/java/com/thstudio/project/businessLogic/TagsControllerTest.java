@@ -76,6 +76,11 @@ class TagsControllerTest {
         assertTrue(tagsController.deleteTag("Online1", "Online"));
     }
 
+    @Test
+    void deleteNonExistentTag() throws Exception {
+        assertFalse(tagsController.deleteTag("NonExistent", "Type"));
+    }
+
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();

@@ -8,7 +8,7 @@ import com.thstudio.project.domainModel.Tags.TagZone;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class MariaDbTagDao implements TagDao{
+public class MariaDbTagDao implements TagDao {
     @Override
     public void attachTagToMedicalExam(MedicalExam medicalExam, Tag tagToAttach) throws SQLException {
         Connection con = null;
@@ -23,7 +23,7 @@ public class MariaDbTagDao implements TagDao{
             ps.executeUpdate();
             medicalExam.addTag(tagToAttach);
         } finally {
-            assert ps != null: "PreparedStatement is null";
+            assert ps != null : "PreparedStatement is null";
             ps.close();
             Database.closeConnection(con);
         }
@@ -43,7 +43,7 @@ public class MariaDbTagDao implements TagDao{
             rows = ps.executeUpdate();
             medicalExam.removeTag(tagToDetach);
         } finally {
-            assert ps != null: "preparedStatement is Null";
+            assert ps != null : "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }
@@ -65,7 +65,7 @@ public class MariaDbTagDao implements TagDao{
             parseTagsFromDb(rs, tList);
 
         } finally {
-            assert rs != null: "ResultSet is Null";
+            assert rs != null : "ResultSet is Null";
             rs.close();
             ps.close();
             Database.closeConnection(con);
@@ -101,7 +101,7 @@ public class MariaDbTagDao implements TagDao{
             ps.setString(1, tag);
             ps.setString(2, tagType);
             rs = ps.executeQuery();
-            if(!rs.next()) {
+            if (!rs.next()) {
                 throw new RuntimeException("The Tag looked for in not present in the database");
             }
             tag = rs.getString("tag");
@@ -113,7 +113,7 @@ public class MariaDbTagDao implements TagDao{
                 default -> null;
             };
         } finally {
-            assert rs != null: "ResultSet is Null";
+            assert rs != null : "ResultSet is Null";
             rs.close();
             ps.close();
             Database.closeConnection(con);
@@ -133,7 +133,7 @@ public class MariaDbTagDao implements TagDao{
             rs = stm.executeQuery("select * from tags");
             parseTagsFromDb(rs, tList);
         } finally {
-            assert rs != null: "ResultSet is Null";
+            assert rs != null : "ResultSet is Null";
             rs.close();
             stm.close();
             Database.closeConnection(con);
@@ -153,7 +153,7 @@ public class MariaDbTagDao implements TagDao{
             ps.setString(2, tag.getTagType());
             ps.executeUpdate();
         } finally {
-            assert ps != null: "PreparedStatement is null";
+            assert ps != null : "PreparedStatement is null";
             ps.close();
             Database.closeConnection(con);
         }
@@ -170,7 +170,7 @@ public class MariaDbTagDao implements TagDao{
             ps.setString(2, tag.getTagType());
             ps.executeUpdate();
         } finally {
-            assert ps != null: "preparedStatement is Null";
+            assert ps != null : "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }
@@ -190,7 +190,7 @@ public class MariaDbTagDao implements TagDao{
             ps.setString(2, tagType);
             rows = ps.executeUpdate();
         } finally {
-            assert ps != null: "preparedStatement is Null";
+            assert ps != null : "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }

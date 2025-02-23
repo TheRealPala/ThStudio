@@ -1,4 +1,5 @@
 package com.thstudio.project.businessLogic;
+
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Customer;
 
@@ -20,7 +21,7 @@ public class CustomerController extends PersonController<Customer> {
      * @param balance     The balance of the customer
      * @return The customer added
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
-    */
+     */
     public Customer addCustomer(String name, String surname, String dateOfBirth, int level, double balance) throws Exception {
         Customer c = new Customer(name, surname, dateOfBirth, level, balance);
         super.addPerson(c);
@@ -30,7 +31,7 @@ public class CustomerController extends PersonController<Customer> {
     /**
      * Add a new customer
      *
-     * @param customer     The customer object
+     * @param customer The customer object
      * @return The customer added
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
@@ -43,7 +44,7 @@ public class CustomerController extends PersonController<Customer> {
      *
      * @param id The id of the customer
      * @return The customer
-    */
+     */
     public Customer getCustomer(int id) throws Exception {
         return this.customerDao.get(id);
     }

@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MariaDbPersonDao implements PersonDao{
+public class MariaDbPersonDao implements PersonDao {
     @Override
     public Person get(Integer id) throws SQLException {
         Connection con = null;
@@ -18,7 +18,7 @@ public class MariaDbPersonDao implements PersonDao{
             ps = con.prepareStatement("select * from people where id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            if(!rs.next()) {
+            if (!rs.next()) {
                 throw new RuntimeException("The person looked for in not present in the database");
             }
             p = new Person(
@@ -30,7 +30,7 @@ public class MariaDbPersonDao implements PersonDao{
             );
 
         } finally {
-            assert rs != null: "ResultSet is Null";
+            assert rs != null : "ResultSet is Null";
             rs.close();
             ps.close();
             Database.closeConnection(con);
@@ -64,7 +64,7 @@ public class MariaDbPersonDao implements PersonDao{
             }
 
         } finally {
-            assert rs != null: "ResultSet is Null";
+            assert rs != null : "ResultSet is Null";
             rs.close();
             stm.close();
             Database.closeConnection(con);
@@ -88,11 +88,11 @@ public class MariaDbPersonDao implements PersonDao{
             ps.executeUpdate();
             //get generated id from dbms
             rs = ps.getGeneratedKeys();
-            if (rs.next()){
+            if (rs.next()) {
                 person.setId(rs.getInt(1));
             }
         } finally {
-            assert rs != null: "ResultSet is null";
+            assert rs != null : "ResultSet is null";
             rs.close();
             ps.close();
             Database.closeConnection(con);
@@ -113,7 +113,7 @@ public class MariaDbPersonDao implements PersonDao{
             ps.setInt(5, person.getId());
             ps.executeUpdate();
         } finally {
-            assert ps != null: "preparedStatement is Null";
+            assert ps != null : "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }
@@ -130,7 +130,7 @@ public class MariaDbPersonDao implements PersonDao{
             ps.setInt(1, id);
             rows = ps.executeUpdate();
         } finally {
-            assert ps != null: "preparedStatement is Null";
+            assert ps != null : "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }

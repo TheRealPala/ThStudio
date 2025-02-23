@@ -6,13 +6,13 @@ public class Deleted extends State {
 
     private final LocalDateTime cancelledTime;
 
-    public Deleted(LocalDateTime ldt){
+    public Deleted(LocalDateTime ldt) {
         this.state = "Cancelled";
         this.cancelledTime = ldt;
     }
 
     @Override
-    public String getExtraInfo(){
+    public String getExtraInfo() {
         return this.cancelledTime.toString();
     }
 }

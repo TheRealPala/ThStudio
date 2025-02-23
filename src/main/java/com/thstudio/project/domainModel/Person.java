@@ -10,7 +10,7 @@ public class Person {
     protected int id;
     protected double balance;
 
-    public Person(int id, String name, String surname, String dateOfBirth, double balance){
+    public Person(int id, String name, String surname, String dateOfBirth, double balance) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -19,7 +19,7 @@ public class Person {
 
     }
 
-    public Person(String name, String surname, String dateOfBirth, double balance){
+    public Person(String name, String surname, String dateOfBirth, double balance) {
         this.name = name;
         this.surname = surname;
         this.dateOfBirth = parseDate(dateOfBirth);
@@ -70,11 +70,11 @@ public class Person {
         this.id = id;
     }
 
-    public double getBalance(){
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance){
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 

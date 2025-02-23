@@ -2,7 +2,7 @@ package com.thstudio.project.domainModel.Search;
 
 public class DecoratorSearchIsOnline extends BaseDecoratorSearch {
 
-    public DecoratorSearchIsOnline(Search decoratedSearch, String online){
+    public DecoratorSearchIsOnline(Search decoratedSearch, String online) {
         super(decoratedSearch);
         this.arguments = super.getArguments();
         this.arguments.add(online);

@@ -5,7 +5,7 @@ import java.util.Objects;
 public abstract class State {
     protected String state;
 
-    public String getState(){
+    public String getState() {
         return this.state;
     }
 

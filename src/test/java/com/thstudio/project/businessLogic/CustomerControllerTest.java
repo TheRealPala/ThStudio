@@ -4,6 +4,7 @@ import com.thstudio.project.dao.CustomerDao;
 import com.thstudio.project.dao.Database;
 import com.thstudio.project.dao.MariaDbCustomerDao;
 import com.thstudio.project.dao.MariaDbPersonDao;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.thstudio.project.domainModel.Customer;
@@ -63,7 +64,6 @@ class CustomerControllerTest {
         Customer updatedCustomer = customerController.getCustomer(customerToAdd.getId());
         assertEquals(customerToAdd, updatedCustomer);
     }
-
 
 
     @AfterEach

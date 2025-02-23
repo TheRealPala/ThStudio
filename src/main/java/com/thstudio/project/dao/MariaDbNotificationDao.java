@@ -125,7 +125,7 @@ public class MariaDbNotificationDao implements NotificationDao {
             ps.setInt(1, id);
             rows = ps.executeUpdate();
         } finally {
-            assert ps != null: "preparedStatement is Null";
+            assert ps != null : "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }
@@ -143,10 +143,10 @@ public class MariaDbNotificationDao implements NotificationDao {
             ps = con.prepareStatement("select * from notifications where id_receiver = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 nList.add(parseNotification(rs));
             }
-            if (nList.isEmpty()){
+            if (nList.isEmpty()) {
                 throw new RuntimeException("The receiver has not notifications");
             }
         } catch (SQLException e) {

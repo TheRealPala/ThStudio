@@ -2,7 +2,7 @@ package com.thstudio.project.domainModel.Search;
 
 public class DecoratorSearchZone extends BaseDecoratorSearch {
 
-    public DecoratorSearchZone(Search decoratedSearch, String zone){
+    public DecoratorSearchZone(Search decoratedSearch, String zone) {
         super(decoratedSearch);
         this.arguments = super.getArguments();
         this.arguments.add(zone);

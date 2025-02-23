@@ -4,12 +4,13 @@ import com.thstudio.project.dao.DAO;
 import com.thstudio.project.domainModel.Person;
 
 import java.util.List;
+
 import static java.util.Collections.unmodifiableList;
 
-public class PersonController <T extends Person>{
+public class PersonController<T extends Person> {
     private DAO<T, Integer> dao;
 
-    public PersonController(DAO<T, Integer> dao){
+    public PersonController(DAO<T, Integer> dao) {
         this.dao = dao;
     }
 
@@ -47,7 +48,9 @@ public class PersonController <T extends Person>{
         return unmodifiableList(dao.getAll());
     }
 
-        /** Returns the person with the corresponding CF */
+    /**
+     * Returns the person with the corresponding CF
+     */
     public T getPerson(int id) throws Exception {
         return dao.get(id);
     }

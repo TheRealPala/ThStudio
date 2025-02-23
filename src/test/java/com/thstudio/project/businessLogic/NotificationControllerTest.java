@@ -3,6 +3,8 @@ package com.thstudio.project.businessLogic;
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Doctor;
 import com.thstudio.project.domainModel.Notification;
+import com.thstudio.project.fixture.DoctorFixture;
+import com.thstudio.project.fixture.NotificationFixture;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,10 +40,10 @@ class NotificationControllerTest {
 
     @Test
     void getNotificationByReceiver() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Notification notificationToInsert = new Notification("Titolo notifica", doctor.getId());
+        Notification notificationToInsert = new Notification(NotificationFixture.genTitle(), doctor.getId());
         notificationDao.insert(notificationToInsert);
         List<Notification> notificationList = notificationController.getNotificationsByReceiverId(doctor.getId());
         assertEquals(notificationList.getFirst(), notificationToInsert);
@@ -49,11 +51,11 @@ class NotificationControllerTest {
 
     @Test
     void getMoreThanOneNotificationByReceiver() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Notification firstNotificationToAdd = new Notification("Titolo notifica", doctor.getId());
-        Notification secondNotificationToAdd = new Notification("Titolo seconda notifica", doctor.getId());
+        Notification firstNotificationToAdd = new Notification(NotificationFixture.genTitle(), doctor.getId());
+        Notification secondNotificationToAdd = new Notification(NotificationFixture.genTitle(), doctor.getId());
         List<Notification> notificationsToAdd = new ArrayList<>();
         notificationsToAdd.add(firstNotificationToAdd);
         notificationsToAdd.add(secondNotificationToAdd);
@@ -69,7 +71,7 @@ class NotificationControllerTest {
 
     @Test
     void getNoNotifications() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,

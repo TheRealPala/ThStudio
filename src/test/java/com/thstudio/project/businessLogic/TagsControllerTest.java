@@ -59,6 +59,11 @@ class TagsControllerTest {
     }
 
     @Test
+    void createNonExistentTag() {
+        assertThrows(IllegalArgumentException.class, () -> tagsController.createTag("NonExistent", "NonExistent"));
+    }
+
+    @Test
     void deleteZoneTag() throws Exception {
         tagsController.createTag("Zone1", "Zone");
         assertTrue(tagsController.deleteTag("Zone1", "Zone"));

@@ -11,6 +11,7 @@ import com.thstudio.project.domainModel.State.Completed;
 import com.thstudio.project.domainModel.State.Deleted;
 import com.thstudio.project.fixture.CustomerFixture;
 import com.thstudio.project.fixture.DoctorFixture;
+import com.thstudio.project.fixture.MedicalExamFixture;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -57,7 +58,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
         MedicalExam bookedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId());
@@ -81,7 +82,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
 
@@ -99,10 +100,9 @@ class StateControllerTest {
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
         Customer customer = CustomerFixture.genCustomer();
-        customer.setBalance(100);
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer, customer.getBalance() + 1000));
         assertNotEquals(addedMedicalExam.getId(), 0);
 
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
@@ -121,7 +121,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
         assertTrue(stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), customer.getId()));
@@ -146,7 +146,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
         Customer otherCustomer = CustomerFixture.genCustomer();
@@ -167,7 +167,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
@@ -185,7 +185,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
         MedicalExam bookedExam = medicalExamController.getExam(addedMedicalExam.getId());
@@ -208,7 +208,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         assertTrue(stateController.cancelMedicalExam(addedMedicalExam.getId(), doctor.getId()));
         MedicalExam deletedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId());
@@ -224,7 +224,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
         assertTrue(stateController.cancelMedicalExam(addedMedicalExam.getId(), doctor.getId()));
@@ -262,7 +262,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
@@ -280,7 +280,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
@@ -298,7 +298,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         Doctor otherDoctor = DoctorFixture.genDoctor();
         doctorDao.insert(otherDoctor);
@@ -319,7 +319,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         addedMedicalExam.setStartTime(LocalDateTime.now());
         addedMedicalExam.setEndTime(LocalDateTime.now().plusHours(1));
@@ -340,7 +340,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-01-01 15:30:00", "2025-01-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer, LocalDateTime.now().minusHours(10), LocalDateTime.now().minusHours(9)));
         assertNotEquals(addedMedicalExam.getId(), 0);
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
         stateController.markMedicalExamAsComplete(addedMedicalExam.getId());
@@ -356,7 +356,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2024-10-01 15:30:00", "2024-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer, LocalDateTime.now().minusHours(10), LocalDateTime.now().minusHours(9)));
         assertNotEquals(addedMedicalExam.getId(), 0);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
@@ -374,7 +374,7 @@ class StateControllerTest {
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer));
         assertNotEquals(addedMedicalExam.getId(), 0);
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,

@@ -13,6 +13,11 @@ public class Customer extends Person {
         this.level = level;
     }
 
+    public Customer(Person p) {
+        super(p);
+        this.level = 1;
+    }
+
     public int getLevel() {
         return level;
     }

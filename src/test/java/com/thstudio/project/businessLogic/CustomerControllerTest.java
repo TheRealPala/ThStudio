@@ -7,6 +7,7 @@ import com.thstudio.project.dao.MariaDbPersonDao;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.thstudio.project.domainModel.Customer;
+import com.thstudio.project.fixture.CustomerFixture;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.*;
 
@@ -32,7 +33,7 @@ class CustomerControllerTest {
 
     @Test
     void addCustomer() throws Exception {
-        Customer customerToAdd = customerController.addCustomer("Marco", "Rossi", "2000-10-01", 1, 1000);
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
         assertNotNull(customerToAdd);
         assertNotEquals(customerToAdd.getId(), 0);
         Customer addedCustomer = customerController.getPerson(customerToAdd.getId());
@@ -41,7 +42,7 @@ class CustomerControllerTest {
 
     @Test
     void modifyCustomerLevel() throws Exception {
-        Customer customerToAdd = customerController.addCustomer("Marco", "Rossi", "2000-10-01", 1, 1000);
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
         assertEquals(customerToAdd.getLevel(), customerController.getPerson(customerToAdd.getId()).getLevel());
         customerToAdd.setLevel(customerToAdd.getLevel() + 1);
         assertTrue(customerController.modifyCustomerLevel(customerToAdd.getId(), customerToAdd.getLevel()));
@@ -52,7 +53,7 @@ class CustomerControllerTest {
 
     @Test
     void updateCustomer() throws Exception {
-        Customer customerToAdd = customerController.addCustomer("Marco", "Rossi", "2000-10-01", 1, 1000);
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
         customerToAdd.setName("Luigi");
         customerToAdd.setSurname("Bianchi");
         customerToAdd.setDateOfBirth("2003-08-22");

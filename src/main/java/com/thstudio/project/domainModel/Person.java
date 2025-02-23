@@ -26,6 +26,14 @@ public class Person {
         this.balance = balance;
     }
 
+    public Person(Person that) {
+        this.id = that.id;
+        this.name = that.name;
+        this.surname = that.surname;
+        this.dateOfBirth = that.dateOfBirth;
+        this.balance = that.balance;
+    }
+
     private LocalDate parseDate(String date) {
         return LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }

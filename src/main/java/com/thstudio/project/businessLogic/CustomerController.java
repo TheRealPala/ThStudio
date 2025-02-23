@@ -28,6 +28,17 @@ public class CustomerController extends PersonController<Customer> {
     }
 
     /**
+     * Add a new customer
+     *
+     * @param customer     The customer object
+     * @return The customer added
+     * @throws Exception bubbles up exceptions to PeopleController::addPerson()
+     */
+    public Customer addCustomer(Customer customer) throws Exception {
+        return this.addCustomer(customer.getName(), customer.getSurname(), customer.getDateOfBirth(), customer.getLevel(), customer.getBalance());
+    }
+
+    /**
      * get the customer
      *
      * @param id The id of the customer

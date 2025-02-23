@@ -118,10 +118,7 @@ public class MedicalExamController {
         }
     }
 
-    public MedicalExam addMedicalExam(int idDoctor, int idCustomer, String title, String description, String startTime, String endTime, double price) throws Exception {
-        Doctor doctor = doctorDao.get(idDoctor);
-        MedicalExam medicalExam = new MedicalExam(doctor.getId(), startTime, endTime, description, title, price);
-        medicalExam.setIdCustomer(idCustomer);
+    private void addMedicalExamLogic (MedicalExam medicalExam, Doctor doctor) throws Exception {
         List<MedicalExam> medicalExams = new ArrayList<>();
         try {
             medicalExams = medicalExamDao.getDoctorExams(doctor.getId());
@@ -133,6 +130,19 @@ public class MedicalExamController {
         }
         medicalExam.setState(new Available());
         medicalExamDao.insert(medicalExam);
+    }
+
+    public MedicalExam addMedicalExam(int idDoctor, int idCustomer, String title, String description, String startTime, String endTime, double price) throws Exception {
+        Doctor doctor = doctorDao.get(idDoctor);
+        MedicalExam medicalExam = new MedicalExam(doctor.getId(), startTime, endTime, description, title, price);
+        medicalExam.setIdCustomer(idCustomer);
+        this.addMedicalExamLogic(medicalExam, doctor);
+        return medicalExam;
+    }
+
+    public MedicalExam addMedicalExam(MedicalExam medicalExam) throws Exception {
+        Doctor doctor = doctorDao.get(medicalExam.getIdDoctor());
+        this.addMedicalExamLogic(medicalExam, doctor);
         return medicalExam;
     }
 

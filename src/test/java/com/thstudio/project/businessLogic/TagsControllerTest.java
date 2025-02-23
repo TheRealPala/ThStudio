@@ -1,7 +1,8 @@
 package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
-import com.thstudio.project.businessLogic.TagsController;
+import com.thstudio.project.domainModel.Doctor;
+import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.domainModel.Tags.Tag;
 import com.thstudio.project.domainModel.Tags.TagIsOnline;
 import com.thstudio.project.domainModel.Tags.TagType;
@@ -18,7 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class TagsControllerTest {
     private static TagsController tagsController;
     private static TagDao tagDao;
+    private static MedicalExamController medicalExamController;
     private static MedicalExamDao medicalExamDao;
+    private static DoctorDao doctorDao;
 
     @BeforeAll
     static void setDatabaseSettings() {
@@ -31,7 +34,13 @@ class TagsControllerTest {
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
         tagDao = new MariaDbTagDao();
+        medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
         tagsController = new TagsController(tagDao, medicalExamDao);
+        NotificationDao notificationDao = new MariaDbNotificationDao();
+        PersonDao personDao = new MariaDbPersonDao();
+        doctorDao = new MariaDbDoctorDao(personDao);
+        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao);
+        tagDao = new MariaDbTagDao();
     }
 
     @Test
@@ -86,9 +95,23 @@ class TagsControllerTest {
         assertFalse(tagsController.deleteTag("NonExistent", "Type"));
     }
 
+    @Test
+    void attachTagToMedicalExam() throws Exception {
+        Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(firstDoctor);
+        assertNotEquals(firstDoctor.getId(), 0);
+        MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
+        tagsController.createTag("Zone1", "Zone");
+
+        assertTrue(tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+
+    }
+
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();
         connection.prepareStatement("delete from tags").executeUpdate();
+        connection.prepareStatement("delete from medical_exams").executeUpdate();
+        connection.prepareStatement("delete from people").executeUpdate();
     }
 }

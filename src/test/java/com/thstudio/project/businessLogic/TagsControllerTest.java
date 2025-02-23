@@ -61,8 +61,13 @@ class TagsControllerTest {
     @Test
     void deleteZoneTag() throws Exception {
         tagsController.createTag("Zone1", "Zone");
-        boolean deleted = tagsController.deleteTag("Zone1", "Zone");
         assertTrue(tagsController.deleteTag("Zone1", "Zone"));
+    }
+
+    @Test
+    void deleteTypeTag() throws Exception {
+        tagsController.createTag("Type1", "Type");
+        assertTrue(tagsController.deleteTag("Type1", "Type"));
     }
 
     @AfterEach

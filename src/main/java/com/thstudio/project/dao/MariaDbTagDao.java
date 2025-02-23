@@ -80,6 +80,7 @@ public class MariaDbTagDao implements TagDao{
             String tagType = rs.getString("tag_type");
             Tag tmp = switch (tagType) {
                 case "Online" -> new TagIsOnline(tag);
+                case "Type" -> new TagType(tag);
                 case "Zone" -> new TagZone(tag);
                 default -> null;
             };

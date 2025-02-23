@@ -22,14 +22,6 @@ public class MedicalExamFixture {
         return new MedicalExam(doctor.getId(), dateOfStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), dateOfFinish.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), faker.lorem().characters(55), faker.file().fileName(), 300);
     }
 
-    public static MedicalExam genMedicalExam(Doctor doctor, int numberOfHours) {
-        assert numberOfHours > 0;
-        Date tmp = faker.date().future(24 * 365, TimeUnit.DAYS);
-        LocalDateTime dateOfStart = tmp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        LocalDateTime dateOfFinish = dateOfStart.plusHours(numberOfHours);
-        return new MedicalExam(doctor.getId(), dateOfStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), dateOfFinish.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), faker.lorem().characters(55), faker.file().fileName(), 300);
-    }
-
     public static MedicalExam genMedicalExam(Doctor doctor, Customer customer) {
         Date tmp = faker.date().future(24 * 365, TimeUnit.DAYS);
         LocalDateTime dateOfStart = tmp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();

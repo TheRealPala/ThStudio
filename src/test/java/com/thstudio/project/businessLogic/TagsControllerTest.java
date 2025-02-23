@@ -58,6 +58,13 @@ class TagsControllerTest {
         assertEquals(onlineTag, onlineTagToAdd);
     }
 
+    @Test
+    void deleteZoneTag() throws Exception {
+        tagsController.createTag("Zone1", "Zone");
+        boolean deleted = tagsController.deleteTag("Zone1", "Zone");
+        assertTrue(tagsController.deleteTag("Zone1", "Zone"));
+    }
+
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();

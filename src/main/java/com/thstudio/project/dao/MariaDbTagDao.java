@@ -33,7 +33,7 @@ public class MariaDbTagDao implements TagDao {
     public boolean detachTagFromMedicalExam(MedicalExam medicalExam, Tag tagToDetach) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
-        int rows = 0;
+        int rows;
         try {
             con = Database.getConnection();
             ps = con.prepareStatement("delete from medical_exams_tags where tag = ? and tag_type = ? and id_medical_exam = ?");
@@ -182,7 +182,7 @@ public class MariaDbTagDao implements TagDao {
         PreparedStatement ps = null;
         String tag = id[0];
         String tagType = id[1];
-        int rows = 0;
+        int rows;
         try {
             con = Database.getConnection();
             ps = con.prepareStatement("delete from tags where tag = ? and tag_type = ?");

@@ -123,7 +123,7 @@ public class MedicalExamController {
         try {
             medicalExams = medicalExamDao.getDoctorExams(doctor.getId());
         } catch (RuntimeException e) {
-            System.out.println("The doctor has not exam, therefore is free in the time specified");
+           /* System.out.println("The doctor has not exam, therefore is free in the time specified");*/
         }
         if (!medicalExams.isEmpty()) {
             checkDateTimeBounds(medicalExams, medicalExam.getStartTime(), medicalExam.getEndTime());

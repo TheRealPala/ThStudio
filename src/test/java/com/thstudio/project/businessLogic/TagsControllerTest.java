@@ -107,6 +107,18 @@ class TagsControllerTest {
 
     }
 
+    @Test
+    void detachTagToMedicalExam() throws Exception {
+        Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(firstDoctor);
+        assertNotEquals(firstDoctor.getId(), 0);
+        MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
+        tagsController.createTag("Zone1", "Zone");
+        tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId());
+
+        assertTrue(tagsController.detachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+    }
+
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();

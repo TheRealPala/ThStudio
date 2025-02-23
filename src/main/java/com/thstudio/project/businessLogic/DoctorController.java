@@ -30,6 +30,17 @@ public class DoctorController extends PersonController<Doctor> {
     }
 
     /**
+     * Add a new doctor from obj
+     *
+     * @param doctor    The doctor obk
+     * @return The added doctor
+     * @throws Exception bubbles up exceptions to PeopleController::addPerson()
+     */
+    public Doctor addDoctor(Doctor doctor) throws Exception {
+        return this.addDoctor(doctor.getName(), doctor.getSurname(), doctor.getDateOfBirth(), doctor.getMedicalLicenseNumber(), doctor.getBalance());
+    }
+
+    /**
      * get the doctor
      *
      * @param id The id of the doctor

@@ -141,6 +141,10 @@ class DocumentControllerTest {
 
         // controllare la notifica
         Document documentDb = documentController.addDocument(DocumentFixture.genTitle(), doctor.getId());
+        Customer customer = CustomerFixture.genCustomer();
+        customerDao.insert(customer);
+        documentController.sendDocument(documentDb, customer.getId());
+        assertEquals(notificationDao.getNotificationsByReceiverId(customer.getId()).getFirst().getTitle(), "New document " + documentDb.getTitle() + " by :" + doctor.getFullName());
         Doctor otherDoctor = DoctorFixture.genDoctor();
         doctorDao.insert(otherDoctor);
         Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), otherDoctor.getId());

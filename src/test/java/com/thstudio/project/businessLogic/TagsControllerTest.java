@@ -43,6 +43,14 @@ class TagsControllerTest {
     }
 
     @Test
+    void createTypeTag() throws Exception {
+        Tag typeTag = new TagType("Type1");
+        Tag typeTagToAdd = tagsController.createTag("Type1", "Type");
+        assertNotNull(typeTagToAdd);
+        assertEquals(typeTag, typeTagToAdd);
+    }
+
+    @Test
     void createOnlineTag() throws Exception {
         Tag onlineTag = new TagIsOnline("Online1");
         Tag onlineTagToAdd = tagsController.createTag("Online1", "Online");

@@ -14,6 +14,11 @@ public class Doctor extends Person {
         this.medicalLicenseNumber = medicalLicenseNumber;
     }
 
+    public Doctor(Person p) {
+        super(p);
+        this.medicalLicenseNumber = "MLN-00000";
+    }
+
     public String getMedicalLicenseNumber() {
         return medicalLicenseNumber;
     }

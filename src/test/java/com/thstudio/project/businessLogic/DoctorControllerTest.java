@@ -1,8 +1,8 @@
 package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
-import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.Doctor;
+import com.thstudio.project.fixture.DoctorFixture;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,7 +32,7 @@ class DoctorControllerTest {
 
     @Test
     void addDoctor() throws Exception {
-        Doctor doctorToAdd = doctorController.addDoctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctorToAdd = doctorController.addDoctor(DoctorFixture.genDoctor());
         assertNotNull(doctorToAdd);
         assertNotEquals(doctorToAdd.getId(), 0);
         Doctor addedDoctor = doctorController.getPerson(doctorToAdd.getId());
@@ -41,7 +41,7 @@ class DoctorControllerTest {
 
     @Test
     void updateDoctor() throws Exception {
-        Doctor doctorToAdd = doctorController.addDoctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctorToAdd = doctorController.addDoctor(DoctorFixture.genDoctor());
         doctorToAdd.setName("Luigi");
         doctorToAdd.setSurname("Bianchi");
         doctorToAdd.setDateOfBirth("2003-08-22");

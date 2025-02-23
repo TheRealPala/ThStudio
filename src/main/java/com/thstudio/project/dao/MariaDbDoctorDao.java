@@ -1,11 +1,12 @@
 package com.thstudio.project.dao;
 
 import com.thstudio.project.domainModel.Doctor;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MariaDbDoctorDao implements DoctorDao{
+public class MariaDbDoctorDao implements DoctorDao {
     private final PersonDao personDao;
 
     public MariaDbDoctorDao(PersonDao personDao) {
@@ -23,20 +24,20 @@ public class MariaDbDoctorDao implements DoctorDao{
             ps = con.prepareStatement("select * from people natural join doctors where id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            if(!rs.next()) {
+            if (!rs.next()) {
                 throw new RuntimeException("The Doctor looked for in not present in the database");
             }
             d = new Doctor(
-                rs.getString("name"),
-                rs.getString("surname"),
-                rs.getString("date_of_birth"),
-                rs.getInt("id"),
-                rs.getString("medical_license_number"),
-                rs.getDouble("balance")
+                    rs.getString("name"),
+                    rs.getString("surname"),
+                    rs.getString("date_of_birth"),
+                    rs.getInt("id"),
+                    rs.getString("medical_license_number"),
+                    rs.getDouble("balance")
             );
 
         } finally {
-            assert rs != null: "ResultSet is Null";
+            assert rs != null : "ResultSet is Null";
             rs.close();
             ps.close();
             Database.closeConnection(con);
@@ -71,7 +72,7 @@ public class MariaDbDoctorDao implements DoctorDao{
             }
 
         } finally {
-            assert rs != null: "ResultSet is Null";
+            assert rs != null : "ResultSet is Null";
             rs.close();
             stm.close();
             Database.closeConnection(con);
@@ -94,13 +95,13 @@ public class MariaDbDoctorDao implements DoctorDao{
             ps.executeUpdate();
             //get generated id from dbms
             rs = ps.getGeneratedKeys();
-            if (rs.next()){
+            if (rs.next()) {
                 doctor.setId(rs.getInt(1));
             }
         } catch (Exception e) {
             throw new SQLException(e);
         } finally {
-            assert rs != null: "ResultSet is null";
+            assert rs != null : "ResultSet is null";
             rs.close();
             ps.close();
             Database.closeConnection(con);
@@ -121,7 +122,7 @@ public class MariaDbDoctorDao implements DoctorDao{
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            assert ps != null: "preparedStatement is Null";
+            assert ps != null : "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }

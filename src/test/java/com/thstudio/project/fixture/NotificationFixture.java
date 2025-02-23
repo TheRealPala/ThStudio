@@ -9,7 +9,7 @@ public class NotificationFixture {
     private static final Faker faker = new Faker();
 
     public static String genTitle() {
-       return faker.file().fileName();
+        return faker.file().fileName();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.thstudio.project.dao;
 
 import com.thstudio.project.domainModel.Customer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
@@ -23,19 +24,19 @@ public class MariaDbCustomerDao implements CustomerDao {
             ps = con.prepareStatement("select * from people natural join customers where id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            if(!rs.next()) {
+            if (!rs.next()) {
                 throw new RuntimeException("The Customer looked for in not present in the database");
             }
             c = new Customer(
-                rs.getString("name"),
-                rs.getString("surname"),
-                rs.getString("date_of_birth"),
-                rs.getInt("id"),
-                rs.getInt("level"),
-                rs.getDouble("balance")
+                    rs.getString("name"),
+                    rs.getString("surname"),
+                    rs.getString("date_of_birth"),
+                    rs.getInt("id"),
+                    rs.getInt("level"),
+                    rs.getDouble("balance")
             );
         } finally {
-            assert rs != null: "ResultSet is Null";
+            assert rs != null : "ResultSet is Null";
             rs.close();
             ps.close();
             Database.closeConnection(con);
@@ -55,21 +56,21 @@ public class MariaDbCustomerDao implements CustomerDao {
             rs = stm.executeQuery("select * from people natural join customers");
             while (rs.next()) {
                 cList.add(
-                    new Customer(
-                        rs.getString("name"),
-                        rs.getString("surname"),
-                        rs.getString("date_of_birth"),
-                        rs.getInt("id"),
-                        rs.getInt("level"),
-                        rs.getDouble("balance")
-                    )
+                        new Customer(
+                                rs.getString("name"),
+                                rs.getString("surname"),
+                                rs.getString("date_of_birth"),
+                                rs.getInt("id"),
+                                rs.getInt("level"),
+                                rs.getDouble("balance")
+                        )
                 );
             }
-            if(cList.isEmpty()){
+            if (cList.isEmpty()) {
                 throw new RuntimeException("There is no Customers in the database");
             }
         } finally {
-            assert rs != null: "ResultSet is Null";
+            assert rs != null : "ResultSet is Null";
             rs.close();
             stm.close();
             Database.closeConnection(con);
@@ -110,7 +111,7 @@ public class MariaDbCustomerDao implements CustomerDao {
             ps.setInt(2, customer.getId());
             ps.executeUpdate();
         } finally {
-            assert ps != null: "preparedStatement is Null";
+            assert ps != null : "preparedStatement is Null";
             ps.close();
             Database.closeConnection(con);
         }

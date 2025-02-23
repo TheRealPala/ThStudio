@@ -2,6 +2,7 @@ package com.thstudio.project;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import com.thstudio.project.dao.*;
+
 public class Main {
     public static void main(String[] args) throws Exception {
         Dotenv dotenv = Dotenv.configure().directory("config").load();

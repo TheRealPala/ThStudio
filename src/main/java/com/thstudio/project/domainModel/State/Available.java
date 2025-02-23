@@ -2,12 +2,12 @@ package com.thstudio.project.domainModel.State;
 
 public class Available extends State {
 
-    public Available(){
+    public Available() {
         this.state = "Available";
     }
 
     @Override
-    public String getExtraInfo(){
+    public String getExtraInfo() {
         return null;
     }
 

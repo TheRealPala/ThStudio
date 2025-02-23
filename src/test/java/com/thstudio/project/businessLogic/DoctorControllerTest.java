@@ -53,7 +53,6 @@ class DoctorControllerTest {
     }
 
 
-
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();

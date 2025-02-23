@@ -32,7 +32,7 @@ public class MedicalExamController {
     private void checkDateTimeBounds(List<MedicalExam> medicalExams, LocalDateTime startTime,
                                      LocalDateTime endTime) throws IllegalArgumentException {
         for (MedicalExam exam : medicalExams) {
-            if ( (startTime.isAfter(exam.getStartTime()) && startTime.isBefore(exam.getEndTime())) || (endTime.isAfter(exam.getStartTime()) && endTime.isBefore(exam.getEndTime())) ) {
+            if ((startTime.isAfter(exam.getStartTime()) && startTime.isBefore(exam.getEndTime())) || (endTime.isAfter(exam.getStartTime()) && endTime.isBefore(exam.getEndTime()))) {
                 throw new IllegalArgumentException("The given doctor is already occupied in the given time range");
             }
         }
@@ -118,12 +118,12 @@ public class MedicalExamController {
         }
     }
 
-    private void addMedicalExamLogic (MedicalExam medicalExam, Doctor doctor) throws Exception {
+    private void addMedicalExamLogic(MedicalExam medicalExam, Doctor doctor) throws Exception {
         List<MedicalExam> medicalExams = new ArrayList<>();
         try {
             medicalExams = medicalExamDao.getDoctorExams(doctor.getId());
         } catch (RuntimeException e) {
-           /* System.out.println("The doctor has not exam, therefore is free in the time specified");*/
+            /* System.out.println("The doctor has not exam, therefore is free in the time specified");*/
         }
         if (!medicalExams.isEmpty()) {
             checkDateTimeBounds(medicalExams, medicalExam.getStartTime(), medicalExam.getEndTime());

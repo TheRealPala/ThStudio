@@ -32,7 +32,7 @@ public class DoctorController extends PersonController<Doctor> {
     /**
      * Add a new doctor from obj
      *
-     * @param doctor    The doctor obk
+     * @param doctor The doctor obk
      * @return The added doctor
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */

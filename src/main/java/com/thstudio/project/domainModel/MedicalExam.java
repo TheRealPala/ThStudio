@@ -50,6 +50,7 @@ public class MedicalExam {
         this.tags = new ArrayList<>();
         this.documents = new ArrayList<>();
     }
+
     public MedicalExam(int id, int idDoctor, int idCustomer, String startTime, String endTime,
                        String description, String title, double price, State state) {
         this.id = id;
@@ -62,7 +63,7 @@ public class MedicalExam {
         this.price = price;
         this.tags = new ArrayList<>();
         this.documents = new ArrayList<>();
-        this.idCustomer=idCustomer;
+        this.idCustomer = idCustomer;
         this.state = state;
     }
 
@@ -101,7 +102,8 @@ public class MedicalExam {
     public ArrayList<Document> getDocuments() {
         return documents;
     }
-    public void addDocument(Document document){
+
+    public void addDocument(Document document) {
         this.documents.add(document);
     }
 
@@ -195,7 +197,7 @@ public class MedicalExam {
     }
 
     public void setEndTimeFromString(String endTime) {
-        LocalDateTime parsedEndTime =  this.parseDate(endTime);
+        LocalDateTime parsedEndTime = this.parseDate(endTime);
         checkEndTime(parsedEndTime);
         this.endTime = parsedEndTime;
     }

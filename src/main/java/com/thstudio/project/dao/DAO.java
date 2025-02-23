@@ -2,7 +2,7 @@ package com.thstudio.project.dao;
 
 import java.util.List;
 
-public interface DAO <T, ID>{
+public interface DAO<T, ID> {
     // This method returns the object with the given ID
     T get(ID id) throws Exception;
 

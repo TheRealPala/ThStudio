@@ -256,7 +256,7 @@ class StateControllerTest {
 
     @Test
     void attemptToCancelAMedicalExamFromACustomer() throws Exception {
-        Doctor doctor =DoctorFixture.genDoctor();
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
         Customer customer = CustomerFixture.genCustomer();
@@ -360,7 +360,8 @@ class StateControllerTest {
         assertNotEquals(addedMedicalExam.getId(), 0);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    stateController.markMedicalExamAsComplete(addedMedicalExam.getId());;
+                    stateController.markMedicalExamAsComplete(addedMedicalExam.getId());
+                    ;
                 }
         );
         assertEquals(thrown.getMessage(), "Can't mark an exam as complete if is not in booked state");
@@ -379,7 +380,8 @@ class StateControllerTest {
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    stateController.markMedicalExamAsComplete(addedMedicalExam.getId());;
+                    stateController.markMedicalExamAsComplete(addedMedicalExam.getId());
+                    ;
                 }
         );
         assertEquals(thrown.getMessage(), "Can't mark an exam as complete if is not finished");

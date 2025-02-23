@@ -10,14 +10,14 @@ public class Document {
     private int receiverId;
     private int medicalExamId;
 
-    public Document (int id, String title, String path, int ownerId) {
+    public Document(int id, String title, String path, int ownerId) {
         this.id = id;
         this.title = title;
         this.path = path;
         this.ownerId = ownerId;
     }
 
-    public Document (String title, String path, int ownerId) {
+    public Document(String title, String path, int ownerId) {
         this.title = title;
         this.path = path;
         this.ownerId = ownerId;

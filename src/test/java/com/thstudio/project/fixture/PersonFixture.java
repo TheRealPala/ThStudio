@@ -13,7 +13,7 @@ public class PersonFixture {
     private static final Faker faker = new Faker();
 
     public static Person genPerson() {
-        Date tmp= faker.date().past(50*365, TimeUnit.DAYS);
+        Date tmp = faker.date().past(50 * 365, TimeUnit.DAYS);
         LocalDateTime dateOfBirth = tmp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         return new Person(faker.name().firstName(), faker.name().lastName(), dateOfBirth.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), faker.number().randomDouble(0, 5000, 99999));
     }

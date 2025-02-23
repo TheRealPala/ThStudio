@@ -2,7 +2,7 @@ package com.thstudio.project.domainModel.Search;
 
 public class DecoratorSearchType extends BaseDecoratorSearch {
 
-    public DecoratorSearchType(Search decoratedSearch, String type){
+    public DecoratorSearchType(Search decoratedSearch, String type) {
         super(decoratedSearch);
         this.arguments = super.getArguments();
         this.arguments.add(type);

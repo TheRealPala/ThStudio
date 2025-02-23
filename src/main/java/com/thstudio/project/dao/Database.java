@@ -14,8 +14,9 @@ public class Database {
     private static String dbHost;
     private static String dbPort;
     private static String dbUrl;
+
     /**
-     *Private constructor to avoid instantiation, since this class is used only to connect to the database
+     * Private constructor to avoid instantiation, since this class is used only to connect to the database
      * We follow the Singleton pattern
      */
     private Database() {
@@ -79,7 +80,6 @@ public class Database {
 
     /**
      * Set the database url to deault
-     *
      */
     public static void useDefaultDb() {
         dbUrl = "jdbc:mariadb://" + dbHost + ":" + dbPort + "/" + dbName + "?user=" + dbUser + "&password=" + dbPassword;
@@ -87,7 +87,6 @@ public class Database {
 
     /**
      * Set the database url to test
-     *
      */
     public static void useTestDb() {
         dbUrl = "jdbc:mariadb://" + dbHost + ":" + dbPort + "/" + dbTestName + "?user=" + dbUser + "&password=" + dbPassword;

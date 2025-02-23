@@ -12,6 +12,7 @@ import com.thstudio.project.domainModel.State.Deleted;
 import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.dao.MedicalExamDao;
+
 import java.time.LocalDateTime;
 
 public class StateController {
@@ -33,7 +34,7 @@ public class StateController {
      * a client book a medical exam
      *
      * @param medicalExamId The medical exam id
-     * @param customerId The customer id
+     * @param customerId    The customer id
      * @return true if the medical exam is canceled, false otherwise
      */
     public boolean bookMedicalExam(int medicalExamId, int customerId) throws Exception {
@@ -63,7 +64,7 @@ public class StateController {
      * cancel a medical exam booking
      *
      * @param medicalExamId The medical exam id
-     * @param customerId  The customer id
+     * @param customerId    The customer id
      * @return true, if the medical exam booking is canceled, raise up RuntimeExceptions otherwise
      */
     public boolean cancelMedicalExamBooking(int medicalExamId, int customerId) throws Exception {
@@ -72,7 +73,7 @@ public class StateController {
         if (me.getIdCustomer() != c.getId()) {
             throw new RuntimeException("Unauthorized request");
         }
-        if (!(me.getState() instanceof Booked)){
+        if (!(me.getState() instanceof Booked)) {
             throw new RuntimeException("Can't cancel a booking for an exam which is not booked");
         }
         if (LocalDateTime.now().isAfter(me.getStartTime())) {
@@ -97,7 +98,7 @@ public class StateController {
      * cancel a medical exam
      *
      * @param medicalExamId The medical exam id
-     * @param doctorId  The doctor id
+     * @param doctorId      The doctor id
      * @return true, if the medical exam is canceled, raise up RuntimeExceptions otherwise
      */
     public boolean cancelMedicalExam(int medicalExamId, int doctorId) throws Exception {
@@ -110,7 +111,7 @@ public class StateController {
             throw new RuntimeException("Can't cancel an exam already started");
         }
 
-        if (me.getState() instanceof Booked){
+        if (me.getState() instanceof Booked) {
             double medicalExamPrice = me.getPrice();
             Customer c = this.customerDao.get(me.getIdCustomer());
             d.setBalance(d.getBalance() - medicalExamPrice);
@@ -129,10 +130,10 @@ public class StateController {
     /**
      * Complete a medical exam
      *
-     * @param examId            The id of the medical exam
-     * @throws Exception        If the medical exam is not found or if it is already completed
+     * @param examId The id of the medical exam
+     * @throws Exception If the medical exam is not found or if it is already completed
      */
-    public void markMedicalExamAsComplete(int examId) throws Exception{
+    public void markMedicalExamAsComplete(int examId) throws Exception {
         MedicalExam medicalExam = medicalExamDao.get(examId);
         if (!(medicalExam.getState() instanceof Booked)) {
             throw new RuntimeException("Can't mark an exam as complete if is not in booked state");

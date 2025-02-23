@@ -38,8 +38,16 @@ class TagsControllerTest {
     void createZoneTag() throws Exception {
         Tag zoneTag = new TagZone("Zone1");
         Tag zoneTagToAdd = tagsController.createTag("Zone1", "Zone");
-        assertNotNull(zoneTag);
+        assertNotNull(zoneTagToAdd);
         assertEquals(zoneTag, zoneTagToAdd);
+    }
+
+    @Test
+    void createOnlineTag() throws Exception {
+        Tag onlineTag = new TagIsOnline("Online1");
+        Tag onlineTagToAdd = tagsController.createTag("Online1", "Online");
+        assertNotNull(onlineTagToAdd);
+        assertEquals(onlineTag, onlineTagToAdd);
     }
 
     @AfterEach

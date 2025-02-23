@@ -30,6 +30,7 @@ public class MedicalExam {
         this.idDoctor = idDoctor;
         this.startTime = this.parseDate(startTime);
         this.endTime = this.parseDate(endTime);
+        checkEndTime(this.endTime);
         this.description = description;
         this.title = title;
         this.price = price;
@@ -42,6 +43,7 @@ public class MedicalExam {
         this.idDoctor = idDoctor;
         this.startTime = this.parseDate(startTime);
         this.endTime = this.parseDate(endTime);
+        checkEndTime(this.endTime);
         this.description = description;
         this.title = title;
         this.price = price;
@@ -54,6 +56,7 @@ public class MedicalExam {
         this.idDoctor = idDoctor;
         this.startTime = this.parseDate(startTime);
         this.endTime = this.parseDate(endTime);
+        checkEndTime(this.endTime);
         this.description = description;
         this.title = title;
         this.price = price;
@@ -61,6 +64,18 @@ public class MedicalExam {
         this.documents = new ArrayList<>();
         this.idCustomer=idCustomer;
         this.state = state;
+    }
+
+    private void checkStartTime(LocalDateTime startTime) {
+        if (this.endTime != null && endTime.isBefore(startTime)) {
+            throw new IllegalArgumentException("startTime must be before endTime");
+        }
+    }
+
+    private void checkEndTime(LocalDateTime endTime) {
+        if (startTime != null && endTime.isBefore(startTime)) {
+            throw new IllegalArgumentException("endTime must be after startTime");
+        }
     }
 
     private LocalDateTime parseDate(String date) {
@@ -119,6 +134,7 @@ public class MedicalExam {
     }
 
     public void setEndTime(LocalDateTime endTime) {
+        checkEndTime(endTime);
         this.endTime = endTime;
     }
 
@@ -127,6 +143,7 @@ public class MedicalExam {
     }
 
     public void setStartTime(LocalDateTime startTime) {
+        this.checkStartTime(startTime);
         this.startTime = startTime;
     }
 
@@ -172,10 +189,14 @@ public class MedicalExam {
     }
 
     public void setStartTimeFromString(String startTime) {
-        this.startTime = this.parseDate(startTime);
+        LocalDateTime parsedStartTime = this.parseDate(startTime);
+        checkStartTime(parsedStartTime);
+        this.startTime = parsedStartTime;
     }
 
     public void setEndTimeFromString(String endTime) {
-        this.endTime = this.parseDate(endTime);
+        LocalDateTime parsedEndTime =  this.parseDate(endTime);
+        checkEndTime(parsedEndTime);
+        this.endTime = parsedEndTime;
     }
 }

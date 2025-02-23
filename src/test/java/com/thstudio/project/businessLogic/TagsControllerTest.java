@@ -108,6 +108,21 @@ class TagsControllerTest {
     }
 
     @Test
+    void attachTagToNonExistentMedicalExam() throws Exception {
+        tagsController.createTag("Zone1", "Zone");
+        assertThrows(RuntimeException.class, () -> tagsController.attachTagToMedicalExam("Zone1", "Zone", 0));
+    }
+
+    @Test
+    void attachNonExistentTagToMedicalExam() throws Exception {
+        Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(firstDoctor);
+        assertNotEquals(firstDoctor.getId(), 0);
+        MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
+        assertThrows(RuntimeException.class, () -> tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+    }
+
+    @Test
     void detachTagToMedicalExam() throws Exception {
         Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
         doctorDao.insert(firstDoctor);
@@ -118,6 +133,23 @@ class TagsControllerTest {
 
         assertTrue(tagsController.detachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
     }
+
+    @Test
+    void detachTagToNonExistentMedicalExam() throws Exception {
+        tagsController.createTag("Zone1", "Zone");
+        assertThrows(RuntimeException.class, () -> tagsController.detachTagToMedicalExam("Zone1", "Zone", 0));
+    }
+
+    @Test
+    void detachNonExistentTagToMedicalExam() throws Exception {
+        Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        doctorDao.insert(firstDoctor);
+        assertNotEquals(firstDoctor.getId(), 0);
+        MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
+        assertThrows(RuntimeException.class, () -> tagsController.detachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+    }
+
+
 
     @AfterEach
     void flushDb() throws SQLException {

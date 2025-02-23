@@ -27,26 +27,22 @@ public class TagsController {
      */
     public Tag createTag(String tag, String tagType) throws Exception {
         String[] stringTag = new String[]{tag, tagType};
-        Tag t = this.tagDao.get(stringTag);
-        if (t == null) {
-            switch (tagType) {
-                case "Zone":
-                    TagZone tagZone = new TagZone(tag);
-                    this.tagDao.insert(tagZone);
-                    return this.tagDao.get(stringTag);
-                case "Type":
-                    TagType tagVisitType = new TagType(tag);
-                    this.tagDao.insert(tagVisitType);
-                    return this.tagDao.get(stringTag);
-                case "Online":
-                    TagIsOnline tagIsOnline = new TagIsOnline(tag);
-                    this.tagDao.insert(tagIsOnline);
-                    return this.tagDao.get(stringTag);
-                default:
-                    throw new IllegalArgumentException("Invalid tag type");
-            }
+        switch (tagType) {
+            case "Zone":
+                TagZone tagZone = new TagZone(tag);
+                this.tagDao.insert(tagZone);
+                return this.tagDao.get(stringTag);
+            case "Type":
+                TagType tagVisitType = new TagType(tag);
+                this.tagDao.insert(tagVisitType);
+                return this.tagDao.get(stringTag);
+            case "Online":
+                TagIsOnline tagIsOnline = new TagIsOnline(tag);
+                this.tagDao.insert(tagIsOnline);
+                return this.tagDao.get(stringTag);
+            default:
+                throw new IllegalArgumentException("Invalid tag type");
         }
-        return t;
     }
 
     /**

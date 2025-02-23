@@ -1,6 +1,7 @@
 package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
+import com.thstudio.project.businessLogic.TagsController;
 import com.thstudio.project.domainModel.Tags.Tag;
 import com.thstudio.project.domainModel.Tags.TagIsOnline;
 import com.thstudio.project.domainModel.Tags.TagType;
@@ -17,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TagsControllerTest {
     private static TagsController tagsController;
     private static TagDao tagDao;
+    private static MedicalExamDao medicalExamDao;
 
     @BeforeAll
     static void setDatabaseSettings() {
@@ -28,7 +30,16 @@ class TagsControllerTest {
         Database.setDbPassword(dotenv.get("DB_PASSWORD"));
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
-        TagDao tagDao = new MariaDbTagDao();
+        tagDao = new MariaDbTagDao();
+        tagsController = new TagsController(tagDao, medicalExamDao);
+    }
+
+    @Test
+    void createZoneTag() throws Exception {
+        Tag zoneTag = new TagZone("Zone1");
+        Tag zoneTagToAdd = tagsController.createTag("Zone1", "Zone");
+        assertNotNull(zoneTag);
+        assertEquals(zoneTag, zoneTagToAdd);
     }
 
     @AfterEach

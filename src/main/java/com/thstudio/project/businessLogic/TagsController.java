@@ -35,7 +35,6 @@ public class TagsController {
             case "Type":
                 TagType tagVisitType = new TagType(tag);
                 this.tagDao.insert(tagVisitType);
-                Tag r = this.tagDao.get(stringTag);
                 return this.tagDao.get(stringTag);
             case "Online":
                 TagIsOnline tagIsOnline = new TagIsOnline(tag);

@@ -9,6 +9,8 @@ import com.thstudio.project.domainModel.State.Available;
 import com.thstudio.project.domainModel.State.Booked;
 import com.thstudio.project.domainModel.State.Completed;
 import com.thstudio.project.domainModel.State.Deleted;
+import com.thstudio.project.fixture.CustomerFixture;
+import com.thstudio.project.fixture.DoctorFixture;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -49,10 +51,10 @@ class StateControllerTest {
 
     @Test
     void bookMedicalExam() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -73,10 +75,10 @@ class StateControllerTest {
 
     @Test
     void bookMedicalExamAlreadyBooked() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -93,10 +95,11 @@ class StateControllerTest {
 
     @Test
     void bookTooExpensiveMedicalExam() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 100);
+        Customer customer = CustomerFixture.genCustomer();
+        customer.setBalance(100);
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -112,10 +115,10 @@ class StateControllerTest {
 
     @Test
     void cancelMedicalExamBooking() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -137,16 +140,16 @@ class StateControllerTest {
 
     @Test
     void cancelMedicalExamBookingOfADifferentCustomer() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
         assertNotEquals(addedMedicalExam.getId(), 0);
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId()));
-        Customer otherCustomer = new Customer("Marco", "Rossi", "2000-05-04", 2, 500);
+        Customer otherCustomer = CustomerFixture.genCustomer();
         customerDao.insert(otherCustomer);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
@@ -158,10 +161,10 @@ class StateControllerTest {
 
     @Test
     void cancelNotBookedMedicalExamBooking() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -176,10 +179,10 @@ class StateControllerTest {
 
     @Test
     void cancelAlreadyStartedMedicalExamBooking() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -199,10 +202,10 @@ class StateControllerTest {
 
     @Test
     void cancelUnbookedMedicalExam() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -215,10 +218,10 @@ class StateControllerTest {
 
     @Test
     void cancelBookedMedicalExam() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -240,7 +243,7 @@ class StateControllerTest {
 
     @Test
     void cancelUnknownMedicalExam() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
@@ -253,10 +256,10 @@ class StateControllerTest {
 
     @Test
     void attemptToCancelAMedicalExamFromACustomer() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor =DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -271,10 +274,10 @@ class StateControllerTest {
 
     @Test
     void attemptToCancelAMedicalExamFromAStranger() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -289,15 +292,15 @@ class StateControllerTest {
 
     @Test
     void unauthorizedDeleteAttemptOfMedicalExam() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
         assertNotEquals(addedMedicalExam.getId(), 0);
-        Doctor otherDoctor = new Doctor("Pietro", "Bianchi", "2000-10-01", "MLN-01212", 12000);
+        Doctor otherDoctor = DoctorFixture.genDoctor();
         doctorDao.insert(otherDoctor);
         assertNotEquals(otherDoctor.getId(), 0);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
@@ -310,10 +313,10 @@ class StateControllerTest {
 
     @Test
     void cancelAlreadyStartedMedicalExam() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);
@@ -331,10 +334,10 @@ class StateControllerTest {
 
     @Test
     void markMedicalExamAsComplete() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-01-01 15:30:00", "2025-01-01 16:30:00", 1000);
@@ -347,10 +350,10 @@ class StateControllerTest {
 
     @Test
     void markUnbookedMedicalExamAsComplete() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2024-10-01 15:30:00", "2024-10-01 16:30:00", 1000);
@@ -365,10 +368,10 @@ class StateControllerTest {
 
     @Test
     void markUnfinishedMedicalExamAsComplete() throws Exception {
-        Doctor doctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
+        Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
-        Customer customer = new Customer("Luca", "Verdi", "1990-05-04", 1, 2000);
+        Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
         assertNotEquals(customer.getId(), 0);
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(doctor.getId(), customer.getId(), "Titolo Visita", "Chek-up", "2025-10-01 15:30:00", "2025-10-01 16:30:00", 1000);

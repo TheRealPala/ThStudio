@@ -2,10 +2,7 @@ package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.*;
-import com.thstudio.project.fixture.CustomerFixture;
-import com.thstudio.project.fixture.DoctorFixture;
-import com.thstudio.project.fixture.DocumentFixture;
-import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.fixture.*;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -130,12 +127,12 @@ class DocumentControllerTest {
 
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        MedicalExam medicalExam1 = new MedicalExam(doctor.getId(), "2026-01-01 12:40:00", "2026-01-01 13:40:00", "description", "title", 30.5);
-        medicalExamDao.insert(medicalExam1);
+        MedicalExam medicalExam = MedicalExamFixture.genMedicalExam(doctor);
+        medicalExamDao.insert(medicalExam);
         Document document = DocumentFixture.genDocument(doctor);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    documentController.attachDocumentToMedicalExam(document.getId(), medicalExam1.getId());
+                    documentController.attachDocumentToMedicalExam(document.getId(), medicalExam.getId());
                 }
         );
         assertEquals(thrown.getMessage(), "The Document looked for in not present in the database");
@@ -147,18 +144,18 @@ class DocumentControllerTest {
         Doctor otherDoctor = DoctorFixture.genDoctor();
         doctorDao.insert(otherDoctor);
         Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), otherDoctor.getId());
-        MedicalExam medicalExam = new MedicalExam(otherDoctor.getId(), "2026-01-01 12:40:00", "2026-01-01 13:40:00", "description", "title", 30.5);
-        medicalExamDao.insert(medicalExam);
-        documentController.attachDocumentToMedicalExam(documentToAdd.getId(), medicalExam.getId());
-        assertEquals(documentDao.get(documentToAdd.getId()).getMedicalExamId(), medicalExam.getId());  // due medical exam a cui è stato attaccato lo stesso documento uno tramite attach e uno con add
+        MedicalExam otherMedicalExam = MedicalExamFixture.genMedicalExam(otherDoctor);
+        medicalExamDao.insert(otherMedicalExam);
+        documentController.attachDocumentToMedicalExam(documentToAdd.getId(), otherMedicalExam.getId());
+        assertEquals(documentDao.get(documentToAdd.getId()).getMedicalExamId(), otherMedicalExam.getId());  // due medical exam a cui è stato attaccato lo stesso documento uno tramite attach e uno con add
         // documento già presente nel db
 
-        RuntimeException thrown1 = assertThrowsExactly(RuntimeException.class,
+        RuntimeException otherThrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    documentController.attachDocumentToMedicalExam(documentDb.getId(), medicalExam.getId());
+                    documentController.attachDocumentToMedicalExam(documentDb.getId(), otherMedicalExam.getId());
                 }
         );
-        assertEquals(thrown1.getMessage(), "Can't attach a document to a medicalExam which is not yours");
+        assertEquals(otherThrown.getMessage(), "Can't attach a document to a medicalExam which is not yours");
 
 
     }

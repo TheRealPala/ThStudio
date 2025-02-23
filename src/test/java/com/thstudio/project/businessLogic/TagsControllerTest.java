@@ -70,6 +70,12 @@ class TagsControllerTest {
         assertTrue(tagsController.deleteTag("Type1", "Type"));
     }
 
+    @Test
+    void deleteOnlineTag() throws Exception {
+        tagsController.createTag("Online1", "Online");
+        assertTrue(tagsController.deleteTag("Online1", "Online"));
+    }
+
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();

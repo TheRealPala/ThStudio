@@ -68,8 +68,14 @@ class TagsControllerTest {
     }
 
     @Test
-    void createNonExistentTag() {
+    void createNonExistentTagType() {
         assertThrows(IllegalArgumentException.class, () -> tagsController.createTag("NonExistent", "NonExistent"));
+    }
+
+    @Test
+    void createAlreadyExistingTag() throws Exception {
+        tagsController.createTag("Zone1", "Zone");
+        assertThrows(RuntimeException.class, () -> tagsController.createTag("Zone1", "Zone"));
     }
 
     @Test

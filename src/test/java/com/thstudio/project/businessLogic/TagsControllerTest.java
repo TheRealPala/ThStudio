@@ -7,6 +7,8 @@ import com.thstudio.project.domainModel.Tags.Tag;
 import com.thstudio.project.domainModel.Tags.TagIsOnline;
 import com.thstudio.project.domainModel.Tags.TagType;
 import com.thstudio.project.domainModel.Tags.TagZone;
+import com.thstudio.project.fixture.DoctorFixture;
+import com.thstudio.project.fixture.MedicalExamFixture;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -68,13 +70,17 @@ class TagsControllerTest {
 
     @Test
     void createNonExistentTagType() {
-        assertThrows(IllegalArgumentException.class, () -> tagsController.createTag("NonExistent", "NonExistent"));
+        IllegalArgumentException ex = assertThrowsExactly(IllegalArgumentException.class, () -> {
+            tagsController.createTag("NonExistent", "NonExistent");
+        });
+        assertEquals("Invalid tag type", ex.getMessage());
     }
 
     @Test
     void createAlreadyExistingTag() throws Exception {
         tagsController.createTag("Zone1", "Zone");
-        assertThrowsExactly(SQLIntegrityConstraintViolationException.class, () -> tagsController.createTag("Zone1", "Zone"));
+        Exception ex = assertThrowsExactly(SQLIntegrityConstraintViolationException.class, () -> tagsController.createTag("Zone1", "Zone"));
+        assertTrue(ex.getMessage().matches(".*Duplicate entry 'Zone1-Zone' for key 'PRIMARY'"));
     }
 
     @Test
@@ -102,10 +108,10 @@ class TagsControllerTest {
 
     @Test
     void attachTagToMedicalExam() throws Exception {
-        Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(firstDoctor);
-        assertNotEquals(firstDoctor.getId(), 0);
-        MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
+        Doctor doctor = DoctorFixture.genDoctor();
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        MedicalExam addedExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor));
         tagsController.createTag("Zone1", "Zone");
         assertTrue(tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
 
@@ -114,35 +120,40 @@ class TagsControllerTest {
     @Test
     void attachTagToNonExistentMedicalExam() throws Exception {
         tagsController.createTag("Zone1", "Zone");
-        assertThrows(RuntimeException.class, () -> tagsController.attachTagToMedicalExam("Zone1", "Zone", 0));
+        RuntimeException ex = assertThrowsExactly(RuntimeException.class, () -> {
+            tagsController.attachTagToMedicalExam("Zone1", "Zone", 0);
+        });
+        assertEquals("The Medical Exam looked for in not present in the database", ex.getMessage());
     }
 
     @Test
     void attachNonExistentTagToMedicalExam() throws Exception {
-        Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(firstDoctor);
-        assertNotEquals(firstDoctor.getId(), 0);
-        MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
-        assertThrows(RuntimeException.class, () -> tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+        Doctor doctor = DoctorFixture.genDoctor();
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        MedicalExam addedExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor));
+        RuntimeException ex = assertThrowsExactly(RuntimeException.class, () -> tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+        assertEquals("The Tag looked for in not present in the database", ex.getMessage());
     }
 
     @Test
     void attachAlreadyAttachedTag() throws Exception {
-        Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(firstDoctor);
-        assertNotEquals(firstDoctor.getId(), 0);
-        MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
+        Doctor doctor = DoctorFixture.genDoctor();
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        MedicalExam addedExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor));
         tagsController.createTag("Zone1", "Zone");
         tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId());
-        assertThrows(RuntimeException.class, () -> tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+        RuntimeException ex = assertThrowsExactly(RuntimeException.class, () -> tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+        assertEquals(ex.getMessage(), "The tag is already present");
     }
 
     @Test
     void detachTagToMedicalExam() throws Exception {
-        Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(firstDoctor);
-        assertNotEquals(firstDoctor.getId(), 0);
-        MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
+        Doctor doctor = DoctorFixture.genDoctor();
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        MedicalExam addedExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor));
         tagsController.createTag("Zone1", "Zone");
         tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId());
 
@@ -152,26 +163,29 @@ class TagsControllerTest {
     @Test
     void detachTagToNonExistentMedicalExam() throws Exception {
         tagsController.createTag("Zone1", "Zone");
-        assertThrows(RuntimeException.class, () -> tagsController.detachTagToMedicalExam("Zone1", "Zone", 0));
+        RuntimeException ex = assertThrowsExactly(RuntimeException.class, () -> tagsController.detachTagToMedicalExam("Zone1", "Zone", 0));
+        assertEquals("The Medical Exam looked for in not present in the database", ex.getMessage());
     }
 
     @Test
     void detachNonExistentTagToMedicalExam() throws Exception {
-        Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(firstDoctor);
-        assertNotEquals(firstDoctor.getId(), 0);
-        MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
-        assertThrows(RuntimeException.class, () -> tagsController.detachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+        Doctor doctor = DoctorFixture.genDoctor();
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        MedicalExam addedExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor));
+        RuntimeException ex = assertThrowsExactly(RuntimeException.class, () -> tagsController.detachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+        assertEquals("The Tag looked for in not present in the database", ex.getMessage());
     }
 
     @Test
     void detachNonAttachedTagToMedicalExam() throws Exception {
-        Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
-        doctorDao.insert(firstDoctor);
-        assertNotEquals(firstDoctor.getId(), 0);
-        MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
+        Doctor doctor = DoctorFixture.genDoctor();
+        doctorDao.insert(doctor);
+        assertNotEquals(doctor.getId(), 0);
+        MedicalExam addedExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor));
         tagsController.createTag("Zone1", "Zone");
-        assertThrows(RuntimeException.class, () -> tagsController.detachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+        RuntimeException ex = assertThrowsExactly(RuntimeException.class, () -> tagsController.detachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
+        assertEquals("The tag has been already detached", ex.getMessage());
     }
 
 

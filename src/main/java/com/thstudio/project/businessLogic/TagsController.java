@@ -30,7 +30,6 @@ public class TagsController {
      * @throws Exception if the tag type is invalid
      */
     public Tag createTag(String tag, String tagType) throws Exception {
-        String[] stringTag = new String[]{tag, tagType};
         Tag tagToReturn = null;
         switch (tagType) {
             case "Zone":

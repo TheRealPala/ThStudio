@@ -44,6 +44,12 @@ class TagsControllerTest {
     }
 
     @Test
+    void createInvalidType() throws Exception {
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> tagsController.createTag("Zone1", "Invalid"));
+        assertEquals("Invalid tag type", exception.getMessage());
+    }
+
+    @Test
     void createZoneTag() throws Exception {
         Tag zoneTag = new TagZone("Zone1");
         Tag zoneTagToAdd = tagsController.createTag("Zone1", "Zone");
@@ -69,7 +75,7 @@ class TagsControllerTest {
 
     @Test
     void createNonExistentTagType() {
-        assertThrows(IllegalArgumentException.class, () -> tagsController.createTag("NonExistent", "NonExistent"));
+        assertThrows(IllegalArgumentException.class, () -> tagsController.createTag("NonExistent", "NonExistent"));  // non ho capito perchè dovrebbe lanciare un'eccezione di tipo IllegalArgumentException
     }
 
     @Test

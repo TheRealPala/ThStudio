@@ -27,34 +27,32 @@ public class TagsController {
      */
     public Tag createTag(String tag, String tagType) throws Exception {
         String[] stringTag = new String[]{tag, tagType};
-            switch (tagType) {
-                case "Zone":
-                    TagZone tagZone = new TagZone(tag);
-                    try {
-                        this.tagDao.insert(tagZone);
-                        return this.tagDao.get(stringTag);
-                    } catch (Exception e) {
-                        throw new RuntimeException("The Tag already exists");
-                    }
-                case "Type":
-                    TagType tagVisitType = new TagType(tag);
-                    try{
-                        this.tagDao.insert(tagVisitType);
-                        return this.tagDao.get(stringTag);
-                    } catch (Exception e) {
-                        throw new RuntimeException("The Tag already exists");
-                    }
-                case "Online":
-                    TagIsOnline tagIsOnline = new TagIsOnline(tag);
-                    try {
-                        this.tagDao.insert(tagIsOnline);
-                        return this.tagDao.get(stringTag);
-                    } catch (Exception e) {
-                        throw new RuntimeException("The Tag already exists");
-                    }
-                default:
-                    throw new IllegalArgumentException("Invalid tag type");
+        Tag tagToCreate;
+        switch (tagType) {
+            case "Zone": {
+                tagToCreate = new TagZone(tag);
+                break;
             }
+            case "Type": {
+                tagToCreate = new TagType(tag);
+                break;
+
+            }
+            case "Online": {
+                tagToCreate = new TagIsOnline(tag);
+                break;
+            }
+            default: {
+                throw new RuntimeException("Invalid tag type");
+            }
+        }
+        try {
+            this.tagDao.insert(tagToCreate);
+        } catch (Exception e) {
+            throw new RuntimeException("The tag already exists");
+        }
+        return tagDao.get(stringTag);
+
 
     }
 

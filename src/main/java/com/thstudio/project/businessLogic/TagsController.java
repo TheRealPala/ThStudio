@@ -32,27 +32,21 @@ public class TagsController {
     public Tag createTag(String tag, String tagType) throws Exception {
         String[] stringTag = new String[]{tag, tagType};
         Tag tagToReturn = null;
-        try {
-            this.tagDao.get(stringTag);
-            throw new SQLException("Primary key constraint violated");
-        } catch (RuntimeException e) {
-            //it is a new tag
-            switch (tagType) {
-                case "Zone":
-                    tagToReturn = new TagZone(tag);
-                    this.tagDao.insert(tagToReturn);
-                    break;
-                case "Type":
-                    tagToReturn = new TagType(tag);
-                    this.tagDao.insert(tagToReturn);
-                    break;
-                case "Online":
-                    tagToReturn = new TagIsOnline(tag);
-                    this.tagDao.insert(tagToReturn);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid tag type");
-            }
+        switch (tagType) {
+            case "Zone":
+                tagToReturn = new TagZone(tag);
+                this.tagDao.insert(tagToReturn);
+                break;
+            case "Type":
+                tagToReturn = new TagType(tag);
+                this.tagDao.insert(tagToReturn);
+                break;
+            case "Online":
+                tagToReturn = new TagIsOnline(tag);
+                this.tagDao.insert(tagToReturn);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid tag type");
         }
         return tagToReturn;
     }

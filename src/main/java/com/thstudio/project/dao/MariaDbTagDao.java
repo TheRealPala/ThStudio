@@ -3,6 +3,7 @@ package com.thstudio.project.dao;
 import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.domainModel.Tags.Tag;
 import com.thstudio.project.domainModel.Tags.TagIsOnline;
+import com.thstudio.project.domainModel.Tags.TagType;
 import com.thstudio.project.domainModel.Tags.TagZone;
 
 import java.sql.*;
@@ -79,6 +80,7 @@ public class MariaDbTagDao implements TagDao {
             String tagType = rs.getString("tag_type");
             Tag tmp = switch (tagType) {
                 case "Online" -> new TagIsOnline(tag);
+                case "Type" -> new TagType(tag);
                 case "Zone" -> new TagZone(tag);
                 default -> null;
             };
@@ -109,6 +111,7 @@ public class MariaDbTagDao implements TagDao {
 
             t = switch (tagType) {
                 case "Online" -> new TagIsOnline(tag);
+                case "Type" -> new TagType(tag);
                 case "Zone" -> new TagZone(tag);
                 default -> null;
             };

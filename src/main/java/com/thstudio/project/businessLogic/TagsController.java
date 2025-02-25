@@ -8,6 +8,10 @@ import com.thstudio.project.domainModel.Tags.TagIsOnline;
 import com.thstudio.project.domainModel.Tags.TagType;
 import com.thstudio.project.domainModel.Tags.TagZone;
 
+import java.lang.module.ResolutionException;
+import java.sql.SQLException;
+import java.util.InvalidPropertiesFormatException;
+
 public class TagsController {
     private final TagDao tagDao;
     private final MedicalExamDao medicalExamDao;
@@ -27,35 +31,30 @@ public class TagsController {
      */
     public Tag createTag(String tag, String tagType) throws Exception {
         String[] stringTag = new String[]{tag, tagType};
+        Tag tagToReturn = null;
+        try {
+            this.tagDao.get(stringTag);
+            throw new SQLException("Primary key constraint violated");
+        } catch (RuntimeException e) {
+            //it is a new tag
             switch (tagType) {
                 case "Zone":
-                    TagZone tagZone = new TagZone(tag);
-                    try {
-                        this.tagDao.insert(tagZone);
-                        return this.tagDao.get(stringTag);
-                    } catch (Exception e) {
-                        throw new RuntimeException("The Tag already exists");
-                    }
+                    tagToReturn = new TagZone(tag);
+                    this.tagDao.insert(tagToReturn);
+                    break;
                 case "Type":
-                    TagType tagVisitType = new TagType(tag);
-                    try{
-                        this.tagDao.insert(tagVisitType);
-                        return this.tagDao.get(stringTag);
-                    } catch (Exception e) {
-                        throw new RuntimeException("The Tag already exists");
-                    }
+                    tagToReturn = new TagType(tag);
+                    this.tagDao.insert(tagToReturn);
+                    break;
                 case "Online":
-                    TagIsOnline tagIsOnline = new TagIsOnline(tag);
-                    try {
-                        this.tagDao.insert(tagIsOnline);
-                        return this.tagDao.get(stringTag);
-                    } catch (Exception e) {
-                        throw new RuntimeException("The Tag already exists");
-                    }
+                    tagToReturn = new TagIsOnline(tag);
+                    this.tagDao.insert(tagToReturn);
+                    break;
                 default:
                     throw new IllegalArgumentException("Invalid tag type");
             }
-
+        }
+        return tagToReturn;
     }
 
     /**

@@ -11,6 +11,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -18,9 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TagsControllerTest {
     private static TagsController tagsController;
-    private static TagDao tagDao;
     private static MedicalExamController medicalExamController;
-    private static MedicalExamDao medicalExamDao;
     private static DoctorDao doctorDao;
 
     @BeforeAll
@@ -33,14 +32,13 @@ class TagsControllerTest {
         Database.setDbPassword(dotenv.get("DB_PASSWORD"));
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
-        tagDao = new MariaDbTagDao();
-        medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
+        TagDao tagDao = new MariaDbTagDao();
+        MedicalExamDao medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
         tagsController = new TagsController(tagDao, medicalExamDao);
         NotificationDao notificationDao = new MariaDbNotificationDao();
         PersonDao personDao = new MariaDbPersonDao();
         doctorDao = new MariaDbDoctorDao(personDao);
         medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao);
-        tagDao = new MariaDbTagDao();
     }
 
     @Test
@@ -75,7 +73,8 @@ class TagsControllerTest {
     @Test
     void createAlreadyExistingTag() throws Exception {
         tagsController.createTag("Zone1", "Zone");
-        assertThrows(RuntimeException.class, () -> tagsController.createTag("Zone1", "Zone"));
+        SQLException thrown = assertThrowsExactly(SQLException.class, () -> tagsController.createTag("Zone1", "Zone"));
+        assertEquals(thrown.getMessage(), "Primary key constraint violated");
     }
 
     @Test
@@ -108,7 +107,6 @@ class TagsControllerTest {
         assertNotEquals(firstDoctor.getId(), 0);
         MedicalExam addedExam = medicalExamController.addMedicalExam(firstDoctor.getId(), 0, "TEST", "DDDD", "2021-10-10 13:20:00", "2021-10-10 15:33:00", 1);
         tagsController.createTag("Zone1", "Zone");
-
         assertTrue(tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
 
     }
@@ -128,7 +126,7 @@ class TagsControllerTest {
         assertThrows(RuntimeException.class, () -> tagsController.attachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
     }
 
-   @Test
+    @Test
     void attachAlreadyAttachedTag() throws Exception {
         Doctor firstDoctor = new Doctor("Marco", "Rossi", "2000-10-01", "MLN-01212", 12000);
         doctorDao.insert(firstDoctor);
@@ -175,7 +173,6 @@ class TagsControllerTest {
         tagsController.createTag("Zone1", "Zone");
         assertThrows(RuntimeException.class, () -> tagsController.detachTagToMedicalExam("Zone1", "Zone", addedExam.getId()));
     }
-
 
 
     @AfterEach

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -73,8 +74,7 @@ class TagsControllerTest {
     @Test
     void createAlreadyExistingTag() throws Exception {
         tagsController.createTag("Zone1", "Zone");
-        SQLException thrown = assertThrowsExactly(SQLException.class, () -> tagsController.createTag("Zone1", "Zone"));
-        assertEquals(thrown.getMessage(), "Primary key constraint violated");
+        assertThrowsExactly(SQLIntegrityConstraintViolationException.class, () -> tagsController.createTag("Zone1", "Zone"));
     }
 
     @Test

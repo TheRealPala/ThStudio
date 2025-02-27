@@ -68,21 +68,19 @@ class CustomerControllerTest {
     }
     @Test
     void deleteCustomer() throws Exception {
-        Customer customerToAdd = CustomerFixture.genCustomer();
-        customerController.addCustomer(customerToAdd);
-        assertTrue(customerController.deletePerson(customerToAdd.getId()));
-        assertNull(customerController.getPerson(customerToAdd.getId()));
-        RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> customerController.deletePerson(customerToAdd.getId()));
-        assertEquals("Person not found", exception.getMessage());
-        assertEquals(0,personDao.getAll().size());
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
+        customerController.deleteCustomer(customerToAdd.getId());
+        RuntimeException exception = assertThrowsExactly(RuntimeException.class,
+                () -> customerController.getCustomer(customerToAdd.getId()));
+        assertEquals("The Customer looked for in not present in the database", exception.getMessage());
+        RuntimeException exception2 = assertThrowsExactly(RuntimeException.class,
+                () -> personDao.get(customerToAdd.getId()));
+        assertEquals("The person looked for in not present in the database", exception2.getMessage());
     }
     @Test
     void getAllCustomers() throws Exception {
-        Customer customerToAdd = CustomerFixture.genCustomer();
-        Customer customerToAdd2 = CustomerFixture.genCustomer();
-        customerController.addCustomer(customerToAdd);
-        customerController.addCustomer(customerToAdd2);
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
+        Customer customerToAdd2 = customerController.addCustomer(CustomerFixture.genCustomer());
         assertEquals(2, customerController.getAllPersons().size());
         assertEquals(2, personDao.getAll().size());
         customerController.deletePerson(customerToAdd.getId());

@@ -1,15 +1,12 @@
 package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
-import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.Doctor;
 
 public class DoctorController extends PersonController<Doctor> {
-    private final DoctorDao doctorDao;
 
     public DoctorController(DoctorDao doctorDao) {
         super(doctorDao);
-        this.doctorDao = doctorDao;
     }
 
     /**
@@ -47,11 +44,11 @@ public class DoctorController extends PersonController<Doctor> {
      * @return The customer
      */
     public Doctor getDoctor(int id) throws Exception {
-        return this.doctorDao.get(id);
+        return super.getPerson(id);
     }
 
     public void updateDoctor(Doctor doctor) throws Exception {
-        doctorDao.update(doctor);
+        super.updatePerson(doctor);
     }
 
 }

@@ -4,11 +4,9 @@ import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Customer;
 
 public class CustomerController extends PersonController<Customer> {
-    private final CustomerDao customerDao;
 
     public CustomerController(CustomerDao customerDao) {
         super(customerDao);
-        this.customerDao = customerDao;
     }
 
     /**
@@ -46,7 +44,7 @@ public class CustomerController extends PersonController<Customer> {
      * @return The customer
      */
     public Customer getCustomer(int id) throws Exception {
-        return this.customerDao.get(id);
+        return super.getPerson(id);
     }
 
     /**
@@ -55,16 +53,16 @@ public class CustomerController extends PersonController<Customer> {
      * @param customer The new customer
      */
     public void updateCustomer(Customer customer) throws Exception {
-        this.customerDao.update(customer);
+        super.updatePerson(customer);
     }
 
 
     public boolean modifyCustomerLevel(int customerId, int level) throws Exception {
-        Customer customer = this.customerDao.get(customerId);
+        Customer customer = super.getPerson(customerId);
         boolean outcome = false;
         if (customer.getLevel() != level) {
             customer.setLevel(level);
-            customerDao.update(customer);
+            super.updatePerson(customer);
             outcome = true;
         }
         return outcome;

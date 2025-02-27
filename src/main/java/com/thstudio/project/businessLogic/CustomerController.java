@@ -3,6 +3,8 @@ package com.thstudio.project.businessLogic;
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Customer;
 
+import java.util.List;
+
 public class CustomerController extends PersonController<Customer> {
 
     public CustomerController(CustomerDao customerDao) {
@@ -66,5 +68,11 @@ public class CustomerController extends PersonController<Customer> {
             outcome = true;
         }
         return outcome;
+    }
+    public boolean deleteCustomer(int id) throws Exception {
+        return super.deletePerson(id);
+    }
+    public List<Customer> getAllCustomers() throws Exception {
+        return super.getAllPersons();
     }
 }

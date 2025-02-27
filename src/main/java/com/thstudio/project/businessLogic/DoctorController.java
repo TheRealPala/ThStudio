@@ -3,6 +3,8 @@ package com.thstudio.project.businessLogic;
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Doctor;
 
+import java.util.List;
+
 public class DoctorController extends PersonController<Doctor> {
 
     public DoctorController(DoctorDao doctorDao) {
@@ -50,5 +52,12 @@ public class DoctorController extends PersonController<Doctor> {
     public void updateDoctor(Doctor doctor) throws Exception {
         super.updatePerson(doctor);
     }
+    public boolean deleteDoctor(int id) throws Exception {
+        return super.deletePerson(id);
+    }
 
+    @Override
+    public List<Doctor> getAllPersons() throws Exception {
+        return super.getAllPersons();
+    }
 }

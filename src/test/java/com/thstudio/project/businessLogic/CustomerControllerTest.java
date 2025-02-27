@@ -83,7 +83,7 @@ class CustomerControllerTest {
         Customer customerToAdd2 = CustomerFixture.genCustomer();
         customerController.addCustomer(customerToAdd);
         customerController.addCustomer(customerToAdd2);
-        assertEquals(1, customerController.getAllPersons().size());
+        assertEquals(2, customerController.getAllPersons().size());
         assertEquals(2, personDao.getAll().size());
         customerController.deletePerson(customerToAdd.getId());
         assertEquals(1, customerController.getAllCustomers().size());

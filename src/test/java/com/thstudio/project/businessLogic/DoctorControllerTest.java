@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DoctorControllerTest {
     private static DoctorController doctorController;
+    private static MariaDbPersonDao personDao;
 
     @BeforeAll
     static void setDatabaseSettings() {
@@ -26,7 +27,8 @@ class DoctorControllerTest {
         Database.setDbPassword(dotenv.get("DB_PASSWORD"));
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
-        DoctorDao doctorDao = new MariaDbDoctorDao(new MariaDbPersonDao());
+        personDao = new MariaDbPersonDao();
+        DoctorDao doctorDao = new MariaDbDoctorDao(personDao);
         doctorController = new DoctorController(doctorDao);
     }
 
@@ -50,6 +52,29 @@ class DoctorControllerTest {
         doctorController.updateDoctor(doctorToAdd);
         Doctor updatedDoctor = doctorController.getDoctor(doctorToAdd.getId());
         assertEquals(doctorToAdd, updatedDoctor);
+    }
+
+    @Test
+    void deleteDoctor() throws Exception {
+        Doctor doctorToAdd = doctorController.addDoctor(DoctorFixture.genDoctor());
+        doctorController.deleteDoctor(doctorToAdd.getId());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> doctorController.getDoctor(doctorToAdd.getId()));
+        assertEquals("The Doctor looked for in not present in the database", exception.getMessage());
+        RuntimeException exception2 = assertThrows(RuntimeException.class,
+                () -> personDao.get(doctorToAdd.getId()));
+        assertEquals("The person looked for in not present in the database", exception2.getMessage());
+    }
+    @Test
+    void getAllDoctors() throws Exception {
+        Doctor doctorToAdd = doctorController.addDoctor(DoctorFixture.genDoctor());
+        Doctor doctorToAdd2 = doctorController.addDoctor(DoctorFixture.genDoctor());
+        assertEquals(2, doctorController.getAllPersons().size());
+        assertEquals(2, personDao.getAll().size());
+        doctorController.deleteDoctor(doctorToAdd.getId());
+        assertEquals(1, doctorController.getAllPersons().size());
+        assertEquals(1, personDao.getAll().size());
     }
 
 

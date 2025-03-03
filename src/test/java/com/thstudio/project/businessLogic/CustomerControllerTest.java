@@ -17,6 +17,7 @@ import java.sql.SQLException;
 
 class CustomerControllerTest {
     private static CustomerController customerController;
+    private static MariaDbPersonDao personDao;
 
     @BeforeAll
     static void setDatabaseSettings() {
@@ -28,7 +29,8 @@ class CustomerControllerTest {
         Database.setDbPassword(dotenv.get("DB_PASSWORD"));
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
-        CustomerDao customerDao = new MariaDbCustomerDao(new MariaDbPersonDao());
+        personDao = new MariaDbPersonDao();
+        CustomerDao customerDao = new MariaDbCustomerDao( personDao);
         customerController = new CustomerController(customerDao);
     }
 
@@ -63,6 +65,28 @@ class CustomerControllerTest {
         customerController.updateCustomer(customerToAdd);
         Customer updatedCustomer = customerController.getCustomer(customerToAdd.getId());
         assertEquals(customerToAdd, updatedCustomer);
+    }
+    @Test
+    void deleteCustomer() throws Exception {
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
+        customerController.deleteCustomer(customerToAdd.getId());
+        RuntimeException exception = assertThrowsExactly(RuntimeException.class,
+                () -> customerController.getCustomer(customerToAdd.getId()));
+        assertEquals("The Customer looked for in not present in the database", exception.getMessage());
+        RuntimeException exception2 = assertThrowsExactly(RuntimeException.class,
+                () -> personDao.get(customerToAdd.getId()));
+        assertEquals("The person looked for in not present in the database", exception2.getMessage());
+    }
+    @Test
+    void getAllCustomers() throws Exception {
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
+        Customer customerToAdd2 = customerController.addCustomer(CustomerFixture.genCustomer());
+        assertEquals(2, customerController.getAllPersons().size());
+        assertEquals(2, personDao.getAll().size());
+        customerController.deletePerson(customerToAdd.getId());
+        assertEquals(1, customerController.getAllCustomers().size());
+        assertEquals(1, personDao.getAll().size());
+
     }
 
 

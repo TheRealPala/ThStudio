@@ -1,17 +1,17 @@
 package com.thstudio.project.businessLogic;
 
-import com.thstudio.project.dao.DAO;
+import com.thstudio.project.dao.PersonDao;
 import com.thstudio.project.domainModel.Person;
 
 import java.util.List;
 
 import static java.util.Collections.unmodifiableList;
 
-public class PersonController<T extends Person> {
-    private DAO<T, Integer> dao;
+public class PersonController {
+    private final PersonDao personDao;
 
-    public PersonController(DAO<T, Integer> dao) {
-        this.dao = dao;
+    public PersonController(PersonDao personDao) {
+        this.personDao = personDao;
     }
 
     /**
@@ -19,16 +19,16 @@ public class PersonController<T extends Person> {
      *
      * @param newPerson The new person
      */
-    public String addPerson(T newPerson) throws Exception {
-        dao.insert(newPerson);
-        return "Person added successfully";
+    public Person addPerson(Person newPerson) throws Exception {
+        personDao.insert(newPerson);
+        return newPerson;
     }
 
     /**
      * Update the person with the corresponding CF
      */
-    public String updatePerson(T person) throws Exception {
-        dao.update(person);
+    public String updatePerson(Person person) throws Exception {
+        personDao.update(person);
         return "Person updated successfully";
     }
 
@@ -36,7 +36,7 @@ public class PersonController<T extends Person> {
      * Remove from the DB the person with the corresponding CF
      */
     public boolean deletePerson(int id) throws Exception {
-        return this.dao.delete(id);
+        return this.personDao.delete(id);
     }
 
     /**
@@ -44,14 +44,14 @@ public class PersonController<T extends Person> {
      *
      * @return The list of person
      */
-    public List<T> getAllPersons() throws Exception {
-        return unmodifiableList(dao.getAll());
+    public List<Person> getAllPersons() throws Exception {
+        return unmodifiableList(personDao.getAll());
     }
 
     /**
      * Returns the person with the corresponding CF
      */
-    public T getPerson(int id) throws Exception {
-        return dao.get(id);
+    public Person getPerson(int id) throws Exception {
+        return personDao.get(id);
     }
 }

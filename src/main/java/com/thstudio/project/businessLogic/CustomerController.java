@@ -5,10 +5,13 @@ import com.thstudio.project.domainModel.Customer;
 
 import java.util.List;
 
-public class CustomerController extends PersonController<Customer> {
+public class CustomerController extends AuthorizedController{
 
-    public CustomerController(CustomerDao customerDao) {
-        super(customerDao);
+    private final CustomerDao customerDao;
+
+    public CustomerController(CustomerDao customerDao, PersonDao personDao) throws Exception {
+        super(personDao);
+        this.customerDao = customerDao;
     }
 
     /**
@@ -22,9 +25,10 @@ public class CustomerController extends PersonController<Customer> {
      * @return The customer added
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
-    public Customer addCustomer(String name, String surname, String dateOfBirth, int level, double balance) throws Exception {
-        Customer c = new Customer(name, surname, dateOfBirth, level, balance);
-        super.addPerson(c);
+    public Customer addCustomer(String name, String surname, String dateOfBirth, int level, double balance, String email, String password, String token) throws Exception {
+        super.validateToken(token);
+        Customer c = new Customer(name, surname, dateOfBirth, level, balance, email, password);
+        customerDao.insert(c);
         return c;
     }
 
@@ -35,8 +39,8 @@ public class CustomerController extends PersonController<Customer> {
      * @return The customer added
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
-    public Customer addCustomer(Customer customer) throws Exception {
-        return this.addCustomer(customer.getName(), customer.getSurname(), customer.getDateOfBirth(), customer.getLevel(), customer.getBalance());
+    public Customer addCustomer(Customer customer, String token) throws Exception {
+        return this.addCustomer(customer.getName(), customer.getSurname(), customer.getDateOfBirth(), customer.getLevel(), customer.getBalance(), customer.getEmail(), customer.getPassword(), token);
     }
 
     /**
@@ -45,8 +49,9 @@ public class CustomerController extends PersonController<Customer> {
      * @param id The id of the customer
      * @return The customer
      */
-    public Customer getCustomer(int id) throws Exception {
-        return super.getPerson(id);
+    public Customer getCustomer(int id, String token) throws Exception {
+        super.validateToken(token);
+        return customerDao.get(id);
     }
 
     /**
@@ -54,25 +59,30 @@ public class CustomerController extends PersonController<Customer> {
      *
      * @param customer The new customer
      */
-    public void updateCustomer(Customer customer) throws Exception {
-        super.updatePerson(customer);
+    public void updateCustomer(Customer customer, String token) throws Exception {
+        super.validateToken(token);
+        customerDao.update(customer);
     }
 
 
-    public boolean modifyCustomerLevel(int customerId, int level) throws Exception {
-        Customer customer = super.getPerson(customerId);
+    public boolean modifyCustomerLevel(int customerId, int level, String token) throws Exception {
+        super.validateToken(token);
+        Customer customer = customerDao.get(customerId);
         boolean outcome = false;
         if (customer.getLevel() != level) {
             customer.setLevel(level);
-            super.updatePerson(customer);
+            customerDao.update(customer);
             outcome = true;
         }
         return outcome;
     }
-    public boolean deleteCustomer(int id) throws Exception {
-        return super.deletePerson(id);
+    public boolean deleteCustomer(int id, String token) throws Exception {
+        super.validateToken(token);
+        return customerDao.delete(id);
     }
-    public List<Customer> getAllCustomers() throws Exception {
-        return super.getAllPersons();
+
+    public List<Customer> getAllCustomers(String token) throws Exception {
+        super.validateToken(token);
+        return customerDao.getAll();
     }
 }

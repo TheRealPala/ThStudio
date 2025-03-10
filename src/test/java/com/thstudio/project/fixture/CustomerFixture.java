@@ -12,4 +12,9 @@ public class CustomerFixture {
         customer.setLevel(faker.number().numberBetween(1, 5));
         return customer;
     }
+    public static Customer genTestCustomer() {
+        Customer customer = new Customer(PersonFixture.genTestPerson());
+        customer.setLevel(1);
+        return customer;
+    }
 }

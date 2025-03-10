@@ -5,10 +5,12 @@ import com.thstudio.project.domainModel.Doctor;
 
 import java.util.List;
 
-public class DoctorController extends PersonController<Doctor> {
+public class DoctorController extends AuthorizedController {
 
-    public DoctorController(DoctorDao doctorDao) {
-        super(doctorDao);
+    private final DoctorDao doctorDao;
+    public DoctorController(DoctorDao doctorDao, PersonDao personDao) throws Exception {
+        super(personDao);
+        this.doctorDao = doctorDao;
     }
 
     /**
@@ -22,21 +24,22 @@ public class DoctorController extends PersonController<Doctor> {
      * @return The added doctor
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
-    public Doctor addDoctor(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance) throws Exception {
-        Doctor d = new Doctor(name, surname, dateOfBirth, medicalLicenseNumber, balance);
-        super.addPerson(d);
+    public Doctor addDoctor(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance, String email, String password, String token) throws Exception {
+        this.validateToken(token);
+        Doctor d = new Doctor(name, surname, dateOfBirth, medicalLicenseNumber, balance, email, password);
+        doctorDao.insert(d);
         return d;
     }
 
     /**
      * Add a new doctor from obj
      *
-     * @param doctor The doctor obk
+     * @param doctor The doctor object
      * @return The added doctor
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
-    public Doctor addDoctor(Doctor doctor) throws Exception {
-        return this.addDoctor(doctor.getName(), doctor.getSurname(), doctor.getDateOfBirth(), doctor.getMedicalLicenseNumber(), doctor.getBalance());
+    public Doctor addDoctor(Doctor doctor, String token) throws Exception {
+        return this.addDoctor(doctor.getName(), doctor.getSurname(), doctor.getDateOfBirth(), doctor.getMedicalLicenseNumber(), doctor.getBalance(), doctor.getEmail(), doctor.getPassword(), token);
     }
 
     /**
@@ -45,19 +48,22 @@ public class DoctorController extends PersonController<Doctor> {
      * @param id The id of the doctor
      * @return The customer
      */
-    public Doctor getDoctor(int id) throws Exception {
-        return super.getPerson(id);
+    public Doctor getDoctor(int id, String token) throws Exception {
+        this.validateToken(token);
+        return doctorDao.get(id);
     }
 
-    public void updateDoctor(Doctor doctor) throws Exception {
-        super.updatePerson(doctor);
+    public void updateDoctor(Doctor doctor, String token) throws Exception {
+        this.validateToken(token);
+        doctorDao.update(doctor);
     }
-    public boolean deleteDoctor(int id) throws Exception {
-        return super.deletePerson(id);
+    public boolean deleteDoctor(int id, String token) throws Exception {
+        this.validateToken(token);
+        return doctorDao.delete(id);
     }
 
-    @Override
-    public List<Doctor> getAllPersons() throws Exception {
-        return super.getAllPersons();
+    public List<Doctor> getAllPersons(String token) throws Exception {
+        this.validateToken(token);
+        return doctorDao.getAll();
     }
 }

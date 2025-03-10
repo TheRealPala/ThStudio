@@ -4,13 +4,13 @@ public class Doctor extends Person {
     private String medicalLicenseNumber;
 
 
-    public Doctor(String name, String surname, String dateOfBirth, int id, String medicalLicenseNumber, double balance) {
-        super(id, name, surname, dateOfBirth, balance);
+    public Doctor(String name, String surname, String dateOfBirth, int id, String medicalLicenseNumber, double balance, String email, String password) {
+        super(id, name, surname, dateOfBirth, balance, email, password);
         this.medicalLicenseNumber = medicalLicenseNumber;
     }
 
-    public Doctor(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance) {
-        super(name, surname, dateOfBirth, balance);
+    public Doctor(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance, String email, String password) {
+        super(name, surname, dateOfBirth, balance, email, password);
         this.medicalLicenseNumber = medicalLicenseNumber;
     }
 
@@ -35,6 +35,6 @@ public class Doctor extends Person {
         Doctor doctor = (Doctor) o;
         return doctor.id == this.id && doctor.name.equals(this.name) && doctor.surname.equals(this.surname) &&
                 doctor.dateOfBirth.equals(this.dateOfBirth) && doctor.balance == this.balance &&
-                doctor.medicalLicenseNumber.equals(this.medicalLicenseNumber);
+                doctor.medicalLicenseNumber.equals(this.medicalLicenseNumber) && doctor.email.equals(this.email) && doctor.password.equals(this.password);
     }
 }

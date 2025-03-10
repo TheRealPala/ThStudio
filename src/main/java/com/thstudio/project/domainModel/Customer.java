@@ -3,13 +3,13 @@ package com.thstudio.project.domainModel;
 public class Customer extends Person {
     private int level;
 
-    public Customer(String name, String surname, String dateOfBirth, int id, int level, double balance) {
-        super(id, name, surname, dateOfBirth, balance);
+    public Customer(String name, String surname, String dateOfBirth, int id, int level, double balance, String email, String password) {
+        super(id, name, surname, dateOfBirth, balance, email, password);
         this.level = level;
     }
 
-    public Customer(String name, String surname, String dateOfBirth, int level, double balance) {
-        super(name, surname, dateOfBirth, balance);
+    public Customer(String name, String surname, String dateOfBirth, int level, double balance, String email, String password) {
+        super(name, surname, dateOfBirth, balance, email, password);
         this.level = level;
     }
 

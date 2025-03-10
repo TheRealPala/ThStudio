@@ -1,12 +1,26 @@
 package com.thstudio.project.dao;
 
 import com.thstudio.project.domainModel.Person;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MariaDbPersonDao implements PersonDao {
+
+    private Person parseResultSet(ResultSet rs) throws SQLException {
+        Person p;
+        p = new Person(
+                rs.getInt("id"),
+                rs.getString("name"),
+                rs.getString("surname"),
+                rs.getString("date_of_birth"),
+                rs.getDouble("balance"),
+                rs.getString("email"),
+                rs.getString("password")
+        );
+        return p;
+    }
+
     @Override
     public Person get(Integer id) throws SQLException {
         Connection con = null;
@@ -21,13 +35,7 @@ public class MariaDbPersonDao implements PersonDao {
             if (!rs.next()) {
                 throw new RuntimeException("The person looked for in not present in the database");
             }
-            p = new Person(
-                    rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getString("surname"),
-                    rs.getString("date_of_birth"),
-                    rs.getDouble("balance")
-            );
+            p = parseResultSet(rs);
 
         } finally {
             assert rs != null : "ResultSet is Null";
@@ -49,15 +57,7 @@ public class MariaDbPersonDao implements PersonDao {
             stm = con.createStatement();
             rs = stm.executeQuery("select * from people");
             while (rs.next()) {
-                pList.add(
-                        new Person(
-                                rs.getInt("id"),
-                                rs.getString("name"),
-                                rs.getString("surname"),
-                                rs.getString("date_of_birth"),
-                                rs.getDouble("balance")
-                        )
-                );
+                pList.add(this.parseResultSet(rs));
             }
             if (pList.isEmpty()) {
                 throw new RuntimeException("There is no people in the database");
@@ -79,12 +79,14 @@ public class MariaDbPersonDao implements PersonDao {
         ResultSet rs = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("insert into people (name, surname, date_of_birth, balance) " +
-                    "values (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps = con.prepareStatement("insert into people (name, surname, date_of_birth, balance, email, password) " +
+                    "values (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, person.getName());
             ps.setString(2, person.getSurname());
             ps.setString(3, person.getDateOfBirth());
             ps.setDouble(4, person.getBalance());
+            ps.setString(5, person.getEmail());
+            ps.setString(6, person.getPassword());
             ps.executeUpdate();
             //get generated id from dbms
             rs = ps.getGeneratedKeys();
@@ -105,12 +107,14 @@ public class MariaDbPersonDao implements PersonDao {
         PreparedStatement ps = null;
         try {
             con = Database.getConnection();
-            ps = con.prepareStatement("update people set name = ?, surname = ?, date_of_birth = ?, balance = ? where id = ?");
+            ps = con.prepareStatement("update people set name = ?, surname = ?, date_of_birth = ?, balance = ?, email = ?, password=? where id = ?");
             ps.setString(1, person.getName());
             ps.setString(2, person.getSurname());
             ps.setString(3, person.getDateOfBirth());
             ps.setDouble(4, person.getBalance());
-            ps.setInt(5, person.getId());
+            ps.setString(5, person.getEmail());
+            ps.setString(6, person.getPassword());
+            ps.setInt(7, person.getId());
             ps.executeUpdate();
         } finally {
             assert ps != null : "preparedStatement is Null";
@@ -135,5 +139,30 @@ public class MariaDbPersonDao implements PersonDao {
             Database.closeConnection(con);
         }
         return rows > 0;
+    }
+
+    public Person getPersonByUsername(String email) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList<Person> pList = new ArrayList<Person>();
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("select * from people where email = ?");
+            ps.setString(1, email);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                pList.add(this.parseResultSet(rs));
+            }
+            if (pList.size() > 1) {
+                throw new SQLDataException("Database inconsistency");
+            }
+        } finally {
+            assert rs != null : "ResultSet is Null";
+            rs.close();
+            ps.close();
+            Database.closeConnection(con);
+        }
+        return pList.getFirst();
     }
 }

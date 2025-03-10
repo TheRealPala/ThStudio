@@ -12,4 +12,10 @@ public class DoctorFixture {
         doctor.setMedicalLicenseNumber(faker.regexify("^MLN-\\d{5}$\n"));
         return doctor;
     }
+
+    public static Doctor genTestDoctor() {
+        Doctor doctor = new Doctor(PersonFixture.genTestPerson());
+        doctor.setMedicalLicenseNumber(faker.regexify("^MLN-\\d{5}$\n"));
+        return doctor;
+    }
 }

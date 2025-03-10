@@ -1,6 +1,7 @@
 package com.thstudio.project.dao;
 
 import com.thstudio.project.domainModel.Doctor;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,6 +12,21 @@ public class MariaDbDoctorDao implements DoctorDao {
 
     public MariaDbDoctorDao(PersonDao personDao) {
         this.personDao = personDao;
+    }
+
+    private Doctor parseResultSet(ResultSet rs) throws SQLException {
+        Doctor d;
+        d = new Doctor(
+                rs.getString("name"),
+                rs.getString("surname"),
+                rs.getString("date_of_birth"),
+                rs.getInt("id"),
+                rs.getString("medical_license_number"),
+                rs.getDouble("balance"),
+                rs.getString("email"),
+                rs.getString("password")
+        );
+        return d;
     }
 
     @Override
@@ -27,14 +43,7 @@ public class MariaDbDoctorDao implements DoctorDao {
             if (!rs.next()) {
                 throw new RuntimeException("The Doctor looked for in not present in the database");
             }
-            d = new Doctor(
-                    rs.getString("name"),
-                    rs.getString("surname"),
-                    rs.getString("date_of_birth"),
-                    rs.getInt("id"),
-                    rs.getString("medical_license_number"),
-                    rs.getDouble("balance")
-            );
+            d = parseResultSet(rs);
 
         } finally {
             assert rs != null : "ResultSet is Null";
@@ -44,6 +53,7 @@ public class MariaDbDoctorDao implements DoctorDao {
         }
         return d;
     }
+
 
     @Override
     public List<Doctor> getAll() throws SQLException {
@@ -56,16 +66,7 @@ public class MariaDbDoctorDao implements DoctorDao {
             stm = con.createStatement();
             rs = stm.executeQuery("select * from people natural join doctors");
             while (rs.next()) {
-                dList.add(
-                        new Doctor(
-                                rs.getString("name"),
-                                rs.getString("surname"),
-                                rs.getString("date_of_birth"),
-                                rs.getInt("id"),
-                                rs.getString("medical_license_number"),
-                                rs.getDouble("balance")
-                        )
-                );
+                dList.add(this.parseResultSet(rs));
             }
             if (dList.isEmpty()) {
                 throw new RuntimeException("There is no Doctors in the database");

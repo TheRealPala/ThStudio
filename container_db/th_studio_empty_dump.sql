@@ -205,7 +205,10 @@ CREATE TABLE `people` (
   `surname` varchar(255) NOT NULL,
   `date_of_birth` date NOT NULL,
   `balance` double NOT NULL,
-  PRIMARY KEY (`id`)
+  `email` varchar(100) NOT NULL,
+  `password` varchar(60) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -250,4 +253,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-10 10:50:18
+-- Dump completed on 2025-03-10 12:07:47

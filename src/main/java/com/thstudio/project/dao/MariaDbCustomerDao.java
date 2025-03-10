@@ -1,6 +1,7 @@
 package com.thstudio.project.dao;
 
 import com.thstudio.project.domainModel.Customer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,22 @@ public class MariaDbCustomerDao implements CustomerDao {
 
     public MariaDbCustomerDao(PersonDao personDao) {
         this.personDao = personDao;
+    }
+
+    @NotNull
+    private Customer parseResultSet(ResultSet rs) throws SQLException {
+        Customer c;
+        c = new Customer(
+                rs.getString("name"),
+                rs.getString("surname"),
+                rs.getString("date_of_birth"),
+                rs.getInt("id"),
+                rs.getInt("level"),
+                rs.getDouble("balance"),
+                rs.getString("email"),
+                rs.getString("password")
+        );
+        return c;
     }
 
     @Override
@@ -27,14 +44,7 @@ public class MariaDbCustomerDao implements CustomerDao {
             if (!rs.next()) {
                 throw new RuntimeException("The Customer looked for in not present in the database");
             }
-            c = new Customer(
-                    rs.getString("name"),
-                    rs.getString("surname"),
-                    rs.getString("date_of_birth"),
-                    rs.getInt("id"),
-                    rs.getInt("level"),
-                    rs.getDouble("balance")
-            );
+            c = parseResultSet(rs);
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();
@@ -55,16 +65,7 @@ public class MariaDbCustomerDao implements CustomerDao {
             stm = con.createStatement();
             rs = stm.executeQuery("select * from people natural join customers");
             while (rs.next()) {
-                cList.add(
-                        new Customer(
-                                rs.getString("name"),
-                                rs.getString("surname"),
-                                rs.getString("date_of_birth"),
-                                rs.getInt("id"),
-                                rs.getInt("level"),
-                                rs.getDouble("balance")
-                        )
-                );
+                cList.add(this.parseResultSet(rs));
             }
             if (cList.isEmpty()) {
                 throw new RuntimeException("There is no Customers in the database");

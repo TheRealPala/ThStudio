@@ -20,7 +20,7 @@ class CustomerControllerTest {
     private static MariaDbPersonDao personDao;
 
     @BeforeAll
-    static void setDatabaseSettings() {
+    static void setDatabaseSettings() throws Exception {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
         Database.setDbHost(dotenv.get("DB_HOST"));
         Database.setDbName(dotenv.get("DB_NAME_DEFAULT"));
@@ -31,62 +31,71 @@ class CustomerControllerTest {
         assertTrue((Database.testConnection(true, false)));
         personDao = new MariaDbPersonDao();
         CustomerDao customerDao = new MariaDbCustomerDao( personDao);
-        customerController = new CustomerController(customerDao);
+        customerController = new CustomerController(customerDao, personDao);
+    }
+
+    @BeforeEach
+    void setUpTestUser() throws Exception {
+        Customer customer = CustomerFixture.genTestCustomer();
+        personDao.insert(customer);
     }
 
     @Test
     void addCustomer() throws Exception {
-        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
+        String token = customerController.login("test@test.com", "test");
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
         assertNotNull(customerToAdd);
         assertNotEquals(customerToAdd.getId(), 0);
-        Customer addedCustomer = customerController.getPerson(customerToAdd.getId());
+        Customer addedCustomer = customerController.getCustomer(customerToAdd.getId(), token);
         assertEquals(customerToAdd, addedCustomer);
     }
 
     @Test
     void modifyCustomerLevel() throws Exception {
-        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
-        assertEquals(customerToAdd.getLevel(), customerController.getPerson(customerToAdd.getId()).getLevel());
+        String token = customerController.login("test@test.com", "test");
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
+        assertEquals(customerToAdd.getLevel(), customerController.getCustomer(customerToAdd.getId(), token).getLevel());
         customerToAdd.setLevel(customerToAdd.getLevel() + 1);
-        assertTrue(customerController.modifyCustomerLevel(customerToAdd.getId(), customerToAdd.getLevel()));
-        Customer updatedCustomer = customerController.getCustomer(customerToAdd.getId());
+        assertTrue(customerController.modifyCustomerLevel(customerToAdd.getId(), customerToAdd.getLevel(), token));
+        Customer updatedCustomer = customerController.getCustomer(customerToAdd.getId(), token);
         assertNotNull(updatedCustomer);
         assertEquals(updatedCustomer.getLevel(), customerToAdd.getLevel());
     }
 
     @Test
     void updateCustomer() throws Exception {
-        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
+        String token = customerController.login("test@test.com", "test");
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
         customerToAdd.setName("Luigi");
         customerToAdd.setSurname("Bianchi");
         customerToAdd.setDateOfBirth("2003-08-22");
         customerToAdd.setLevel(2);
         customerToAdd.setBalance(350.55);
-        customerController.updateCustomer(customerToAdd);
-        Customer updatedCustomer = customerController.getCustomer(customerToAdd.getId());
+        customerController.updateCustomer(customerToAdd, token);
+        Customer updatedCustomer = customerController.getCustomer(customerToAdd.getId(), token);
         assertEquals(customerToAdd, updatedCustomer);
     }
     @Test
     void deleteCustomer() throws Exception {
-        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
-        customerController.deleteCustomer(customerToAdd.getId());
+        String token = customerController.login("test@test.com", "test");
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
+        customerController.deleteCustomer(customerToAdd.getId(), token);
         RuntimeException exception = assertThrowsExactly(RuntimeException.class,
-                () -> customerController.getCustomer(customerToAdd.getId()));
+                () -> customerController.getCustomer(customerToAdd.getId(), token));
         assertEquals("The Customer looked for in not present in the database", exception.getMessage());
         RuntimeException exception2 = assertThrowsExactly(RuntimeException.class,
                 () -> personDao.get(customerToAdd.getId()));
         assertEquals("The person looked for in not present in the database", exception2.getMessage());
     }
+
     @Test
     void getAllCustomers() throws Exception {
-        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer());
-        Customer customerToAdd2 = customerController.addCustomer(CustomerFixture.genCustomer());
-        assertEquals(2, customerController.getAllPersons().size());
-        assertEquals(2, personDao.getAll().size());
-        customerController.deletePerson(customerToAdd.getId());
-        assertEquals(1, customerController.getAllCustomers().size());
-        assertEquals(1, personDao.getAll().size());
-
+        String token = customerController.login("test@test.com", "test");
+        Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
+        customerController.addCustomer(CustomerFixture.genCustomer(), token);
+        assertEquals(2, customerController.getAllCustomers(token).size());
+        customerController.deleteCustomer(customerToAdd.getId(), token);
+        assertEquals(1, customerController.getAllCustomers(token).size());
     }
 
 

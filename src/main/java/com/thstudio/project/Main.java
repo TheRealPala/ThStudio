@@ -8,6 +8,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.cdimascio.dotenv.Dotenv;
 import com.thstudio.project.dao.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.nio.file.*;
 import java.security.*;
@@ -86,7 +87,11 @@ public class Main {
         } catch (JWTVerificationException exception){
             // Invalid signature/claims
         }
-
-
+        //BCrypt
+        String stringToHash = "prova123";
+        String hashedPassword = BCrypt.hashpw(stringToHash, BCrypt.gensalt(12));
+        System.out.println(hashedPassword);
+        System.out.println(BCrypt.checkpw("puppa", hashedPassword));
+        System.out.println(BCrypt.checkpw(stringToHash, hashedPassword));
     }
 }

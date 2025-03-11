@@ -3,9 +3,11 @@ package com.thstudio.project.businessLogic;
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.*;
 import com.thstudio.project.fixture.*;
+import com.thstudio.project.security.LoginController;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -17,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DocumentControllerTest {
     private static DocumentController documentController;
+    private static LoginController loginController;
     private static DocumentDao documentDao;
     private static PersonDao personDao;
     private static DoctorDao doctorDao;
@@ -25,7 +28,7 @@ class DocumentControllerTest {
     private static NotificationDao notificationDao;
 
     @BeforeAll
-    static void setDatabaseSettings() {
+    static void setDatabaseSettings() throws Exception {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
         Database.setDbHost(dotenv.get("DB_HOST"));
         Database.setDbName(dotenv.get("DB_NAME_DEFAULT"));
@@ -41,29 +44,37 @@ class DocumentControllerTest {
         notificationDao = new MariaDbNotificationDao();
         medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
         documentController = new DocumentController(documentDao, personDao, notificationDao, medicalExamDao);
+        loginController = new LoginController(personDao);
+    }
 
+    @BeforeEach
+    void setUpTestUser() throws Exception {
+        Person person = PersonFixture.genTestPerson();
+        personDao.insert(person);
     }
 
     @Test
     void addDocument() throws Exception {
+        String token = loginController.login("test@test.com", "test");
         Person personToAdd = PersonFixture.genPerson();
         personDao.insert(personToAdd);
         assertNotEquals(personToAdd.getId(), 0);
-        Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), personToAdd.getId());
+        Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), personToAdd.getId(), token);
         Document addedDocument = documentDao.get(documentToAdd.getId());
         assertEquals(documentToAdd, addedDocument);
     }
 
     @Test
     public void getDocumentsByReceiver() throws Exception {
+        String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), doctor.getId());
+        Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), doctor.getId(), token);
         documentToAdd.setReceiverId(customer.getId());
         documentDao.update(documentToAdd);
-        List<Document> addedDocuments = documentController.getDocumentsByReceiver(customer.getId());
+        List<Document> addedDocuments = documentController.getDocumentsByReceiver(customer.getId(), token);
         assertNotNull(addedDocuments);
         assertTrue(addedDocuments.contains(documentToAdd));
         assertEquals(documentToAdd, addedDocuments.getFirst());
@@ -73,7 +84,7 @@ class DocumentControllerTest {
 
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    documentController.getDocumentsByReceiver(otherCustomer.getId());
+                    documentController.getDocumentsByReceiver(otherCustomer.getId(), token);
                 }
         );
         assertEquals(thrown.getMessage(), "There is no Documents in the database for this receiver");
@@ -82,10 +93,11 @@ class DocumentControllerTest {
 
     @Test
     public void getDocumentsByOwner() throws Exception {
+        String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), doctor.getId());
-        List<Document> addedDocuments = documentController.getDocumentsByOwner(doctor.getId());
+        Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), doctor.getId(), token);
+        List<Document> addedDocuments = documentController.getDocumentsByOwner(doctor.getId(), token);
         assertNotNull(addedDocuments);
         assertTrue(addedDocuments.contains(documentToAdd));
         assertEquals(documentToAdd, addedDocuments.getFirst());
@@ -94,7 +106,7 @@ class DocumentControllerTest {
         doctorDao.insert(otherDoctor);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    documentController.getDocumentsByOwner(otherDoctor.getId());
+                    documentController.getDocumentsByOwner(otherDoctor.getId(), token);
                 }
         );
         assertEquals(thrown.getMessage(), "There is no Documents in the database for this owner");
@@ -102,13 +114,14 @@ class DocumentControllerTest {
 
     @Test
     public void sendDocument() throws Exception {
+        String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), doctor.getId());
+        Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), doctor.getId(), token);
 
-        documentController.sendDocument(documentToAdd, customer.getId());
+        documentController.sendDocument(documentToAdd, customer.getId(), token);
         Document addedDocument = documentDao.get(documentToAdd.getId());
         assertNotNull(addedDocument);
         assertEquals(customer.getId(), addedDocument.getReceiverId());
@@ -116,7 +129,7 @@ class DocumentControllerTest {
         Customer otherCustomer = CustomerFixture.genCustomer();
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    documentController.sendDocument(documentToAdd, otherCustomer.getId());
+                    documentController.sendDocument(documentToAdd, otherCustomer.getId(), token);
                 }
         );
         assertEquals(thrown.getMessage(), "The person looked for in not present in the database");
@@ -124,7 +137,7 @@ class DocumentControllerTest {
 
     @Test
     public void attachDocumentToMedicalExam() throws Exception {
-
+        String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         MedicalExam medicalExam = MedicalExamFixture.genMedicalExam(doctor);
@@ -132,7 +145,7 @@ class DocumentControllerTest {
         Document document = DocumentFixture.genDocument(doctor);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    documentController.attachDocumentToMedicalExam(document.getId(), medicalExam.getId());
+                    documentController.attachDocumentToMedicalExam(document.getId(), medicalExam.getId(), token);
                 }
         );
         assertEquals(thrown.getMessage(), "The Document looked for in not present in the database");
@@ -140,23 +153,23 @@ class DocumentControllerTest {
 
 
         // controllare la notifica
-        Document documentDb = documentController.addDocument(DocumentFixture.genTitle(), doctor.getId());
+        Document documentDb = documentController.addDocument(DocumentFixture.genTitle(), doctor.getId(), token);
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        documentController.sendDocument(documentDb, customer.getId());
+        documentController.sendDocument(documentDb, customer.getId(), token);
         assertEquals(notificationDao.getNotificationsByReceiverId(customer.getId()).getFirst().getTitle(), "New document " + documentDb.getTitle() + " by :" + doctor.getFullName());
         Doctor otherDoctor = DoctorFixture.genDoctor();
         doctorDao.insert(otherDoctor);
-        Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), otherDoctor.getId());
+        Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), otherDoctor.getId(), token);
         MedicalExam otherMedicalExam = MedicalExamFixture.genMedicalExam(otherDoctor);
         medicalExamDao.insert(otherMedicalExam);
-        documentController.attachDocumentToMedicalExam(documentToAdd.getId(), otherMedicalExam.getId());
+        documentController.attachDocumentToMedicalExam(documentToAdd.getId(), otherMedicalExam.getId(), token);
         assertEquals(documentDao.get(documentToAdd.getId()).getMedicalExamId(), otherMedicalExam.getId());  // due medical exam a cui è stato attaccato lo stesso documento uno tramite attach e uno con add
         // documento già presente nel db
 
         RuntimeException otherThrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    documentController.attachDocumentToMedicalExam(documentDb.getId(), otherMedicalExam.getId());
+                    documentController.attachDocumentToMedicalExam(documentDb.getId(), otherMedicalExam.getId(), token);
                 }
         );
         assertEquals(otherThrown.getMessage(), "Can't attach a document to a medicalExam which is not yours");

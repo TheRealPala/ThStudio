@@ -4,3 +4,5 @@ container_db/dataDb/*
 .idea
 target
 .env
+config/security/keys/*
+!config/security/keys/.gitkeep

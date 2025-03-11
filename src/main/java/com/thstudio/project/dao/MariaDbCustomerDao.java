@@ -1,6 +1,7 @@
 package com.thstudio.project.dao;
 
 import com.thstudio.project.domainModel.Customer;
+import com.thstudio.project.domainModel.Person;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

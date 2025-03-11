@@ -6,6 +6,7 @@ KEY_DIR="keys"
 
 # Crea la cartella 'keys' se non esiste
 mkdir -p $KEY_DIR
+rm sign*
 
 # Genera la chiave privata in formato PEM (PKCS#1)
 echo "Generando chiave privata in formato PEM..."

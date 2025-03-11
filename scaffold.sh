@@ -1,4 +1,5 @@
 #!/bin/bash
+./config/security/genkey.sh
 docker-compose -f container_db/docker-compose.yml up -d 
 docker cp container_db/th_studio_empty_dump.sql db_swe:/th_studio_empty_dump.sql
 docker cp container_db/th_studio_test_empty_dump.sql db_swe:/th_studio_test_empty_dump.sql

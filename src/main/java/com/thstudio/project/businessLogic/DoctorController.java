@@ -2,10 +2,12 @@ package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Doctor;
+import com.thstudio.project.security.AuthorizedController;
+import com.thstudio.project.security.LoginController;
 
 import java.util.List;
 
-public class DoctorController extends AuthorizedController {
+public class DoctorController extends LoginController {
 
     private final DoctorDao doctorDao;
     public DoctorController(DoctorDao doctorDao, PersonDao personDao) throws Exception {

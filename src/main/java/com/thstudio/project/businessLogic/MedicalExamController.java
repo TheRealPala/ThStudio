@@ -8,7 +8,7 @@ import com.thstudio.project.domainModel.Search.Search;
 import com.thstudio.project.domainModel.State.Available;
 import com.thstudio.project.domainModel.State.Booked;
 import com.thstudio.project.domainModel.State.State;
-import com.thstudio.project.domainModel.Tags.Tag;
+import com.thstudio.project.security.AuthorizedController;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,12 +18,12 @@ import java.util.Objects;
 import static java.util.Collections.unmodifiableList;
 
 
-public class MedicalExamController {
+public class MedicalExamController extends AuthorizedController {
     private final MedicalExamDao medicalExamDao;
     private final NotificationDao notificationDao;
     private final DoctorDao doctorDao;
 
-    public MedicalExamController(MedicalExamDao medicalExamDao, NotificationDao notificationDao, DoctorDao doctorDao) {
+    public MedicalExamController(MedicalExamDao medicalExamDao, NotificationDao notificationDao, DoctorDao doctorDao) throws Exception{
         this.medicalExamDao = medicalExamDao;
         this.doctorDao = doctorDao;
         this.notificationDao = notificationDao;
@@ -51,8 +51,8 @@ public class MedicalExamController {
      * @throws Exception If the medical exam is not found, bubbles up exceptions to MedicalExamDAO::update()
      */
 
-    private void updateLogicForMedicalExam(int examId, LocalDateTime startTime, LocalDateTime endTime, String description,
-                                           String title, double price, State state) throws Exception {
+    private void updateMedicalExamLogic(int examId, LocalDateTime startTime, LocalDateTime endTime, String description,
+                                        String title, double price, State state) throws Exception {
         MedicalExam medicalExam = this.medicalExamDao.get(examId);
         if (medicalExam.getPrice() == price && medicalExam.getStartTime() == startTime && medicalExam.getEndTime() == endTime && medicalExam.getDescription().equals(description) && medicalExam.getTitle().equals(title)) {
             System.out.println("nothing to update");
@@ -132,7 +132,9 @@ public class MedicalExamController {
         medicalExamDao.insert(medicalExam);
     }
 
-    public MedicalExam addMedicalExam(int idDoctor, int idCustomer, String title, String description, String startTime, String endTime, double price) throws Exception {
+    public MedicalExam addMedicalExam(int idDoctor, int idCustomer, String title, String description,
+                                      String startTime, String endTime, double price, String token) throws Exception {
+        this.validateToken(token);
         Doctor doctor = doctorDao.get(idDoctor);
         MedicalExam medicalExam = new MedicalExam(doctor.getId(), startTime, endTime, description, title, price);
         medicalExam.setIdCustomer(idCustomer);
@@ -140,19 +142,21 @@ public class MedicalExamController {
         return medicalExam;
     }
 
-    public MedicalExam addMedicalExam(MedicalExam medicalExam) throws Exception {
+    public MedicalExam addMedicalExam(MedicalExam medicalExam, String token) throws Exception {
+        this.validateToken(token);
         Doctor doctor = doctorDao.get(medicalExam.getIdDoctor());
         this.addMedicalExamLogic(medicalExam, doctor);
         return medicalExam;
     }
 
-    public boolean updateMedicalExam(MedicalExam medicalExam) throws Exception {
+    public boolean updateMedicalExam(MedicalExam medicalExam, String token) throws Exception {
+        this.validateToken(token);
         MedicalExam me = medicalExamDao.get(medicalExam.getId());
 
         if (!me.getStartTime().isAfter(LocalDateTime.now())) {
             throw new RuntimeException("Forbidden! Can't update an exam already started");
         }
-        this.updateLogicForMedicalExam(medicalExam.getId(), medicalExam.getStartTime(), medicalExam.getEndTime(), medicalExam.getDescription(), medicalExam.getTitle(),
+        this.updateMedicalExamLogic(medicalExam.getId(), medicalExam.getStartTime(), medicalExam.getEndTime(), medicalExam.getDescription(), medicalExam.getTitle(),
                 medicalExam.getPrice(), medicalExam.getState());
         return true;
     }
@@ -164,7 +168,8 @@ public class MedicalExamController {
      * @return The medical exam
      * @throws Exception If the medical exam is not found
      */
-    public MedicalExam getExam(int examId) throws Exception {
+    public MedicalExam getExam(int examId, String token) throws Exception {
+        this.validateToken(token);
         return medicalExamDao.get(examId);
     }
 
@@ -174,7 +179,8 @@ public class MedicalExamController {
      * @return The list of medical exam
      * @throws Exception If there are no medical exams
      */
-    public List<MedicalExam> getAll() throws Exception {
+    public List<MedicalExam> getAll(String token) throws Exception {
+        this.validateToken(token);
         return unmodifiableList(this.medicalExamDao.getAll());
     }
 
@@ -185,7 +191,8 @@ public class MedicalExamController {
      * @return The list of medical exam
      * @throws Exception If the doctor is not found, or if the doctor doesn't have any medical exam
      */
-    public List<MedicalExam> getDoctorExams(int idDoctor) throws Exception {
+    public List<MedicalExam> getDoctorExams(int idDoctor, String token) throws Exception {
+        this.validateToken(token);
         return this.medicalExamDao.getDoctorExams(idDoctor);
 
     }
@@ -197,7 +204,8 @@ public class MedicalExamController {
      * @return The list of medical exam
      * @throws Exception If the customer is not found, or if the customer doesn't have any medical exam
      */
-    public List<MedicalExam> getCustomerExams(int idCustomer) throws Exception {
+    public List<MedicalExam> getCustomerExams(int idCustomer, String token) throws Exception {
+        this.validateToken(token);
         return unmodifiableList(this.medicalExamDao.getCustomerExams(idCustomer));
     }
 
@@ -208,7 +216,8 @@ public class MedicalExamController {
      * @return The list of medical exam
      * @throws Exception If there are no medical exams
      */
-    public List<MedicalExam> getExamsByState(State state) throws Exception {
+    public List<MedicalExam> getExamsByState(State state, String token) throws Exception {
+        this.validateToken(token);
         return unmodifiableList(this.medicalExamDao.getExamsByState(state.getState()));
     }
 
@@ -219,7 +228,8 @@ public class MedicalExamController {
      * @return The list of medical exams
      * @throws Exception If there are no medical exams
      */
-    public List<MedicalExam> search(Search search) throws Exception {
+    public List<MedicalExam> search(Search search, String token) throws Exception {
+        this.validateToken(token);
         return unmodifiableList(this.medicalExamDao.search(search));
     }
 

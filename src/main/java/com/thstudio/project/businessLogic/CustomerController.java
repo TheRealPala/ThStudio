@@ -2,10 +2,12 @@ package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Customer;
+import com.thstudio.project.security.AuthorizedController;
+import com.thstudio.project.security.LoginController;
 
 import java.util.List;
 
-public class CustomerController extends AuthorizedController{
+public class CustomerController extends LoginController {
 
     private final CustomerDao customerDao;
 
@@ -76,6 +78,7 @@ public class CustomerController extends AuthorizedController{
         }
         return outcome;
     }
+
     public boolean deleteCustomer(int id, String token) throws Exception {
         super.validateToken(token);
         return customerDao.delete(id);

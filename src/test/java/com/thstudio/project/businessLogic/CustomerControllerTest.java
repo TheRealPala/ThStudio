@@ -8,7 +8,9 @@ import com.thstudio.project.dao.MariaDbPersonDao;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.thstudio.project.domainModel.Customer;
+import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.CustomerFixture;
+import com.thstudio.project.fixture.PersonFixture;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.*;
 
@@ -36,8 +38,8 @@ class CustomerControllerTest {
 
     @BeforeEach
     void setUpTestUser() throws Exception {
-        Customer customer = CustomerFixture.genTestCustomer();
-        personDao.insert(customer);
+        Person person = PersonFixture.genTestPerson();
+        personDao.insert(person);
     }
 
     @Test

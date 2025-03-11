@@ -3,11 +3,15 @@ package com.thstudio.project.businessLogic;
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Doctor;
 import com.thstudio.project.domainModel.Notification;
+import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.NotificationFixture;
+import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.security.LoginController;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -21,9 +25,11 @@ class NotificationControllerTest {
     private static NotificationController notificationController;
     private static DoctorDao doctorDao;
     private static NotificationDao notificationDao;
+    private static PersonDao personDao;
+    private static LoginController loginController;
 
     @BeforeAll
-    static void setDatabaseSettings() {
+    static void setDatabaseSettings() throws Exception {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
         Database.setDbHost(dotenv.get("DB_HOST"));
         Database.setDbName(dotenv.get("DB_NAME_DEFAULT"));
@@ -32,25 +38,34 @@ class NotificationControllerTest {
         Database.setDbPassword(dotenv.get("DB_PASSWORD"));
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
-        PersonDao personDao = new MariaDbPersonDao();
+        personDao = new MariaDbPersonDao();
         doctorDao = new MariaDbDoctorDao(personDao);
         notificationDao = new MariaDbNotificationDao();
         notificationController = new NotificationController(notificationDao, personDao);
+        loginController = new LoginController(personDao);
+    }
+
+    @BeforeEach
+    void setUpTestUser() throws Exception {
+        Person person = PersonFixture.genTestPerson();
+        personDao.insert(person);
     }
 
     @Test
     void getNotificationByReceiver() throws Exception {
+        String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
         Notification notificationToInsert = new Notification(NotificationFixture.genTitle(), doctor.getId());
         notificationDao.insert(notificationToInsert);
-        List<Notification> notificationList = notificationController.getNotificationsByReceiverId(doctor.getId());
+        List<Notification> notificationList = notificationController.getNotificationsByReceiverId(doctor.getId(), token);
         assertEquals(notificationList.getFirst(), notificationToInsert);
     }
 
     @Test
     void getMoreThanOneNotificationByReceiver() throws Exception {
+        String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
@@ -62,7 +77,7 @@ class NotificationControllerTest {
         for (Notification notificationToAdd : notificationsToAdd) {
             notificationDao.insert(notificationToAdd);
         }
-        List<Notification> addedNotifications = notificationController.getNotificationsByReceiverId(doctor.getId());
+        List<Notification> addedNotifications = notificationController.getNotificationsByReceiverId(doctor.getId(), token);
         assertEquals(notificationsToAdd.size(), addedNotifications.size());
         for (int i = 0; i < notificationsToAdd.size(); ++i) {
             assertEquals(notificationsToAdd.get(i), addedNotifications.get(i));
@@ -71,12 +86,13 @@ class NotificationControllerTest {
 
     @Test
     void getNoNotifications() throws Exception {
+        String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
         assertNotEquals(doctor.getId(), 0);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    notificationController.getNotificationsByReceiverId(doctor.getId());
+                    notificationController.getNotificationsByReceiverId(doctor.getId(), token);
                 }
         );
         assertEquals(thrown.getMessage(), "The receiver has not notifications");
@@ -84,9 +100,10 @@ class NotificationControllerTest {
 
     @Test
     void getNotificationsForAnUnknownReceiver() throws Exception {
-        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+    String token = loginController.login("test@test.com", "test");
+    RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    notificationController.getNotificationsByReceiverId(1);
+                    notificationController.getNotificationsByReceiverId(1, token);
                 }
         );
         assertEquals(thrown.getMessage(), "The person looked for in not present in the database");

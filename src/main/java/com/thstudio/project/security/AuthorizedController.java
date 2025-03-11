@@ -1,4 +1,4 @@
-package com.thstudio.project.businessLogic;
+package com.thstudio.project.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -7,8 +7,6 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.thstudio.project.dao.PersonDao;
-import com.thstudio.project.domainModel.Person;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -23,16 +21,14 @@ import java.util.Base64;
 public class AuthorizedController {
     private RSAPrivateKey privateKey;
     private RSAPublicKey publicKey;
-    private PersonDao personDao;
 
-    public AuthorizedController(PersonDao personDao) throws Exception {
+    public AuthorizedController() throws Exception {
         this.privateKey = loadPrivateKey();
         this.publicKey = loadPublicKey();
-        this.personDao = personDao;
     }
 
     private RSAPrivateKey loadPrivateKey() throws Exception {
-        String key = new String(Files.readAllBytes(Paths.get("config/security/sign_pkcs8.pem")))
+        String key = new String(Files.readAllBytes(Paths.get("config/security/keys/sign_private.pem")))
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
@@ -45,7 +41,7 @@ public class AuthorizedController {
     }
 
     private RSAPublicKey loadPublicKey() throws Exception {
-        String key = new String(Files.readAllBytes(Paths.get("config/security/sign_pub.pem")))
+        String key = new String(Files.readAllBytes(Paths.get("config/security/keys/sign_public.pem")))
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
                 .replaceAll("\\s", "");
@@ -84,18 +80,5 @@ public class AuthorizedController {
 
         verifier.verify(token);
         return true;
-    }
-
-    protected String hashPassword(String stringToHash) {
-        return BCrypt.hashpw(stringToHash, BCrypt.gensalt(12));
-    }
-
-    protected String login(String email, String password) throws Exception {
-        String token = "";
-        Person person = this.personDao.getPersonByUsername(email);
-        if (BCrypt.checkpw(password, person.getPassword())) {
-            token = createToken(person.getId());
-        }
-        return token;
     }
 }

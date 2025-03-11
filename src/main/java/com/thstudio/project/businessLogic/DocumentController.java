@@ -9,11 +9,12 @@ import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.domainModel.Notification;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.domainModel.State.Booked;
+import com.thstudio.project.security.AuthorizedController;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.List;
 
-public class DocumentController {
+public class DocumentController extends AuthorizedController {
     private final DocumentDao documentDao;
     private final String baseDocumentPath;
     private final PersonDao personDao;
@@ -21,7 +22,7 @@ public class DocumentController {
     private final MedicalExamDao medicalExamDao;
 
     public DocumentController(DocumentDao documentDao, PersonDao personDao, NotificationDao notificationDao,
-                              MedicalExamDao medicalExamDao) {
+                              MedicalExamDao medicalExamDao) throws Exception {
         this.documentDao = documentDao;
         this.personDao = personDao;
         this.baseDocumentPath = Dotenv.configure().directory("config").load().get("BASE_DOC_DIR_PATH");
@@ -29,22 +30,26 @@ public class DocumentController {
         this.medicalExamDao = medicalExamDao;
     }
 
-    public Document addDocument(String title, int ownerId) throws Exception {
+    public Document addDocument(String title, int ownerId, String token) throws Exception {
+        this.validateToken(token);
         Person person = personDao.get(ownerId);
         Document document = new Document(title, this.baseDocumentPath + title, person.getId());
         this.documentDao.insert(document);
         return document;
     }
 
-    public List<Document> getDocumentsByReceiver(int receiverId) throws Exception {
+    public List<Document> getDocumentsByReceiver(int receiverId, String token) throws Exception {
+        this.validateToken(token);
         return this.documentDao.getByReceiver(receiverId);
     }
 
-    public List<Document> getDocumentsByOwner(int ownerId) throws Exception {
+    public List<Document> getDocumentsByOwner(int ownerId, String token) throws Exception {
+        this.validateToken(token);
         return this.documentDao.getByOwner(ownerId);
     }
 
-    public void sendDocument(Document document, int receiverId) throws Exception {
+    public void sendDocument(Document document, int receiverId, String token) throws Exception {
+        this.validateToken(token);
         boolean isAlreadyPersisted = true;
         try {
             this.documentDao.get(document.getId());
@@ -64,7 +69,8 @@ public class DocumentController {
         this.notificationDao.insert(nd);
     }
 
-    public void attachDocumentToMedicalExam(int documentId, int medicalExamId) throws Exception {
+    public void attachDocumentToMedicalExam(int documentId, int medicalExamId, String token) throws Exception {
+        this.validateToken(token);
         MedicalExam medicalExam = this.medicalExamDao.get(medicalExamId);
         Document document = this.documentDao.get(documentId);
         if (medicalExam.getIdDoctor() != document.getOwnerId()) {

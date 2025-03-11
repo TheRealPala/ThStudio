@@ -3,8 +3,10 @@ package com.thstudio.project.businessLogic;
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.Doctor;
+import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.CustomerFixture;
 import com.thstudio.project.fixture.DoctorFixture;
+import com.thstudio.project.fixture.PersonFixture;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,8 +39,8 @@ class DoctorControllerTest {
 
     @BeforeEach
     void setUpTestUser() throws Exception {
-        Customer customer = CustomerFixture.genTestCustomer();
-        personDao.insert(customer);
+        Person person = PersonFixture.genTestPerson();
+        personDao.insert(person);
     }
 
     @Test

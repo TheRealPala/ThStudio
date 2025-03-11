@@ -12,10 +12,11 @@ import com.thstudio.project.domainModel.State.Deleted;
 import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.dao.MedicalExamDao;
+import com.thstudio.project.security.AuthorizedController;
 
 import java.time.LocalDateTime;
 
-public class StateController {
+public class StateController extends AuthorizedController {
     private final MedicalExamDao medicalExamDao;
     private final CustomerDao customerDao;
     private final DoctorDao doctorDao;
@@ -23,7 +24,7 @@ public class StateController {
 
 
     public StateController(MedicalExamDao medicalExamDao, CustomerDao customerDao,
-                           DoctorDao doctorDao, NotificationDao notificationDao) {
+                           DoctorDao doctorDao, NotificationDao notificationDao) throws Exception {
         this.medicalExamDao = medicalExamDao;
         this.customerDao = customerDao;
         this.doctorDao = doctorDao;
@@ -37,7 +38,8 @@ public class StateController {
      * @param customerId    The customer id
      * @return true if the medical exam is canceled, false otherwise
      */
-    public boolean bookMedicalExam(int medicalExamId, int customerId) throws Exception {
+    public boolean bookMedicalExam(int medicalExamId, int customerId, String token) throws Exception {
+        this.validateToken(token);
         MedicalExam me = this.medicalExamDao.get(medicalExamId);
         Customer c = this.customerDao.get(customerId);
         if (me.getState() instanceof Booked) {
@@ -67,7 +69,8 @@ public class StateController {
      * @param customerId    The customer id
      * @return true, if the medical exam booking is canceled, raise up RuntimeExceptions otherwise
      */
-    public boolean cancelMedicalExamBooking(int medicalExamId, int customerId) throws Exception {
+    public boolean cancelMedicalExamBooking(int medicalExamId, int customerId, String token) throws Exception {
+        this.validateToken(token);
         MedicalExam me = this.medicalExamDao.get(medicalExamId);
         Customer c = this.customerDao.get(customerId);
         if (me.getIdCustomer() != c.getId()) {
@@ -101,7 +104,8 @@ public class StateController {
      * @param doctorId      The doctor id
      * @return true, if the medical exam is canceled, raise up RuntimeExceptions otherwise
      */
-    public boolean cancelMedicalExam(int medicalExamId, int doctorId) throws Exception {
+    public boolean cancelMedicalExam(int medicalExamId, int doctorId, String token) throws Exception {
+        this.validateToken(token);
         Doctor d = this.doctorDao.get(doctorId);
         MedicalExam me = this.medicalExamDao.get(medicalExamId);
         if (me.getIdDoctor() != d.getId()) {
@@ -133,7 +137,8 @@ public class StateController {
      * @param examId The id of the medical exam
      * @throws Exception If the medical exam is not found or if it is already completed
      */
-    public void markMedicalExamAsComplete(int examId) throws Exception {
+    public void markMedicalExamAsComplete(int examId, String token) throws Exception {
+        this.validateToken(token);
         MedicalExam medicalExam = medicalExamDao.get(examId);
         if (!(medicalExam.getState() instanceof Booked)) {
             throw new RuntimeException("Can't mark an exam as complete if is not in booked state");

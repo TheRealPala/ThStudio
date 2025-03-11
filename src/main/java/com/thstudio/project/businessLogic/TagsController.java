@@ -7,16 +7,13 @@ import com.thstudio.project.domainModel.Tags.Tag;
 import com.thstudio.project.domainModel.Tags.TagIsOnline;
 import com.thstudio.project.domainModel.Tags.TagType;
 import com.thstudio.project.domainModel.Tags.TagZone;
+import com.thstudio.project.security.AuthorizedController;
 
-import java.lang.module.ResolutionException;
-import java.sql.SQLException;
-import java.util.InvalidPropertiesFormatException;
-
-public class TagsController {
+public class TagsController extends AuthorizedController {
     private final TagDao tagDao;
     private final MedicalExamDao medicalExamDao;
 
-    public TagsController(TagDao tagDao, MedicalExamDao medicalExamDao) {
+    public TagsController(TagDao tagDao, MedicalExamDao medicalExamDao) throws Exception {
         this.tagDao = tagDao;
         this.medicalExamDao = medicalExamDao;
     }
@@ -29,7 +26,8 @@ public class TagsController {
      * @return the created tag
      * @throws Exception if the tag type is invalid
      */
-    public Tag createTag(String tag, String tagType) throws Exception {
+    public Tag createTag(String tag, String tagType, String token) throws Exception {
+        this.validateToken(token);
         Tag tagToReturn = null;
         switch (tagType) {
             case "Zone":
@@ -58,12 +56,14 @@ public class TagsController {
      * @return true if the tag was deleted, false otherwise
      * @throws Exception if the tag type is invalid
      */
-    public boolean deleteTag(String tag, String tagType) throws Exception {
+    public boolean deleteTag(String tag, String tagType, String token) throws Exception {
+        this.validateToken(token);
         String[] tagToRemove = new String[]{tag, tagType};
         return this.tagDao.delete(tagToRemove);
     }
 
-    public boolean attachTagToMedicalExam(String tag, String tagType, int medicalExamId) throws Exception {
+    public boolean attachTagToMedicalExam(String tag, String tagType, int medicalExamId, String token) throws Exception {
+        this.validateToken(token);
         MedicalExam medicalExam = this.medicalExamDao.get(medicalExamId);
         String[] tagCompositeKey = {tag, tagType};
         Tag tagToAttach = this.tagDao.get(tagCompositeKey);
@@ -81,7 +81,8 @@ public class TagsController {
         return true;
     }
 
-    public boolean detachTagToMedicalExam(String tag, String tagType, int medicalExamId) throws Exception {
+    public boolean detachTagToMedicalExam(String tag, String tagType, int medicalExamId, String token) throws Exception {
+        this.validateToken(token);
         MedicalExam medicalExam = this.medicalExamDao.get(medicalExamId);
         String[] tagCompositeKey = {tag, tagType};
         Tag tagToDetach = this.tagDao.get(tagCompositeKey);

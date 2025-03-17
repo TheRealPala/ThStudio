@@ -6,7 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.thstudio.project.dao.PersonDao;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -53,22 +52,18 @@ public class AuthorizedController {
         return (RSAPublicKey) keyFactory.generatePublic(spec);
     }
 
-    protected String createToken(int id) {
+    protected String createToken(int id) throws JWTCreationException {
         String token = "";
-        try {
             Algorithm algorithm = Algorithm.RSA256(publicKey, privateKey);
             token = JWT.create()
                     .withIssuer("auth0")
                     .withClaim("id", id)
                     .withExpiresAt(Instant.now())
                     .sign(algorithm);
-        } catch (JWTCreationException exception) {
-            // Invalid Signing configuration / Couldn't convert Claims.
-        }
         return token;
     }
 
-    protected boolean validateToken(String token) throws JWTVerificationException {
+    protected void validateToken(String token) throws JWTVerificationException {
         DecodedJWT decodedJWT;
         Algorithm algorithm = Algorithm.RSA256(publicKey, privateKey);
         JWTVerifier verifier = JWT.require(algorithm)
@@ -79,6 +74,5 @@ public class AuthorizedController {
                 .build();
 
         verifier.verify(token);
-        return true;
     }
 }

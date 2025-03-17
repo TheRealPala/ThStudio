@@ -29,7 +29,7 @@ public class CustomerController extends LoginController {
      */
     public Customer addCustomer(String name, String surname, String dateOfBirth, int level, double balance, String email, String password, String token) throws Exception {
         super.validateToken(token);
-        Customer c = new Customer(name, surname, dateOfBirth, level, balance, email, password);
+        Customer c = new Customer(name, surname, dateOfBirth, level, balance, email, this.hashPassword(password));
         customerDao.insert(c);
         return c;
     }
@@ -42,7 +42,8 @@ public class CustomerController extends LoginController {
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
     public Customer addCustomer(Customer customer, String token) throws Exception {
-        return this.addCustomer(customer.getName(), customer.getSurname(), customer.getDateOfBirth(), customer.getLevel(), customer.getBalance(), customer.getEmail(), customer.getPassword(), token);
+        return this.addCustomer(customer.getName(), customer.getSurname(), customer.getDateOfBirth(), customer.getLevel(),
+                customer.getBalance(), customer.getEmail(), this.hashPassword(customer.getPassword()), token);
     }
 
     /**

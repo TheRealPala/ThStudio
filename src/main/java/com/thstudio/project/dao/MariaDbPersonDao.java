@@ -157,6 +157,9 @@ public class MariaDbPersonDao implements PersonDao {
             if (pList.size() > 1) {
                 throw new SQLDataException("Database inconsistency");
             }
+            else if (pList.isEmpty()) {
+                throw new SecurityException("User not found");
+            }
         } finally {
             assert rs != null : "ResultSet is Null";
             rs.close();

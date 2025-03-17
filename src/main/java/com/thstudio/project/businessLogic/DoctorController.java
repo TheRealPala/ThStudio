@@ -28,7 +28,7 @@ public class DoctorController extends LoginController {
      */
     public Doctor addDoctor(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance, String email, String password, String token) throws Exception {
         this.validateToken(token);
-        Doctor d = new Doctor(name, surname, dateOfBirth, medicalLicenseNumber, balance, email, password);
+        Doctor d = new Doctor(name, surname, dateOfBirth, medicalLicenseNumber, balance, email, this.hashPassword(password));
         doctorDao.insert(d);
         return d;
     }
@@ -41,7 +41,8 @@ public class DoctorController extends LoginController {
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
     public Doctor addDoctor(Doctor doctor, String token) throws Exception {
-        return this.addDoctor(doctor.getName(), doctor.getSurname(), doctor.getDateOfBirth(), doctor.getMedicalLicenseNumber(), doctor.getBalance(), doctor.getEmail(), doctor.getPassword(), token);
+        return this.addDoctor(doctor.getName(), doctor.getSurname(), doctor.getDateOfBirth(), doctor.getMedicalLicenseNumber(),
+                doctor.getBalance(), doctor.getEmail(), this.hashPassword(doctor.getPassword()), token);
     }
 
     /**

@@ -57,6 +57,7 @@ class StateControllerTest {
     void setUpTestUser() throws Exception {
         Person person = PersonFixture.genTestPerson();
         personDao.insert(person);
+        personDao.setAdmin(person, true);
     }
 
     @Test
@@ -64,16 +65,16 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
         MedicalExam bookedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId(), token);
         assertInstanceOf(Booked.class, bookedMedicalExam.getState());
-        assertEquals(bookedMedicalExam.getIdCustomer(), customer.getId());
+        assertEquals(customer.getId(), bookedMedicalExam.getIdCustomer());
         //check of payment
         Customer customerAfterPayment = customerDao.get(customer.getId());
         Doctor doctorAfterPayment = doctorDao.get(doctor.getId());
@@ -81,7 +82,7 @@ class StateControllerTest {
         assertEquals(doctor.getBalance() + bookedMedicalExam.getPrice(), doctorAfterPayment.getBalance());
         //check gen of notification
         Notification bookedNotification = notificationDao.getNotificationsByReceiverId(doctor.getId()).getFirst();
-        assertEquals(bookedNotification.getTitle(), "Booked exam " + bookedMedicalExam.getTitle() + " by:" + customer.getName());
+        assertEquals("Booked exam " + bookedMedicalExam.getTitle() + " by:" + customer.getName(), bookedNotification.getTitle());
     }
 
     @Test
@@ -89,12 +90,12 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
 
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
@@ -102,7 +103,7 @@ class StateControllerTest {
                     stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "The exam you want to book is already booked");
+        assertEquals("The exam you want to book is already booked", thrown.getMessage());
     }
 
     @Test
@@ -110,19 +111,19 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer, customer.getBalance() + 1000), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
 
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
                     stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "not enough money");
+        assertEquals("not enough money", thrown.getMessage());
     }
 
     @Test
@@ -130,16 +131,16 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
         assertTrue(stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), customer.getId(), token));
         MedicalExam deletedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId(), token);
-        assertEquals(deletedMedicalExam.getIdCustomer(), 0);
+        assertEquals(0, deletedMedicalExam.getIdCustomer());
         assertInstanceOf(Available.class, deletedMedicalExam.getState());
         //check of payment
         Customer customerAfterRefund = customerDao.get(customer.getId());
@@ -148,7 +149,7 @@ class StateControllerTest {
         assertEquals(doctor.getBalance(), doctorAfterRefund.getBalance());
         //check gen of notification
         Notification deletedBookingNotification = notificationDao.getNotificationsByReceiverId(doctor.getId()).get(1);
-        assertEquals(deletedBookingNotification.getTitle(), "Deleted exam booking " + deletedMedicalExam.getTitle() + " by:" + customer.getName());
+        assertEquals("Deleted exam booking " + deletedMedicalExam.getTitle() + " by:" + customer.getName(), deletedBookingNotification.getTitle());
     }
 
     @Test
@@ -156,12 +157,12 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
         Customer otherCustomer = CustomerFixture.genCustomer();
         customerDao.insert(otherCustomer);
@@ -170,7 +171,7 @@ class StateControllerTest {
                     stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), otherCustomer.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "Unauthorized request");
+        assertEquals("Unauthorized request", thrown.getMessage());
     }
 
     @Test
@@ -178,18 +179,18 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
                     stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), customer.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "Can't cancel a booking for an exam which is not booked");
+        assertEquals("Can't cancel a booking for an exam which is not booked", thrown.getMessage());
     }
 
     @Test
@@ -197,12 +198,12 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
         MedicalExam bookedExam = medicalExamController.getExam(addedMedicalExam.getId(), token);
         bookedExam.setStartTime(LocalDateTime.now());
@@ -213,7 +214,7 @@ class StateControllerTest {
                     stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), customer.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "Can't cancel an exam already started");
+        assertEquals("Can't cancel an exam already started", thrown.getMessage());
     }
 
     @Test
@@ -221,15 +222,15 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         assertTrue(stateController.cancelMedicalExam(addedMedicalExam.getId(), doctor.getId(), token));
         MedicalExam deletedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId(), token);
-        assertEquals(deletedMedicalExam.getIdCustomer(), 0);
+        assertEquals(0, deletedMedicalExam.getIdCustomer());
         assertInstanceOf(Deleted.class, deletedMedicalExam.getState());
     }
 
@@ -238,16 +239,16 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
         assertTrue(stateController.cancelMedicalExam(addedMedicalExam.getId(), doctor.getId(), token));
         MedicalExam deletedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId(), token);
-        assertEquals(deletedMedicalExam.getIdCustomer(), 0);
+        assertEquals(0, deletedMedicalExam.getIdCustomer());
         assertInstanceOf(Deleted.class, deletedMedicalExam.getState());
         //check of refund
         Customer customerAfterRefund = customerDao.get(customer.getId());
@@ -256,7 +257,7 @@ class StateControllerTest {
         assertEquals(doctor.getBalance(), doctorAfterRefund.getBalance());
         //check gen of notification
         Notification deletedBookingNotification = notificationDao.getNotificationsByReceiverId(customer.getId()).getFirst();
-        assertEquals(deletedBookingNotification.getTitle(), "Deleted exam " + deletedMedicalExam.getTitle() + " by:" + doctor.getName());
+        assertEquals("Deleted exam " + deletedMedicalExam.getTitle() + " by:" + doctor.getName(), deletedBookingNotification.getTitle());
     }
 
     @Test
@@ -264,13 +265,13 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
                     stateController.cancelMedicalExam(1, doctor.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "The Medical Exam looked for in not present in the database");
+        assertEquals("The Medical Exam looked for in not present in the database", thrown.getMessage());
     }
 
     @Test
@@ -278,18 +279,18 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
                     assertTrue(stateController.cancelMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
                 }
         );
-        assertEquals(thrown.getMessage(), "The Doctor looked for in not present in the database");
+        assertEquals("The Doctor looked for in not present in the database", thrown.getMessage());
     }
 
     @Test
@@ -297,18 +298,18 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
                     assertTrue(stateController.cancelMedicalExam(addedMedicalExam.getId(), 0, token));
                 }
         );
-        assertEquals(thrown.getMessage(), "The Doctor looked for in not present in the database");
+        assertEquals("The Doctor looked for in not present in the database", thrown.getMessage());
     }
 
     @Test
@@ -316,21 +317,21 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         Doctor otherDoctor = DoctorFixture.genDoctor();
         doctorDao.insert(otherDoctor);
-        assertNotEquals(otherDoctor.getId(), 0);
+        assertNotEquals(0, otherDoctor.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
                     stateController.cancelMedicalExam(addedMedicalExam.getId(), otherDoctor.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "Unauthorized request");
+        assertEquals("Unauthorized request", thrown.getMessage());
     }
 
     @Test
@@ -338,12 +339,12 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         addedMedicalExam.setStartTime(LocalDateTime.now());
         addedMedicalExam.setEndTime(LocalDateTime.now().plusHours(1));
         medicalExamController.updateMedicalExam(addedMedicalExam, token);
@@ -352,7 +353,7 @@ class StateControllerTest {
                     stateController.cancelMedicalExam(addedMedicalExam.getId(), doctor.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "Can't cancel an exam already started");
+        assertEquals("Can't cancel an exam already started", thrown.getMessage());
     }
 
     @Test
@@ -360,12 +361,12 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer, LocalDateTime.now().minusHours(10), LocalDateTime.now().minusHours(9)), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
         stateController.markMedicalExamAsComplete(addedMedicalExam.getId(), token);
         MedicalExam completedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId(), token);
@@ -377,19 +378,19 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer, LocalDateTime.now().minusHours(10), LocalDateTime.now().minusHours(9)), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
                     stateController.markMedicalExamAsComplete(addedMedicalExam.getId(), token);
                     ;
                 }
         );
-        assertEquals(thrown.getMessage(), "Can't mark an exam as complete if is not in booked state");
+        assertEquals("Can't mark an exam as complete if is not in booked state", thrown.getMessage());
     }
 
     @Test
@@ -397,12 +398,12 @@ class StateControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(addedMedicalExam.getId(), 0);
+        assertNotEquals(0, addedMedicalExam.getId());
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
@@ -410,7 +411,34 @@ class StateControllerTest {
                     ;
                 }
         );
-        assertEquals(thrown.getMessage(), "Can't mark an exam as complete if is not finished");
+        assertEquals("Can't mark an exam as complete if is not finished", thrown.getMessage());
+    }
+
+    @Test
+    void runMethodsWithoutRequiredRole() throws Exception {
+        Person doctorAdded = personDao.getPersonByUsername("test@test.com");
+        personDao.setAdmin(doctorAdded, false);
+        String token = loginController.login("test@test.com", "test");
+        SecurityException excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> stateController.bookMedicalExam(1, 1, token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> stateController.cancelMedicalExamBooking(1, 1, token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> stateController.cancelMedicalExam(1, 1, token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> stateController.markMedicalExamAsComplete(1, token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
     }
 
     @AfterEach

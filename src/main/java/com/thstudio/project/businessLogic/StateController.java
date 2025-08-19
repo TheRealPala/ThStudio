@@ -12,6 +12,8 @@ import com.thstudio.project.domainModel.State.Deleted;
 import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.dao.MedicalExamDao;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +22,7 @@ public class StateController {
     private final CustomerDao customerDao;
     private final DoctorDao doctorDao;
     private final NotificationDao notificationDao;
-
+    private final Authz authz;
 
     public StateController(MedicalExamDao medicalExamDao, CustomerDao customerDao,
                            DoctorDao doctorDao, NotificationDao notificationDao) throws Exception {
@@ -28,6 +30,7 @@ public class StateController {
         this.customerDao = customerDao;
         this.doctorDao = doctorDao;
         this.notificationDao = notificationDao;
+        this.authz = new Authz(new JwtService());
     }
 
     /**
@@ -39,6 +42,7 @@ public class StateController {
      */
     public boolean bookMedicalExam(int medicalExamId, int customerId, String token) throws Exception {
         
+        this.authz.requireAnyRole(token, "customer", "admin");
         MedicalExam me = this.medicalExamDao.get(medicalExamId);
         Customer c = this.customerDao.get(customerId);
         if (me.getState() instanceof Booked) {
@@ -69,7 +73,7 @@ public class StateController {
      * @return true, if the medical exam booking is canceled, raise up RuntimeExceptions otherwise
      */
     public boolean cancelMedicalExamBooking(int medicalExamId, int customerId, String token) throws Exception {
-        
+        this.authz.requireAnyRole(token, "customer", "admin");
         MedicalExam me = this.medicalExamDao.get(medicalExamId);
         Customer c = this.customerDao.get(customerId);
         if (me.getIdCustomer() != c.getId()) {
@@ -104,7 +108,7 @@ public class StateController {
      * @return true, if the medical exam is canceled, raise up RuntimeExceptions otherwise
      */
     public boolean cancelMedicalExam(int medicalExamId, int doctorId, String token) throws Exception {
-        
+        this.authz.requireAnyRole(token, "doctor", "admin");
         Doctor d = this.doctorDao.get(doctorId);
         MedicalExam me = this.medicalExamDao.get(medicalExamId);
         if (me.getIdDoctor() != d.getId()) {
@@ -137,7 +141,7 @@ public class StateController {
      * @throws Exception If the medical exam is not found or if it is already completed
      */
     public void markMedicalExamAsComplete(int examId, String token) throws Exception {
-        
+        this.authz.requireAnyRole(token, "doctor", "admin");
         MedicalExam medicalExam = medicalExamDao.get(examId);
         if (!(medicalExam.getState() instanceof Booked)) {
             throw new RuntimeException("Can't mark an exam as complete if is not in booked state");

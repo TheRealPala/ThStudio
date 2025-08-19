@@ -7,6 +7,7 @@ import org.mindrot.jbcrypt.BCrypt;
 public class LoginController extends AuthorizedController {
     private PersonDao personDao;
 
+
     public LoginController(PersonDao personDao) throws Exception {
         this.personDao = personDao;
     }
@@ -15,11 +16,24 @@ public class LoginController extends AuthorizedController {
         return BCrypt.checkpw(password, hashedPassword);
     }
 
+    private String getRole(Person person) throws Exception {
+        String role = "person";
+        if (this.personDao.isAdmin(person)) {
+            return "admin";
+        } else if (this.personDao.isCustomer(person)) {
+            return "customer";
+        } else if (this.personDao.isDoctor(person)) {
+            return "doctor";
+        }
+        return role;
+    }
+
     public String login(String email, String password) throws Exception {
         String token = "";
         Person person = this.personDao.getPersonByUsername(email);
         if (checkPassword(password, person.getPassword())) {
-            token = createToken(person.getId());
+            String role = getRole(person);
+            token = createToken(person.getId(), role);
         }
         else {
             throw new SecurityException("Invalid password");

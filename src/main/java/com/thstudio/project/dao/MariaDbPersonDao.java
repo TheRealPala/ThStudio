@@ -168,4 +168,102 @@ public class MariaDbPersonDao implements PersonDao {
         }
         return pList.getFirst();
     }
+
+    @Override
+    public boolean isDoctor(Person person) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList<Person> pList = new ArrayList<>();
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("select * from people natural join doctors where id = ?");
+            ps.setInt(1, person.getId());
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                pList.add(this.parseResultSet(rs));
+            }
+            if (pList.size() > 1) {
+                throw new SQLDataException("Database inconsistency");
+            }
+        } finally {
+            assert rs != null : "ResultSet is Null";
+            rs.close();
+            ps.close();
+            Database.closeConnection(con);
+        }
+        return pList.size() == 1 ;
+    }
+
+    @Override
+    public boolean isCustomer(Person person) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList<Person> pList = new ArrayList<>();
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("select * from people natural join customers where id = ?");
+            ps.setInt(1, person.getId());
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                pList.add(this.parseResultSet(rs));
+            }
+            if (pList.size() > 1) {
+                throw new SQLDataException("Database inconsistency");
+            }
+        } finally {
+            assert rs != null : "ResultSet is Null";
+            rs.close();
+            ps.close();
+            Database.closeConnection(con);
+        }
+        return pList.size() == 1 ;
+    }
+
+    @Override
+    public boolean isAdmin(Person person) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Person p = null;
+        boolean isAdmin = false;
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("select * from people where id = ?");
+            ps.setInt(1, person.getId());
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                throw new RuntimeException("The person looked for in not present in the database");
+            }
+            if (rs.getBoolean("admin")) {
+                isAdmin = true;
+            }
+        } finally {
+            assert rs != null : "ResultSet is Null";
+            rs.close();
+            ps.close();
+            Database.closeConnection(con);
+        }
+        return isAdmin;
+    }
+
+    @Override
+    public void setAdmin(Person person, boolean value) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = Database.getConnection();
+            ps = con.prepareStatement("update people set admin = ? where id = ?");
+            ps.setBoolean(1, value);
+            ps.setInt(2, person.getId());
+            ps.executeUpdate();
+        } finally {
+            assert ps != null : "preparedStatement is Null";
+            ps.close();
+            Database.closeConnection(con);
+        }
+    }
+
+
 }

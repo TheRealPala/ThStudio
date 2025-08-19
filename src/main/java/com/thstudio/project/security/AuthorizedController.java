@@ -52,12 +52,13 @@ public class AuthorizedController {
         return (RSAPublicKey) keyFactory.generatePublic(spec);
     }
 
-    protected String createToken(int id) throws JWTCreationException {
+    protected String createToken(int id, String role) throws JWTCreationException {
         String token = "";
             Algorithm algorithm = Algorithm.RSA256(publicKey, privateKey);
             token = JWT.create()
                     .withIssuer("auth0")
                     .withClaim("id", id)
+                    .withClaim("role", role)
                     .withExpiresAt(Instant.now())
                     .sign(algorithm);
         return token;

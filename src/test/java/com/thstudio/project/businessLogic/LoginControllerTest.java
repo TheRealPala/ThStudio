@@ -74,6 +74,19 @@ class LoginControllerTest {
         assertEquals("User not found", thrown.getMessage());
     }
 
+    @Test
+    void loginWithAdminUser() throws Exception {
+        Person person = PersonFixture.genTestPerson();
+        String plainPassword = person.getPassword();
+        person.setPassword(loginController.hashPassword(plainPassword));
+        personDao.insert(person);
+        personDao.setAdmin(person, true);
+        String token = loginController.login(person.getEmail(), plainPassword);
+        assertNotNull(token);
+        String tokenRole = token.
+        assertTrue(token.contains("admin"));
+    }
+
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();

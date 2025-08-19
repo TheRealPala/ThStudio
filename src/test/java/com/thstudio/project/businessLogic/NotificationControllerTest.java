@@ -49,6 +49,7 @@ class NotificationControllerTest {
     void setUpTestUser() throws Exception {
         Person person = PersonFixture.genTestPerson();
         personDao.insert(person);
+        personDao.setAdmin(person, true);
     }
 
     @Test
@@ -109,6 +110,17 @@ class NotificationControllerTest {
         assertEquals(thrown.getMessage(), "The person looked for in not present in the database");
     }
 
+    @Test
+    void runMethodsWithoutRequiredRole() throws Exception {
+        Person personAdded = personDao.getPersonByUsername("test@test.com");
+        personDao.setAdmin(personAdded, false);
+        String token = loginController.login("test@test.com", "test");
+        SecurityException excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> notificationController.getNotificationsByReceiverId(1, token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+    }
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();

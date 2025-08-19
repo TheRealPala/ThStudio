@@ -20,6 +20,7 @@ public class NotificationController {
     }
 
     public List<Notification> getNotificationsByReceiverId(int receiverId, String token) throws Exception {
+        this.authz.requireAnyRole(token, "doctor", "customer", "admin");
         personDao.get(receiverId);
         return notificationDao.getNotificationsByReceiverId(receiverId);
     }

@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 8.0.41, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.42, for Linux (x86_64)
 --
 -- Host: 127.0.0.1    Database: th_studio_test
 -- ------------------------------------------------------
@@ -207,6 +207,7 @@ CREATE TABLE `people` (
   `balance` double NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(60) NOT NULL,
+  `admin` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -218,7 +219,6 @@ CREATE TABLE `people` (
 
 LOCK TABLES `people` WRITE;
 /*!40000 ALTER TABLE `people` DISABLE KEYS */;
-insert into `people` values (0,'test','test','1990-01-01',100000,'test@test.com', 'test');
 /*!40000 ALTER TABLE `people` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -254,4 +254,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-10 12:08:05
+-- Dump completed on 2025-08-19 15:53:04

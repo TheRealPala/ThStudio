@@ -2,7 +2,7 @@
 
 # Definisci il nome del file per le chiavi
 KEY_NAME="sign"
-KEY_DIR="keys"
+KEY_DIR="config/security/keys"
 
 # Crea la cartella 'keys' se non esiste
 mkdir -p $KEY_DIR

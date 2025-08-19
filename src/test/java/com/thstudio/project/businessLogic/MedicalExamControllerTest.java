@@ -36,6 +36,7 @@ class MedicalExamControllerTest {
     private static TagDao tagDao;
     private static PersonDao personDao;
     private static LoginController loginController;
+
     @BeforeAll
     static void setDatabaseSettings() throws Exception {
         Dotenv dotenv = Dotenv.configure().directory("config").load();
@@ -68,16 +69,16 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor firstDoctor = DoctorFixture.genDoctor();
         doctorDao.insert(firstDoctor);
-        assertNotEquals(firstDoctor.getId(), 0);
+        assertNotEquals(0, firstDoctor.getId());
         Doctor secondDoctor = DoctorFixture.genDoctor();
         doctorDao.insert(secondDoctor);
-        assertNotEquals(secondDoctor.getId(), 0);
+        assertNotEquals(0, secondDoctor.getId());
 
         ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(firstDoctor), token));
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(secondDoctor), token));
         for (MedicalExam addedMedicalExam : addedMedicalExams) {
-            assertNotEquals(addedMedicalExam, 0);
+            assertNotEquals(0, addedMedicalExam);
         }
         assertEquals(addedMedicalExams.size(), medicalExamController.getAll(token).size());
     }
@@ -87,13 +88,13 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor firstDoctor = DoctorFixture.genDoctor();
         doctorDao.insert(firstDoctor);
-        assertNotEquals(firstDoctor.getId(), 0);
+        assertNotEquals(0, firstDoctor.getId());
 
         ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(firstDoctor), token));
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(firstDoctor), token));
         for (MedicalExam addedMedicalExam : addedMedicalExams) {
-            assertNotEquals(addedMedicalExam, 0);
+            assertNotEquals(0, addedMedicalExam);
         }
         assertEquals(addedMedicalExams.size(), medicalExamController.getDoctorExams(firstDoctor.getId(), token).size());
     }
@@ -103,15 +104,15 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
         ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token));
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token));
         for (MedicalExam addedMedicalExam : addedMedicalExams) {
-            assertNotEquals(addedMedicalExam, 0);
+            assertNotEquals(0, addedMedicalExam);
         }
         assertEquals(addedMedicalExams.size(), medicalExamController.getCustomerExams(customer.getId(), token).size());
     }
@@ -121,9 +122,9 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctorToAdd = DoctorFixture.genDoctor();
         doctorDao.insert(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
+        assertNotEquals(0, doctorToAdd.getId());
         MedicalExam medicalExamToAdd = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctorToAdd), token);
-        assertNotEquals(medicalExamToAdd.getId(), 0);
+        assertNotEquals(0, medicalExamToAdd.getId());
         MedicalExam medicalExamAdded = medicalExamController.getExam(medicalExamToAdd.getId(), token);
         assertEquals(medicalExamAdded, medicalExamToAdd);
     }
@@ -137,7 +138,7 @@ class MedicalExamControllerTest {
                     medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "The Doctor looked for in not present in the database");
+        assertEquals("The Doctor looked for in not present in the database", thrown.getMessage());
 
     }
 
@@ -146,15 +147,15 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctorToAdd = DoctorFixture.genDoctor();
         doctorDao.insert(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
+        assertNotEquals(0, doctorToAdd.getId());
         MedicalExam firstMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctorToAdd, LocalDateTime.parse("2000-10-01 15:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), LocalDateTime.parse("2000-10-01 16:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))), token);
-        assertNotEquals(firstMedicalExam, 0);
+        assertNotEquals(0, firstMedicalExam);
         IllegalArgumentException thrown = assertThrowsExactly(IllegalArgumentException.class,
                 () -> {
                     medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctorToAdd, LocalDateTime.parse("2000-10-01 15:45:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), LocalDateTime.parse("2000-10-01 17:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "The given doctor is already occupied in the given time range");
+        assertEquals("The given doctor is already occupied in the given time range", thrown.getMessage());
     }
 
     @Test
@@ -162,9 +163,9 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctorToAdd = DoctorFixture.genDoctor();
         doctorDao.insert(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
+        assertNotEquals(0, doctorToAdd.getId());
         MedicalExam medicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctorToAdd), token);
-        assertNotEquals(medicalExam.getId(), 0);
+        assertNotEquals(0, medicalExam.getId());
 
         medicalExam.setTitle("Titolo Modificato");
         medicalExam.setDescription("Anamnesi dopo primo check");
@@ -180,9 +181,9 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctorToAdd = DoctorFixture.genDoctor();
         doctorDao.insert(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
+        assertNotEquals(0, doctorToAdd.getId());
         MedicalExam firstMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctorToAdd, LocalDateTime.parse("2025-10-01 15:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), LocalDateTime.parse("2025-10-01 16:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))), token);
-        assertNotEquals(firstMedicalExam.getId(), 0);
+        assertNotEquals(0, firstMedicalExam.getId());
         MedicalExam secondMedicalExam = medicalExamController.addMedicalExam((MedicalExamFixture.genMedicalExam(doctorToAdd, LocalDateTime.parse("2025-10-01 17:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), LocalDateTime.parse("2025-10-01 17:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))), token);
         secondMedicalExam.setStartTimeFromString("2025-10-01 16:00:00");
         IllegalArgumentException thrown = assertThrowsExactly(IllegalArgumentException.class,
@@ -190,7 +191,7 @@ class MedicalExamControllerTest {
                     medicalExamController.updateMedicalExam(secondMedicalExam, token);
                 }
         );
-        assertEquals(thrown.getMessage(), "The given doctor is already occupied in the given time range");
+        assertEquals("The given doctor is already occupied in the given time range", thrown.getMessage());
     }
 
     @Test
@@ -198,7 +199,7 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctorToAdd = DoctorFixture.genDoctor();
         doctorDao.insert(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
+        assertNotEquals(0, doctorToAdd.getId());
         LocalDateTime now = LocalDateTime.now();
         MedicalExam medicalExamToAdd = MedicalExamFixture.genMedicalExam(doctorToAdd);
         medicalExamToAdd.setStartTime(now);
@@ -211,7 +212,7 @@ class MedicalExamControllerTest {
                     medicalExamController.updateMedicalExam(medicalExamAdded, token);
                 }
         );
-        assertEquals(thrown.getMessage(), "Forbidden! Can't update an exam already started");
+        assertEquals("Forbidden! Can't update an exam already started", thrown.getMessage());
     }
 
     @Test
@@ -219,16 +220,16 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
 
         ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token));
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token));
         for (MedicalExam addedMedicalExam : addedMedicalExams) {
-            assertNotEquals(addedMedicalExam.getId(), 0);
+            assertNotEquals(0, addedMedicalExam.getId());
         }
         assertEquals(addedMedicalExams.size(), medicalExamController.getExamsByState(new Available(), token).size());
 
@@ -246,10 +247,10 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
 
         ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token));
@@ -266,11 +267,11 @@ class MedicalExamControllerTest {
 
         Search onlineExamSearch = new DecoratorSearchIsOnline(new SearchConcrete(), "yes");
         List<MedicalExam> onlineExams = medicalExamController.search(onlineExamSearch, token);
-        assertEquals(onlineExams.size(), 1);
+        assertEquals(1, onlineExams.size());
 
         Search inPersonExamSearch = new DecoratorSearchIsOnline(new SearchConcrete(), "no");
         List<MedicalExam> inPersonExams = medicalExamController.search(inPersonExamSearch, token);
-        assertEquals(inPersonExams.size(), 1);
+        assertEquals(1, inPersonExams.size());
     }
 
     @Test
@@ -278,21 +279,21 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
 
         medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer, 1000), token);
         medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer, 5000), token);
 
         Search priceBelowOrEqualToOneThousandSearch = new DecoratorSearchPrice(new SearchConcrete(), 1000);
         List<MedicalExam> examsBelowOneThousand = medicalExamController.search(priceBelowOrEqualToOneThousandSearch, token);
-        assertEquals(examsBelowOneThousand.size(), 1);
+        assertEquals(1, examsBelowOneThousand.size());
 
         Search priceBelowOrEqualToFiveThousandSearch = new DecoratorSearchPrice(new SearchConcrete(), 5000);
         List<MedicalExam> examsBelowFiveThousand = medicalExamController.search(priceBelowOrEqualToFiveThousandSearch, token);
-        assertEquals(examsBelowFiveThousand.size(), 2);
+        assertEquals(2, examsBelowFiveThousand.size());
     }
 
     @Test
@@ -300,21 +301,21 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
 
         medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer, LocalDateTime.parse("2025-01-01 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), 1), token);
         medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer, LocalDateTime.parse("2025-02-01 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), 1), token);
 
         Search startAfterOrInJanuarySearch = new DecoratorSearchStartTime(new SearchConcrete(), "2025-01-01 00:00:00");
         List<MedicalExam> examsAfterOrInJanuary = medicalExamController.search(startAfterOrInJanuarySearch, token);
-        assertEquals(examsAfterOrInJanuary.size(), 2);
+        assertEquals(2, examsAfterOrInJanuary.size());
 
         Search startAfterOrInFebruarySearch = new DecoratorSearchStartTime(new SearchConcrete(), "2025-02-01 00:00:00");
         List<MedicalExam> examsAfterOrInFebruary = medicalExamController.search(startAfterOrInFebruarySearch, token);
-        assertEquals(examsAfterOrInFebruary.size(), 1);
+        assertEquals(1, examsAfterOrInFebruary.size());
 
     }
 
@@ -323,16 +324,16 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
 
         ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token));
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token));
         for (MedicalExam addedMedicalExam : addedMedicalExams) {
-            assertNotEquals(addedMedicalExam, 0);
+            assertNotEquals(0, addedMedicalExam);
         }
         Search examsAvailableSearch = new DecoratorSearchState(new SearchConcrete(), new Available().getState());
         assertEquals(addedMedicalExams.size(), medicalExamController.search(examsAvailableSearch, token).size());
@@ -352,10 +353,10 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
 
         ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token));
@@ -373,11 +374,11 @@ class MedicalExamControllerTest {
 
         Search checkUpTagSearch = new DecoratorSearchType(new SearchConcrete(), "Check-up");
         List<MedicalExam> checkUpExams = medicalExamController.search(checkUpTagSearch, token);
-        assertEquals(checkUpExams.size(), 1);
+        assertEquals(1, checkUpExams.size());
 
         Search firstVisitExamSearch = new DecoratorSearchType(new SearchConcrete(), "First visit");
         List<MedicalExam> firstVisitExams = medicalExamController.search(firstVisitExamSearch, token);
-        assertEquals(firstVisitExams.size(), 1);
+        assertEquals(1, firstVisitExams.size());
     }
 
     @Test
@@ -385,10 +386,10 @@ class MedicalExamControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Customer customer = CustomerFixture.genCustomer();
         customerDao.insert(customer);
-        assertNotEquals(customer.getId(), 0);
+        assertNotEquals(0, customer.getId());
 
         ArrayList<MedicalExam> addedMedicalExams = new ArrayList<>();
         addedMedicalExams.add(medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token));
@@ -406,11 +407,11 @@ class MedicalExamControllerTest {
 
         Search milanZoneSearch = new DecoratorSearchZone(new SearchConcrete(), "Milan");
         List<MedicalExam> milanExams = medicalExamController.search(milanZoneSearch, token);
-        assertEquals(milanExams.size(), 1);
+        assertEquals(1, milanExams.size());
 
         Search florenceZoneSearch = new DecoratorSearchZone(new SearchConcrete(), "Florence");
         List<MedicalExam> florenceExams = medicalExamController.search(florenceZoneSearch, token);
-        assertEquals(florenceExams.size(), 1);
+        assertEquals(1, florenceExams.size());
     }
 
     @Test
@@ -464,6 +465,7 @@ class MedicalExamControllerTest {
         );
         assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
     }
+
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();

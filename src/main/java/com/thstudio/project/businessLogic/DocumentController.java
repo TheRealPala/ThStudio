@@ -32,7 +32,8 @@ public class DocumentController {
     }
 
     public Document addDocument(String title, int ownerId, String token) throws Exception {
-        this.authz.role(token);
+
+        this.authz.requireAnyRole(token, "doctor", "customer", "admin");
         Person person = personDao.get(ownerId);
         Document document = new Document(title, this.baseDocumentPath + title, person.getId());
         this.documentDao.insert(document);
@@ -40,17 +41,17 @@ public class DocumentController {
     }
 
     public List<Document> getDocumentsByReceiver(int receiverId, String token) throws Exception {
-        this.authz.role(token);
+        this.authz.requireAnyRole(token, "doctor", "customer", "admin");
         return this.documentDao.getByReceiver(receiverId);
     }
 
     public List<Document> getDocumentsByOwner(int ownerId, String token) throws Exception {
-        this.authz.role(token);
+        this.authz.requireAnyRole(token, "doctor", "customer", "admin");
         return this.documentDao.getByOwner(ownerId);
     }
 
     public void sendDocument(Document document, int receiverId, String token) throws Exception {
-        this.authz.role(token);
+        this.authz.requireAnyRole(token, "doctor", "customer", "admin");
         boolean isAlreadyPersisted = true;
         try {
             this.documentDao.get(document.getId());
@@ -71,7 +72,8 @@ public class DocumentController {
     }
 
     public void attachDocumentToMedicalExam(int documentId, int medicalExamId, String token) throws Exception {
-        this.authz.role(token);
+        this.authz.requireAnyRole(token, "doctor", "admin");
+
         MedicalExam medicalExam = this.medicalExamDao.get(medicalExamId);
         Document document = this.documentDao.get(documentId);
         if (medicalExam.getIdDoctor() != document.getOwnerId()) {

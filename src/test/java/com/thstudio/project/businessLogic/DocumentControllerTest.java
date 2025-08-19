@@ -51,6 +51,7 @@ class DocumentControllerTest {
     void setUpTestUser() throws Exception {
         Person person = PersonFixture.genTestPerson();
         personDao.insert(person);
+        personDao.setAdmin(person, true);
     }
 
     @Test
@@ -58,7 +59,7 @@ class DocumentControllerTest {
         String token = loginController.login("test@test.com", "test");
         Person personToAdd = PersonFixture.genPerson();
         personDao.insert(personToAdd);
-        assertNotEquals(personToAdd.getId(), 0);
+        assertNotEquals(0, personToAdd.getId());
         Document documentToAdd = documentController.addDocument(DocumentFixture.genTitle(), personToAdd.getId(), token);
         Document addedDocument = documentDao.get(documentToAdd.getId());
         assertEquals(documentToAdd, addedDocument);
@@ -87,7 +88,7 @@ class DocumentControllerTest {
                     documentController.getDocumentsByReceiver(otherCustomer.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "There is no Documents in the database for this receiver");
+        assertEquals("There is no Documents in the database for this receiver", thrown.getMessage());
 
     }
 
@@ -109,7 +110,7 @@ class DocumentControllerTest {
                     documentController.getDocumentsByOwner(otherDoctor.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "There is no Documents in the database for this owner");
+        assertEquals("There is no Documents in the database for this owner", thrown.getMessage());
     }
 
     @Test
@@ -132,7 +133,7 @@ class DocumentControllerTest {
                     documentController.sendDocument(documentToAdd, otherCustomer.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "The person looked for in not present in the database");
+        assertEquals("The person looked for in not present in the database", thrown.getMessage());
     }
 
     @Test
@@ -148,10 +149,8 @@ class DocumentControllerTest {
                     documentController.attachDocumentToMedicalExam(document.getId(), medicalExam.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "The Document looked for in not present in the database");
+        assertEquals("The Document looked for in not present in the database", thrown.getMessage());
         // se il documento non è nel db
-
-
         // controllare la notifica
         Document documentDb = documentController.addDocument(DocumentFixture.genTitle(), doctor.getId(), token);
         Customer customer = CustomerFixture.genCustomer();
@@ -172,8 +171,35 @@ class DocumentControllerTest {
                     documentController.attachDocumentToMedicalExam(documentDb.getId(), otherMedicalExam.getId(), token);
                 }
         );
-        assertEquals(otherThrown.getMessage(), "Can't attach a document to a medicalExam which is not yours");
+        assertEquals("Can't attach a document to a medicalExam which is not yours", otherThrown.getMessage());
+    }
 
+    @Test
+    public void useMethodsWithoutRequiredRole() throws Exception {
+        Person personAdded = personDao.getPersonByUsername("test@test.com");
+        personDao.setAdmin(personAdded, false);
+        String token = loginController.login("test@test.com", "test");
+        SecurityException excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> {
+                    documentController.addDocument(DocumentFixture.genTitle(), personAdded.getId(), token);
+                }
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> {
+                    documentController.getDocumentsByReceiver(personAdded.getId(), token);
+                }
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> {
+                    documentController.getDocumentsByOwner(personAdded.getId(), token);
+                }
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
 
     }
 

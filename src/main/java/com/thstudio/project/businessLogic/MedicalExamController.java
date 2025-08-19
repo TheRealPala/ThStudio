@@ -8,6 +8,8 @@ import com.thstudio.project.domainModel.Search.Search;
 import com.thstudio.project.domainModel.State.Available;
 import com.thstudio.project.domainModel.State.Booked;
 import com.thstudio.project.domainModel.State.State;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,11 +23,13 @@ public class MedicalExamController {
     private final MedicalExamDao medicalExamDao;
     private final NotificationDao notificationDao;
     private final DoctorDao doctorDao;
+    private final Authz authz;
 
     public MedicalExamController(MedicalExamDao medicalExamDao, NotificationDao notificationDao, DoctorDao doctorDao) throws Exception{
         this.medicalExamDao = medicalExamDao;
         this.doctorDao = doctorDao;
         this.notificationDao = notificationDao;
+        this.authz = new Authz(new JwtService());
     }
 
     private void checkDateTimeBounds(List<MedicalExam> medicalExams, LocalDateTime startTime,
@@ -133,7 +137,8 @@ public class MedicalExamController {
 
     public MedicalExam addMedicalExam(int idDoctor, int idCustomer, String title, String description,
                                       String startTime, String endTime, double price, String token) throws Exception {
-       
+
+        authz.requireAnyRole(token, "doctor", "admin");
         Doctor doctor = doctorDao.get(idDoctor);
         MedicalExam medicalExam = new MedicalExam(doctor.getId(), startTime, endTime, description, title, price);
         medicalExam.setIdCustomer(idCustomer);
@@ -142,14 +147,16 @@ public class MedicalExamController {
     }
 
     public MedicalExam addMedicalExam(MedicalExam medicalExam, String token) throws Exception {
-       
+
+        authz.requireAnyRole(token, "doctor", "admin");
         Doctor doctor = doctorDao.get(medicalExam.getIdDoctor());
         this.addMedicalExamLogic(medicalExam, doctor);
         return medicalExam;
     }
 
     public boolean updateMedicalExam(MedicalExam medicalExam, String token) throws Exception {
-       
+
+        authz.requireAnyRole(token, "doctor", "admin");
         MedicalExam me = medicalExamDao.get(medicalExam.getId());
 
         if (!me.getStartTime().isAfter(LocalDateTime.now())) {
@@ -168,7 +175,8 @@ public class MedicalExamController {
      * @throws Exception If the medical exam is not found
      */
     public MedicalExam getExam(int examId, String token) throws Exception {
-       
+
+        authz.requireAnyRole(token, "doctor", "admin", "customer");
         return medicalExamDao.get(examId);
     }
 
@@ -179,7 +187,8 @@ public class MedicalExamController {
      * @throws Exception If there are no medical exams
      */
     public List<MedicalExam> getAll(String token) throws Exception {
-       
+
+        authz.requireAnyRole(token, "doctor", "admin", "customer");
         return unmodifiableList(this.medicalExamDao.getAll());
     }
 
@@ -191,7 +200,7 @@ public class MedicalExamController {
      * @throws Exception If the doctor is not found, or if the doctor doesn't have any medical exam
      */
     public List<MedicalExam> getDoctorExams(int idDoctor, String token) throws Exception {
-       
+        authz.requireAnyRole(token, "doctor", "admin");
         return this.medicalExamDao.getDoctorExams(idDoctor);
 
     }
@@ -204,7 +213,7 @@ public class MedicalExamController {
      * @throws Exception If the customer is not found, or if the customer doesn't have any medical exam
      */
     public List<MedicalExam> getCustomerExams(int idCustomer, String token) throws Exception {
-       
+        authz.requireAnyRole(token, "customer", "admin", "doctor");
         return unmodifiableList(this.medicalExamDao.getCustomerExams(idCustomer));
     }
 
@@ -216,7 +225,7 @@ public class MedicalExamController {
      * @throws Exception If there are no medical exams
      */
     public List<MedicalExam> getExamsByState(State state, String token) throws Exception {
-       
+        authz.requireAnyRole(token, "doctor", "admin", "customer");
         return unmodifiableList(this.medicalExamDao.getExamsByState(state.getState()));
     }
 
@@ -228,7 +237,7 @@ public class MedicalExamController {
      * @throws Exception If there are no medical exams
      */
     public List<MedicalExam> search(Search search, String token) throws Exception {
-       
+        authz.requireAnyRole(token, "doctor", "admin", "customer");
         return unmodifiableList(this.medicalExamDao.search(search));
     }
 

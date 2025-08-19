@@ -60,6 +60,7 @@ class MedicalExamControllerTest {
     void setUpTestUser() throws Exception {
         Person person = PersonFixture.genTestPerson();
         personDao.insert(person);
+        personDao.setAdmin(person, true);
     }
 
     @Test
@@ -412,6 +413,57 @@ class MedicalExamControllerTest {
         assertEquals(florenceExams.size(), 1);
     }
 
+    @Test
+    void runMethodsWithoutRequiredRole() throws Exception {
+        Person personAdded = personDao.getPersonByUsername("test@test.com");
+        personDao.setAdmin(personAdded, false);
+        String token = loginController.login("test@test.com", "test");
+        SecurityException excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(DoctorFixture.genDoctor()), token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> medicalExamController.getAll(token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> medicalExamController.getExamsByState(new Available(), token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> medicalExamController.getDoctorExams(1, token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> medicalExamController.getCustomerExams(1, token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> medicalExamController.getExam(1, token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> medicalExamController.updateMedicalExam(MedicalExamFixture.genMedicalExam(DoctorFixture.genDoctor()),
+                        token));
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> medicalExamController.search(new SearchConcrete(), token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(DoctorFixture.genDoctor()), token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+    }
     @AfterEach
     void flushDb() throws SQLException {
         Connection connection = Database.getConnection();

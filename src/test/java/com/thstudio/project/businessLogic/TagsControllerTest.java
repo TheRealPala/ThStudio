@@ -55,6 +55,7 @@ class TagsControllerTest {
     void setUpTestUser() throws Exception {
         Person person = PersonFixture.genTestPerson();
         personDao.insert(person);
+        personDao.setAdmin(person, true);
     }
 
     @Test
@@ -218,6 +219,21 @@ class TagsControllerTest {
         assertEquals("The tag has been already detached", ex.getMessage());
     }
 
+    @Test
+    void runMethodsWithoutRequiredRole() throws Exception {
+        Person person = personDao.getPersonByUsername("test@test.com");
+        personDao.setAdmin(person, false);
+        String token = loginController.login("test@test.com", "test");
+        SecurityException ex = assertThrowsExactly(SecurityException.class, () -> tagsController.createTag("Zone1", "Zone", token));
+        assertTrue(ex.getMessage().matches("^Forbidden: required any of roles.*$"));
+        ex = assertThrowsExactly(SecurityException.class, () -> tagsController.deleteTag("Zone1", "Zone", token));
+        assertTrue(ex.getMessage().matches("^Forbidden: required any of roles.*$"));
+        ex = assertThrowsExactly(SecurityException.class, () -> tagsController.attachTagToMedicalExam("Zone1", "Zone", 1, token));
+        assertTrue(ex.getMessage().matches("^Forbidden: required any of roles.*$"));
+        ex = assertThrowsExactly(SecurityException.class, () -> tagsController.detachTagToMedicalExam("Zone1", "Zone", 1, token));
+        assertTrue(ex.getMessage().matches("^Forbidden: required any of roles.*$"));
+
+    }
 
     @AfterEach
     void flushDb() throws SQLException {

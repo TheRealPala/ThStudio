@@ -7,6 +7,7 @@ import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.CustomerFixture;
 import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.security.LoginController;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DoctorControllerTest {
     private static DoctorController doctorController;
+    private static LoginController loginController;
     private static MariaDbPersonDao personDao;
 
     @BeforeAll
@@ -34,7 +36,8 @@ class DoctorControllerTest {
         assertTrue((Database.testConnection(true, false)));
         personDao = new MariaDbPersonDao();
         DoctorDao doctorDao = new MariaDbDoctorDao(personDao);
-        doctorController = new DoctorController(doctorDao, personDao);
+        loginController = new LoginController(personDao);
+        doctorController = new DoctorController(doctorDao);
     }
 
     @BeforeEach
@@ -45,7 +48,7 @@ class DoctorControllerTest {
 
     @Test
     void addDoctor() throws Exception {
-        String token = doctorController.login("test@test.com", "test");
+        String token = loginController.login("test@test.com", "test");
         Doctor doctorToAdd = doctorController.addDoctor(DoctorFixture.genDoctor(), token);
         assertNotNull(doctorToAdd);
         assertNotEquals(doctorToAdd.getId(), 0);
@@ -55,7 +58,7 @@ class DoctorControllerTest {
 
     @Test
     void updateDoctor() throws Exception {
-        String token = doctorController.login("test@test.com", "test");
+        String token = loginController.login("test@test.com", "test");
         Doctor doctorToAdd = doctorController.addDoctor(DoctorFixture.genDoctor(), token);
         doctorToAdd.setName("Luigi");
         doctorToAdd.setSurname("Bianchi");
@@ -69,7 +72,7 @@ class DoctorControllerTest {
 
     @Test
     void deleteDoctor() throws Exception {
-        String token = doctorController.login("test@test.com", "test");
+        String token = loginController.login("test@test.com", "test");
         Doctor doctorToAdd = doctorController.addDoctor(DoctorFixture.genDoctor(), token);
         doctorController.deleteDoctor(doctorToAdd.getId(), token);
 
@@ -82,7 +85,7 @@ class DoctorControllerTest {
     }
     @Test
     void getAllDoctors() throws Exception {
-        String token = doctorController.login("test@test.com", "test");
+        String token = loginController.login("test@test.com", "test");
         Doctor doctorToAdd = doctorController.addDoctor(DoctorFixture.genDoctor(), token);
         doctorController.addDoctor(DoctorFixture.genDoctor(), token);
         assertEquals(2, doctorController.getAllPersons(token).size());

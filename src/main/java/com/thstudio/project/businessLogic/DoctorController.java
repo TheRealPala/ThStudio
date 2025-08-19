@@ -2,17 +2,22 @@ package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.Doctor;
-import com.thstudio.project.security.AuthorizedController;
-import com.thstudio.project.security.LoginController;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 
 import java.util.List;
 
-public class DoctorController extends LoginController {
+public class DoctorController {
 
     private final DoctorDao doctorDao;
-    public DoctorController(DoctorDao doctorDao, PersonDao personDao) throws Exception {
-        super(personDao);
+    private final Authz authz;
+    private final Authn authn;
+
+    public DoctorController(DoctorDao doctorDao) throws Exception {
         this.doctorDao = doctorDao;
+        this.authz = new Authz(new JwtService());
+        this.authn = new Authn();
     }
 
     /**
@@ -27,8 +32,7 @@ public class DoctorController extends LoginController {
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
     public Doctor addDoctor(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance, String email, String password, String token) throws Exception {
-        this.validateToken(token);
-        Doctor d = new Doctor(name, surname, dateOfBirth, medicalLicenseNumber, balance, email, this.hashPassword(password));
+        Doctor d = new Doctor(name, surname, dateOfBirth, medicalLicenseNumber, balance, email, this.authn.hashPassword(password));
         doctorDao.insert(d);
         return d;
     }
@@ -42,7 +46,7 @@ public class DoctorController extends LoginController {
      */
     public Doctor addDoctor(Doctor doctor, String token) throws Exception {
         return this.addDoctor(doctor.getName(), doctor.getSurname(), doctor.getDateOfBirth(), doctor.getMedicalLicenseNumber(),
-                doctor.getBalance(), doctor.getEmail(), this.hashPassword(doctor.getPassword()), token);
+                doctor.getBalance(), doctor.getEmail(), this.authn.hashPassword(doctor.getPassword()), token);
     }
 
     /**
@@ -52,21 +56,17 @@ public class DoctorController extends LoginController {
      * @return The customer
      */
     public Doctor getDoctor(int id, String token) throws Exception {
-        this.validateToken(token);
         return doctorDao.get(id);
     }
 
     public void updateDoctor(Doctor doctor, String token) throws Exception {
-        this.validateToken(token);
         doctorDao.update(doctor);
     }
     public boolean deleteDoctor(int id, String token) throws Exception {
-        this.validateToken(token);
         return doctorDao.delete(id);
     }
 
     public List<Doctor> getAllPersons(String token) throws Exception {
-        this.validateToken(token);
         return doctorDao.getAll();
     }
 }

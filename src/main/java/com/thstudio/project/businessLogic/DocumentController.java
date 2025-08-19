@@ -9,17 +9,17 @@ import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.domainModel.Notification;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.domainModel.State.Booked;
-import com.thstudio.project.security.AuthorizedController;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.List;
 
-public class DocumentController extends AuthorizedController {
+public class DocumentController {
     private final DocumentDao documentDao;
     private final String baseDocumentPath;
     private final PersonDao personDao;
     private final NotificationDao notificationDao;
     private final MedicalExamDao medicalExamDao;
+    private final com.thstudio.project.security.Authz authz;
 
     public DocumentController(DocumentDao documentDao, PersonDao personDao, NotificationDao notificationDao,
                               MedicalExamDao medicalExamDao) throws Exception {
@@ -28,10 +28,11 @@ public class DocumentController extends AuthorizedController {
         this.baseDocumentPath = Dotenv.configure().directory("config").load().get("BASE_DOC_DIR_PATH");
         this.notificationDao = notificationDao;
         this.medicalExamDao = medicalExamDao;
+        this.authz = new com.thstudio.project.security.Authz(new com.thstudio.project.security.JwtService());
     }
 
     public Document addDocument(String title, int ownerId, String token) throws Exception {
-        this.validateToken(token);
+        this.authz.role(token);
         Person person = personDao.get(ownerId);
         Document document = new Document(title, this.baseDocumentPath + title, person.getId());
         this.documentDao.insert(document);
@@ -39,17 +40,17 @@ public class DocumentController extends AuthorizedController {
     }
 
     public List<Document> getDocumentsByReceiver(int receiverId, String token) throws Exception {
-        this.validateToken(token);
+        this.authz.role(token);
         return this.documentDao.getByReceiver(receiverId);
     }
 
     public List<Document> getDocumentsByOwner(int ownerId, String token) throws Exception {
-        this.validateToken(token);
+        this.authz.role(token);
         return this.documentDao.getByOwner(ownerId);
     }
 
     public void sendDocument(Document document, int receiverId, String token) throws Exception {
-        this.validateToken(token);
+        this.authz.role(token);
         boolean isAlreadyPersisted = true;
         try {
             this.documentDao.get(document.getId());
@@ -70,7 +71,7 @@ public class DocumentController extends AuthorizedController {
     }
 
     public void attachDocumentToMedicalExam(int documentId, int medicalExamId, String token) throws Exception {
-        this.validateToken(token);
+        this.authz.role(token);
         MedicalExam medicalExam = this.medicalExamDao.get(medicalExamId);
         Document document = this.documentDao.get(documentId);
         if (medicalExam.getIdDoctor() != document.getOwnerId()) {

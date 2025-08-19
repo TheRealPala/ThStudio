@@ -1,18 +1,21 @@
 package com.thstudio.project.businessLogic;
 
-import com.thstudio.project.dao.CustomerDao;
 import com.thstudio.project.dao.Database;
 import com.thstudio.project.dao.MariaDbCustomerDao;
+import com.thstudio.project.dao.MariaDbDoctorDao;
 import com.thstudio.project.dao.MariaDbPersonDao;
 import com.thstudio.project.domainModel.Customer;
+import com.thstudio.project.domainModel.Doctor;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.CustomerFixture;
+import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.JwtService;
 import com.thstudio.project.security.LoginController;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -23,6 +26,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class LoginControllerTest {
     private static LoginController loginController;
     private static MariaDbPersonDao personDao;
+    private static MariaDbCustomerDao customerDao;
+    private static MariaDbDoctorDao doctorDao;
+    private static JwtService jwtService;
+    private static Authn authn;
 
     @BeforeAll
     static void setDatabaseSettings() throws Exception {
@@ -35,6 +42,10 @@ class LoginControllerTest {
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
         personDao = new MariaDbPersonDao();
+        customerDao = new MariaDbCustomerDao(personDao);
+        doctorDao = new MariaDbDoctorDao(personDao);
+        jwtService = new JwtService();
+        authn = new Authn();
         loginController = new LoginController(personDao);
     }
 
@@ -42,7 +53,7 @@ class LoginControllerTest {
     void login() throws Exception {
         Person person = PersonFixture.genPerson();
         String plainPassword = person.getPassword();
-        person.setPassword(loginController.hashPassword(plainPassword));
+        person.setPassword(authn.hashPassword(plainPassword));
         personDao.insert(person);
 
         String token = loginController.login(person.getEmail(), plainPassword);
@@ -78,13 +89,37 @@ class LoginControllerTest {
     void loginWithAdminUser() throws Exception {
         Person person = PersonFixture.genTestPerson();
         String plainPassword = person.getPassword();
-        person.setPassword(loginController.hashPassword(plainPassword));
+        person.setPassword(authn.hashPassword(plainPassword));
         personDao.insert(person);
         personDao.setAdmin(person, true);
         String token = loginController.login(person.getEmail(), plainPassword);
         assertNotNull(token);
-        String tokenRole = token.
-        assertTrue(token.contains("admin"));
+        String role = jwtService.getRole(token);
+        assertEquals("admin", role);
+    }
+
+    @Test
+    void loginWithDoctorUser() throws Exception {
+        Doctor doctorToAdd = DoctorFixture.genDoctor();
+        String plainPassword = doctorToAdd.getPassword();
+        doctorToAdd.setPassword(authn.hashPassword(plainPassword));
+        doctorDao.insert(doctorToAdd);
+        String token = loginController.login(doctorToAdd.getEmail(), plainPassword);
+        assertNotNull(token);
+        String role = jwtService.getRole(token);
+        assertEquals("doctor", role);
+    }
+
+    @Test
+    void loginWithCustomerUser() throws Exception {
+        Customer customerToAdd = CustomerFixture.genCustomer();
+        String plainPassword = customerToAdd.getPassword();
+        customerToAdd.setPassword(authn.hashPassword(plainPassword));
+        customerDao.insert(customerToAdd);
+        String token = loginController.login(customerToAdd.getEmail(), plainPassword);
+        assertNotNull(token);
+        String role = jwtService.getRole(token);
+        assertEquals("customer", role);
     }
 
     @AfterEach

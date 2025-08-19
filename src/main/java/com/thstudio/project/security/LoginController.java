@@ -4,12 +4,13 @@ import com.thstudio.project.dao.PersonDao;
 import com.thstudio.project.domainModel.Person;
 import org.mindrot.jbcrypt.BCrypt;
 
-public class LoginController extends AuthorizedController {
-    private PersonDao personDao;
-
+public class LoginController {
+    private final PersonDao personDao;
+    private final JwtService jwtService;
 
     public LoginController(PersonDao personDao) throws Exception {
         this.personDao = personDao;
+        this.jwtService = new JwtService();
     }
 
     public boolean checkPassword(String password, String hashedPassword) {
@@ -29,19 +30,14 @@ public class LoginController extends AuthorizedController {
     }
 
     public String login(String email, String password) throws Exception {
-        String token = "";
         Person person = this.personDao.getPersonByUsername(email);
         if (checkPassword(password, person.getPassword())) {
             String role = getRole(person);
-            token = createToken(person.getId(), role);
-        }
-        else {
+            return jwtService.createToken(person.getId(), role);
+        } else {
             throw new SecurityException("Invalid password");
         }
-        return token;
     }
 
-    public String hashPassword (String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt(12));
-    }
+
 }

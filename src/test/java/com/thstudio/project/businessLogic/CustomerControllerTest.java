@@ -11,6 +11,7 @@ import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.CustomerFixture;
 import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.security.LoginController;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.*;
 
@@ -19,6 +20,7 @@ import java.sql.SQLException;
 
 class CustomerControllerTest {
     private static CustomerController customerController;
+    private static LoginController loginController;
     private static MariaDbPersonDao personDao;
 
     @BeforeAll
@@ -33,7 +35,8 @@ class CustomerControllerTest {
         assertTrue((Database.testConnection(true, false)));
         personDao = new MariaDbPersonDao();
         CustomerDao customerDao = new MariaDbCustomerDao( personDao);
-        customerController = new CustomerController(customerDao, personDao);
+        loginController = new LoginController(personDao);
+        customerController = new CustomerController(customerDao);
     }
 
     @BeforeEach
@@ -44,7 +47,7 @@ class CustomerControllerTest {
 
     @Test
     void addCustomer() throws Exception {
-        String token = customerController.login("test@test.com", "test");
+        String token = loginController.login("test@test.com", "test");
         Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
         assertNotNull(customerToAdd);
         assertNotEquals(customerToAdd.getId(), 0);
@@ -54,7 +57,7 @@ class CustomerControllerTest {
 
     @Test
     void modifyCustomerLevel() throws Exception {
-        String token = customerController.login("test@test.com", "test");
+        String token = loginController.login("test@test.com", "test");
         Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
         assertEquals(customerToAdd.getLevel(), customerController.getCustomer(customerToAdd.getId(), token).getLevel());
         customerToAdd.setLevel(customerToAdd.getLevel() + 1);
@@ -66,7 +69,7 @@ class CustomerControllerTest {
 
     @Test
     void updateCustomer() throws Exception {
-        String token = customerController.login("test@test.com", "test");
+        String token = loginController.login("test@test.com", "test");
         Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
         customerToAdd.setName("Luigi");
         customerToAdd.setSurname("Bianchi");
@@ -79,7 +82,7 @@ class CustomerControllerTest {
     }
     @Test
     void deleteCustomer() throws Exception {
-        String token = customerController.login("test@test.com", "test");
+        String token = loginController.login("test@test.com", "test");
         Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
         customerController.deleteCustomer(customerToAdd.getId(), token);
         RuntimeException exception = assertThrowsExactly(RuntimeException.class,
@@ -92,7 +95,7 @@ class CustomerControllerTest {
 
     @Test
     void getAllCustomers() throws Exception {
-        String token = customerController.login("test@test.com", "test");
+        String token = loginController.login("test@test.com", "test");
         Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
         customerController.addCustomer(CustomerFixture.genCustomer(), token);
         assertEquals(2, customerController.getAllCustomers(token).size());

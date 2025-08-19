@@ -12,11 +12,10 @@ import com.thstudio.project.domainModel.State.Deleted;
 import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.dao.MedicalExamDao;
-import com.thstudio.project.security.AuthorizedController;
 
 import java.time.LocalDateTime;
 
-public class StateController extends AuthorizedController {
+public class StateController {
     private final MedicalExamDao medicalExamDao;
     private final CustomerDao customerDao;
     private final DoctorDao doctorDao;
@@ -39,7 +38,7 @@ public class StateController extends AuthorizedController {
      * @return true if the medical exam is canceled, false otherwise
      */
     public boolean bookMedicalExam(int medicalExamId, int customerId, String token) throws Exception {
-        this.validateToken(token);
+        
         MedicalExam me = this.medicalExamDao.get(medicalExamId);
         Customer c = this.customerDao.get(customerId);
         if (me.getState() instanceof Booked) {
@@ -70,7 +69,7 @@ public class StateController extends AuthorizedController {
      * @return true, if the medical exam booking is canceled, raise up RuntimeExceptions otherwise
      */
     public boolean cancelMedicalExamBooking(int medicalExamId, int customerId, String token) throws Exception {
-        this.validateToken(token);
+        
         MedicalExam me = this.medicalExamDao.get(medicalExamId);
         Customer c = this.customerDao.get(customerId);
         if (me.getIdCustomer() != c.getId()) {
@@ -105,7 +104,7 @@ public class StateController extends AuthorizedController {
      * @return true, if the medical exam is canceled, raise up RuntimeExceptions otherwise
      */
     public boolean cancelMedicalExam(int medicalExamId, int doctorId, String token) throws Exception {
-        this.validateToken(token);
+        
         Doctor d = this.doctorDao.get(doctorId);
         MedicalExam me = this.medicalExamDao.get(medicalExamId);
         if (me.getIdDoctor() != d.getId()) {
@@ -138,7 +137,7 @@ public class StateController extends AuthorizedController {
      * @throws Exception If the medical exam is not found or if it is already completed
      */
     public void markMedicalExamAsComplete(int examId, String token) throws Exception {
-        this.validateToken(token);
+        
         MedicalExam medicalExam = medicalExamDao.get(examId);
         if (!(medicalExam.getState() instanceof Booked)) {
             throw new RuntimeException("Can't mark an exam as complete if is not in booked state");

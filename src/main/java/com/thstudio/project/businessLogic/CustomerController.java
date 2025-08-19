@@ -1,20 +1,28 @@
 package com.thstudio.project.businessLogic;
 
-import com.thstudio.project.dao.*;
+import com.thstudio.project.dao.CustomerDao;
+import com.thstudio.project.dao.PersonDao;
 import com.thstudio.project.domainModel.Customer;
-import com.thstudio.project.security.AuthorizedController;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 import com.thstudio.project.security.LoginController;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 
-public class CustomerController extends LoginController {
+public class CustomerController {
 
     private final CustomerDao customerDao;
-
-    public CustomerController(CustomerDao customerDao, PersonDao personDao) throws Exception {
-        super(personDao);
+    private final Authz authz;
+    private final Authn authn;
+    
+    public CustomerController(CustomerDao customerDao) throws Exception {
         this.customerDao = customerDao;
+        this.authz = new Authz(new JwtService());
+        this.authn = new Authn();
     }
+
 
     /**
      * Add a new customer
@@ -28,8 +36,8 @@ public class CustomerController extends LoginController {
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
     public Customer addCustomer(String name, String surname, String dateOfBirth, int level, double balance, String email, String password, String token) throws Exception {
-        super.validateToken(token);
-        Customer c = new Customer(name, surname, dateOfBirth, level, balance, email, this.hashPassword(password));
+        authz.role(token); // valida e ricava il ruolo (non usato qui)
+        Customer c = new Customer(name, surname, dateOfBirth, level, balance, email, this.authn.hashPassword(password));
         customerDao.insert(c);
         return c;
     }
@@ -43,7 +51,7 @@ public class CustomerController extends LoginController {
      */
     public Customer addCustomer(Customer customer, String token) throws Exception {
         return this.addCustomer(customer.getName(), customer.getSurname(), customer.getDateOfBirth(), customer.getLevel(),
-                customer.getBalance(), customer.getEmail(), this.hashPassword(customer.getPassword()), token);
+                customer.getBalance(), customer.getEmail(), this.authn.hashPassword(customer.getPassword()), token);
     }
 
     /**
@@ -53,7 +61,7 @@ public class CustomerController extends LoginController {
      * @return The customer
      */
     public Customer getCustomer(int id, String token) throws Exception {
-        super.validateToken(token);
+        authz.role(token);
         return customerDao.get(id);
     }
 
@@ -63,13 +71,12 @@ public class CustomerController extends LoginController {
      * @param customer The new customer
      */
     public void updateCustomer(Customer customer, String token) throws Exception {
-        super.validateToken(token);
+        authz.role(token);
         customerDao.update(customer);
     }
 
-
     public boolean modifyCustomerLevel(int customerId, int level, String token) throws Exception {
-        super.validateToken(token);
+        authz.role(token);
         Customer customer = customerDao.get(customerId);
         boolean outcome = false;
         if (customer.getLevel() != level) {
@@ -81,12 +88,13 @@ public class CustomerController extends LoginController {
     }
 
     public boolean deleteCustomer(int id, String token) throws Exception {
-        super.validateToken(token);
+        authz.role(token);
         return customerDao.delete(id);
     }
 
     public List<Customer> getAllCustomers(String token) throws Exception {
-        super.validateToken(token);
+        authz.role(token);
         return customerDao.getAll();
     }
+    
 }

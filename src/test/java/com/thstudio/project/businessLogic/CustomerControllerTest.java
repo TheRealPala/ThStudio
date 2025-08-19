@@ -34,7 +34,7 @@ class CustomerControllerTest {
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
         personDao = new MariaDbPersonDao();
-        CustomerDao customerDao = new MariaDbCustomerDao( personDao);
+        CustomerDao customerDao = new MariaDbCustomerDao(personDao);
         loginController = new LoginController(personDao);
         customerController = new CustomerController(customerDao);
     }
@@ -43,6 +43,7 @@ class CustomerControllerTest {
     void setUpTestUser() throws Exception {
         Person person = PersonFixture.genTestPerson();
         personDao.insert(person);
+        personDao.setAdmin(person, true);
     }
 
     @Test
@@ -50,7 +51,7 @@ class CustomerControllerTest {
         String token = loginController.login("test@test.com", "test");
         Customer customerToAdd = customerController.addCustomer(CustomerFixture.genCustomer(), token);
         assertNotNull(customerToAdd);
-        assertNotEquals(customerToAdd.getId(), 0);
+        assertNotEquals(0, customerToAdd.getId());
         Customer addedCustomer = customerController.getCustomer(customerToAdd.getId(), token);
         assertEquals(customerToAdd, addedCustomer);
     }
@@ -80,6 +81,7 @@ class CustomerControllerTest {
         Customer updatedCustomer = customerController.getCustomer(customerToAdd.getId(), token);
         assertEquals(customerToAdd, updatedCustomer);
     }
+
     @Test
     void deleteCustomer() throws Exception {
         String token = loginController.login("test@test.com", "test");
@@ -103,6 +105,34 @@ class CustomerControllerTest {
         assertEquals(1, customerController.getAllCustomers(token).size());
     }
 
+    @Test
+    void useMethodsWithoutRequiredRole() throws Exception {
+        Person person = personDao.getPersonByUsername("test@test.com");
+        personDao.setAdmin(person, false);
+        String token = loginController.login("test@test.com", "test");
+        Customer customerFixture = CustomerFixture.genCustomer();
+        SecurityException excp = assertThrowsExactly(SecurityException.class,
+                () -> customerController.addCustomer(customerFixture, token));
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        customerFixture.setBalance(customerFixture.getBalance() + 100);
+        excp = assertThrowsExactly(SecurityException.class,
+                () -> customerController.updateCustomer(customerFixture, token));
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        customerFixture.setLevel(customerFixture.getLevel() + 1);
+        excp = assertThrowsExactly(SecurityException.class,
+                () -> customerController.modifyCustomerLevel(customerFixture.getId(), customerFixture.getLevel(), token));
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(SecurityException.class,
+                () -> customerController.deleteCustomer(customerFixture.getId(), token));
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(SecurityException.class,
+                () -> customerController.getCustomer(customerFixture.getId(), token));
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(SecurityException.class,
+                () -> customerController.getAllCustomers(token));
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+
+    }
 
     @AfterEach
     void flushDb() throws SQLException {

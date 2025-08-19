@@ -36,7 +36,7 @@ public class CustomerController {
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
     public Customer addCustomer(String name, String surname, String dateOfBirth, int level, double balance, String email, String password, String token) throws Exception {
-        authz.role(token); // valida e ricava il ruolo (non usato qui)
+        authz.requireAnyRole(token, "admin", "doctor");
         Customer c = new Customer(name, surname, dateOfBirth, level, balance, email, this.authn.hashPassword(password));
         customerDao.insert(c);
         return c;
@@ -61,7 +61,7 @@ public class CustomerController {
      * @return The customer
      */
     public Customer getCustomer(int id, String token) throws Exception {
-        authz.role(token);
+        authz.requireAnyRole(token, "admin", "doctor", "customer");
         return customerDao.get(id);
     }
 
@@ -71,12 +71,12 @@ public class CustomerController {
      * @param customer The new customer
      */
     public void updateCustomer(Customer customer, String token) throws Exception {
-        authz.role(token);
+        authz.requireAnyRole(token, "admin", "doctor", "customer");
         customerDao.update(customer);
     }
 
     public boolean modifyCustomerLevel(int customerId, int level, String token) throws Exception {
-        authz.role(token);
+        authz.requireAnyRole(token, "admin", "doctor");
         Customer customer = customerDao.get(customerId);
         boolean outcome = false;
         if (customer.getLevel() != level) {
@@ -88,12 +88,12 @@ public class CustomerController {
     }
 
     public boolean deleteCustomer(int id, String token) throws Exception {
-        authz.role(token);
+        authz.requireAnyRole(token, "admin", "doctor");
         return customerDao.delete(id);
     }
 
     public List<Customer> getAllCustomers(String token) throws Exception {
-        authz.role(token);
+        authz.requireAnyRole(token, "admin", "doctor");
         return customerDao.getAll();
     }
     

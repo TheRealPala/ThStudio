@@ -1,10 +1,8 @@
 package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
-import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.Doctor;
 import com.thstudio.project.domainModel.Person;
-import com.thstudio.project.fixture.CustomerFixture;
 import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.PersonFixture;
 import com.thstudio.project.security.LoginController;
@@ -44,6 +42,7 @@ class DoctorControllerTest {
     void setUpTestUser() throws Exception {
         Person person = PersonFixture.genTestPerson();
         personDao.insert(person);
+        personDao.setAdmin(person, true);
     }
 
     @Test
@@ -51,7 +50,7 @@ class DoctorControllerTest {
         String token = loginController.login("test@test.com", "test");
         Doctor doctorToAdd = doctorController.addDoctor(DoctorFixture.genDoctor(), token);
         assertNotNull(doctorToAdd);
-        assertNotEquals(doctorToAdd.getId(), 0);
+        assertNotEquals(0, doctorToAdd.getId());
         Doctor addedDoctor = doctorController.getDoctor(doctorToAdd.getId(), token);
         assertEquals(doctorToAdd, addedDoctor);
     }
@@ -93,6 +92,39 @@ class DoctorControllerTest {
         assertEquals(1, doctorController.getAllPersons(token).size());
     }
 
+    @Test
+    void useMethodsWithoutRequiredRole() throws Exception {
+        Person doctorAdded = personDao.getPersonByUsername("test@test.com");
+        personDao.setAdmin(doctorAdded, false);
+        String token = loginController.login("test@test.com", "test");
+        SecurityException excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> doctorController.addDoctor(DoctorFixture.genDoctor(), token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> doctorController.getAllPersons(token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        Doctor doctorFixture = DoctorFixture.genDoctor();
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> doctorController.addDoctor(doctorFixture, token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        doctorFixture.setBalance(doctorFixture.getBalance() + 100);
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> doctorController.updateDoctor(doctorFixture, token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+        excp = assertThrowsExactly(
+                SecurityException.class,
+                () -> doctorController.deleteDoctor(doctorFixture.getId(), token)
+        );
+        assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
+    }
 
     @AfterEach
     void flushDb() throws SQLException {

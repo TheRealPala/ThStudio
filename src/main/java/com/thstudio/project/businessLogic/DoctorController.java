@@ -32,6 +32,7 @@ public class DoctorController {
      * @throws Exception bubbles up exceptions to PeopleController::addPerson()
      */
     public Doctor addDoctor(String name, String surname, String dateOfBirth, String medicalLicenseNumber, double balance, String email, String password, String token) throws Exception {
+        authz.requireAnyRole(token, "admin");
         Doctor d = new Doctor(name, surname, dateOfBirth, medicalLicenseNumber, balance, email, this.authn.hashPassword(password));
         doctorDao.insert(d);
         return d;
@@ -56,17 +57,21 @@ public class DoctorController {
      * @return The customer
      */
     public Doctor getDoctor(int id, String token) throws Exception {
+        authz.requireAnyRole(token, "admin", "doctor");
         return doctorDao.get(id);
     }
 
     public void updateDoctor(Doctor doctor, String token) throws Exception {
+        authz.requireAnyRole(token, "admin", "doctor");
         doctorDao.update(doctor);
     }
     public boolean deleteDoctor(int id, String token) throws Exception {
+        authz.requireAnyRole(token, "admin");
         return doctorDao.delete(id);
     }
 
     public List<Doctor> getAllPersons(String token) throws Exception {
+        authz.requireAnyRole(token, "admin");
         return doctorDao.getAll();
     }
 }

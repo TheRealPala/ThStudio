@@ -38,7 +38,7 @@ public class MedicalExamTest {
                     medicalExam.setStartTime(medicalExam.getEndTime().plusHours(1));
                 }
         );
-        assertEquals(thrown.getMessage(), "startTime must be before endTime");
+        assertEquals("startTime must be before endTime", thrown.getMessage());
     }
 
     @Test
@@ -51,7 +51,7 @@ public class MedicalExamTest {
                     medicalExam.setEndTime(medicalExam.getStartTime().minusHours(1));
                 }
         );
-        assertEquals(thrown.getMessage(), "endTime must be after startTime");
+        assertEquals("endTime must be after startTime", thrown.getMessage());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class MedicalExamTest {
                     medicalExam.setStartTimeFromString(medicalExam.getEndTime().plusHours(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                 }
         );
-        assertEquals(thrown.getMessage(), "startTime must be before endTime");
+        assertEquals("startTime must be before endTime", thrown.getMessage());
     }
 
     @Test
@@ -77,6 +77,6 @@ public class MedicalExamTest {
                     medicalExam.setEndTimeFromString(medicalExam.getStartTime().minusHours(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                 }
         );
-        assertEquals(thrown.getMessage(), "endTime must be after startTime");
+        assertEquals("endTime must be after startTime", thrown.getMessage());
     }
 }

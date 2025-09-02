@@ -11,7 +11,6 @@ import com.thstudio.project.domainModel.Tags.TagZone;
 import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.MedicalExamFixture;
 import com.thstudio.project.fixture.PersonFixture;
-import com.thstudio.project.security.LoginController;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

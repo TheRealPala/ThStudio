@@ -11,7 +11,6 @@ import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.CustomerFixture;
 import com.thstudio.project.fixture.PersonFixture;
-import com.thstudio.project.security.LoginController;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.*;
 

@@ -1,7 +1,8 @@
-package com.thstudio.project.security;
+package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.PersonDao;
 import com.thstudio.project.domainModel.Person;
+import com.thstudio.project.security.JwtService;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class LoginController {

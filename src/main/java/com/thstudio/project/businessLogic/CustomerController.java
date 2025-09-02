@@ -1,13 +1,10 @@
 package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.CustomerDao;
-import com.thstudio.project.dao.PersonDao;
 import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.security.Authn;
 import com.thstudio.project.security.Authz;
 import com.thstudio.project.security.JwtService;
-import com.thstudio.project.security.LoginController;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 

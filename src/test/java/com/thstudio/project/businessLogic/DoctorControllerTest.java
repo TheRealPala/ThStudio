@@ -5,7 +5,6 @@ import com.thstudio.project.domainModel.Doctor;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.PersonFixture;
-import com.thstudio.project.security.LoginController;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;

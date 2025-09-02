@@ -12,7 +12,6 @@ import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.PersonFixture;
 import com.thstudio.project.security.Authn;
 import com.thstudio.project.security.JwtService;
-import com.thstudio.project.security.LoginController;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;

@@ -2,7 +2,7 @@ package com.thstudio.project.domainModel.Tags;
 
 import java.util.Objects;
 
-public class Tag {
+public abstract class Tag {
     protected String tag;
     protected String tagType;
 

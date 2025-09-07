@@ -8,7 +8,6 @@ import com.thstudio.project.domainModel.Tags.TagIsOnline;
 import com.thstudio.project.domainModel.Tags.TagType;
 import com.thstudio.project.domainModel.Tags.TagZone;
 import com.thstudio.project.security.Authz;
-import com.thstudio.project.security.JwtService;
 
 public class TagsController {
     private final TagDao tagDao;
@@ -18,7 +17,7 @@ public class TagsController {
     public TagsController(TagDao tagDao, MedicalExamDao medicalExamDao) throws Exception {
         this.tagDao = tagDao;
         this.medicalExamDao = medicalExamDao;
-        this.authz = new Authz(new JwtService());
+        this.authz = new Authz();
     }
 
     /**

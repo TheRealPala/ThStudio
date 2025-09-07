@@ -8,12 +8,10 @@ import com.thstudio.project.domainModel.Notification;
 import com.thstudio.project.domainModel.State.Available;
 import com.thstudio.project.domainModel.State.Booked;
 import com.thstudio.project.domainModel.State.Completed;
-import com.thstudio.project.domainModel.State.Deleted;
 import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.dao.MedicalExamDao;
 import com.thstudio.project.security.Authz;
-import com.thstudio.project.security.JwtService;
 
 import java.time.LocalDateTime;
 
@@ -30,7 +28,7 @@ public class StateController {
         this.customerDao = customerDao;
         this.doctorDao = doctorDao;
         this.notificationDao = notificationDao;
-        this.authz = new Authz(new JwtService());
+        this.authz = new Authz();
     }
 
     /**

@@ -11,8 +11,6 @@ import com.thstudio.project.domainModel.State.Booked;
 import com.thstudio.project.domainModel.State.Deleted;
 import com.thstudio.project.domainModel.State.State;
 import com.thstudio.project.security.Authz;
-import com.thstudio.project.security.JwtService;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +31,7 @@ public class MedicalExamController {
         this.doctorDao = doctorDao;
         this.notificationDao = notificationDao;
         this.customerDao = customerDao;
-        this.authz = new Authz(new JwtService());
+        this.authz = new Authz();
     }
 
     private void checkDateTimeBounds(List<MedicalExam> medicalExams, LocalDateTime startTime,

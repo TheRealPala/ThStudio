@@ -5,11 +5,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Authz {
-    private final JwtService jwt;
+    private final JwtService jwt = new JwtService();
 
-    public Authz(JwtService jwt) {
-        this.jwt = jwt;
+    public Authz() throws Exception {
     }
+
 
     /**
      * Valida il token e restituisce il ruolo contenuto nel claim "role".

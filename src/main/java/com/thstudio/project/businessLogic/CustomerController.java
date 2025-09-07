@@ -4,7 +4,6 @@ import com.thstudio.project.dao.CustomerDao;
 import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.security.Authn;
 import com.thstudio.project.security.Authz;
-import com.thstudio.project.security.JwtService;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class CustomerController {
     
     public CustomerController(CustomerDao customerDao) throws Exception {
         this.customerDao = customerDao;
-        this.authz = new Authz(new JwtService());
+        this.authz = new Authz();
         this.authn = new Authn();
     }
 

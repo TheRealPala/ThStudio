@@ -9,6 +9,7 @@ import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.domainModel.Notification;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.domainModel.State.Booked;
+import com.thstudio.project.security.Authz;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class DocumentController {
         this.baseDocumentPath = Dotenv.configure().directory("config").load().get("BASE_DOC_DIR_PATH");
         this.notificationDao = notificationDao;
         this.medicalExamDao = medicalExamDao;
-        this.authz = new com.thstudio.project.security.Authz(new com.thstudio.project.security.JwtService());
+        this.authz = new Authz();
     }
 
     public Document addDocument(String title, int ownerId, String token) throws Exception {

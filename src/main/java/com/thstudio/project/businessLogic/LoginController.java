@@ -2,21 +2,19 @@ package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.PersonDao;
 import com.thstudio.project.domainModel.Person;
-import com.thstudio.project.security.JwtService;
-import org.mindrot.jbcrypt.BCrypt;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.Authz;
 
 public class LoginController {
     private final PersonDao personDao;
-    private final JwtService jwtService;
+    private final Authz authz = new Authz();
+    private final Authn authn = new Authn();
 
     public LoginController(PersonDao personDao) throws Exception {
         this.personDao = personDao;
-        this.jwtService = new JwtService();
     }
 
-    private boolean checkPassword(String password, String hashedPassword) {
-        return BCrypt.checkpw(password, hashedPassword);
-    }
+
 
     private String getRole(Person person) throws Exception {
         String role = "person";
@@ -32,9 +30,9 @@ public class LoginController {
 
     public String login(String email, String password) throws Exception {
         Person person = this.personDao.getPersonByUsername(email);
-        if (checkPassword(password, person.getPassword())) {
+        if (this.authn.checkPassword(password, person.getPassword())) {
             String role = getRole(person);
-            return jwtService.createToken(person.getId(), role);
+            return this.authn.createToken(person.getId(), role);
         } else {
             throw new SecurityException("Invalid password");
         }

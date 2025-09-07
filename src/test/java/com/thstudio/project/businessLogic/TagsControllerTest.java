@@ -29,6 +29,7 @@ class TagsControllerTest {
     private static DoctorDao doctorDao;
     private static LoginController loginController;
     private static PersonDao personDao;
+    private static CustomerDao customerDao;
 
     @BeforeAll
     static void setDatabaseSettings() throws Exception {
@@ -46,7 +47,8 @@ class TagsControllerTest {
         NotificationDao notificationDao = new MariaDbNotificationDao();
         personDao = new MariaDbPersonDao();
         doctorDao = new MariaDbDoctorDao(personDao);
-        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao);
+        customerDao = new MariaDbCustomerDao(personDao);
+        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao, customerDao);
         loginController = new LoginController(personDao);
     }
 

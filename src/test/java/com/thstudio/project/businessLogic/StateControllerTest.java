@@ -48,7 +48,7 @@ class StateControllerTest {
         doctorDao = new MariaDbDoctorDao(personDao);
         notificationDao = new MariaDbNotificationDao();
         stateController = new StateController(medicalExamDao, customerDao, doctorDao, notificationDao);
-        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao);
+        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao, customerDao);
         loginController = new LoginController(personDao);
     }
 
@@ -227,7 +227,7 @@ class StateControllerTest {
         assertNotEquals(0, customer.getId());
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
         assertNotEquals(0, addedMedicalExam.getId());
-        assertTrue(stateController.cancelMedicalExam(addedMedicalExam.getId(), doctor.getId(), token));
+        assertTrue(medicalExamController.deleteMedicalExam(addedMedicalExam.getId(), doctor.getId(), token));
         MedicalExam deletedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId(), token);
         assertEquals(0, deletedMedicalExam.getIdCustomer());
         assertInstanceOf(Deleted.class, deletedMedicalExam.getState());
@@ -245,7 +245,7 @@ class StateControllerTest {
         MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
         assertNotEquals(0, addedMedicalExam.getId());
         assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
-        assertTrue(stateController.cancelMedicalExam(addedMedicalExam.getId(), doctor.getId(), token));
+        assertTrue(medicalExamController.deleteMedicalExam(addedMedicalExam.getId(), doctor.getId(), token));
         MedicalExam deletedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId(), token);
         assertEquals(0, deletedMedicalExam.getIdCustomer());
         assertInstanceOf(Deleted.class, deletedMedicalExam.getState());
@@ -267,7 +267,7 @@ class StateControllerTest {
         assertNotEquals(0, doctor.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    stateController.cancelMedicalExam(1, doctor.getId(), token);
+                    medicalExamController.deleteMedicalExam(1, doctor.getId(), token);
                 }
         );
         assertEquals("The Medical Exam looked for in not present in the database", thrown.getMessage());
@@ -286,7 +286,7 @@ class StateControllerTest {
         assertNotEquals(0, addedMedicalExam.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    assertTrue(stateController.cancelMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
+                    assertTrue(medicalExamController.deleteMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
                 }
         );
         assertEquals("The Doctor looked for in not present in the database", thrown.getMessage());
@@ -305,7 +305,7 @@ class StateControllerTest {
         assertNotEquals(0, addedMedicalExam.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    assertTrue(stateController.cancelMedicalExam(addedMedicalExam.getId(), 0, token));
+                    assertTrue(medicalExamController.deleteMedicalExam(addedMedicalExam.getId(), 0, token));
                 }
         );
         assertEquals("The Doctor looked for in not present in the database", thrown.getMessage());
@@ -327,7 +327,7 @@ class StateControllerTest {
         assertNotEquals(0, otherDoctor.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    stateController.cancelMedicalExam(addedMedicalExam.getId(), otherDoctor.getId(), token);
+                    medicalExamController.deleteMedicalExam(addedMedicalExam.getId(), otherDoctor.getId(), token);
                 }
         );
         assertEquals("Unauthorized request", thrown.getMessage());
@@ -349,7 +349,7 @@ class StateControllerTest {
         medicalExamController.updateMedicalExam(addedMedicalExam, token);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
-                    stateController.cancelMedicalExam(addedMedicalExam.getId(), doctor.getId(), token);
+                    medicalExamController.deleteMedicalExam(addedMedicalExam.getId(), doctor.getId(), token);
                 }
         );
         assertEquals("Can't cancel an exam already started", thrown.getMessage());
@@ -430,7 +430,7 @@ class StateControllerTest {
         assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
         excp = assertThrowsExactly(
                 SecurityException.class,
-                () -> stateController.cancelMedicalExam(1, 1, token)
+                () -> medicalExamController.deleteMedicalExam(1, 1, token)
         );
         assertTrue(excp.getMessage().matches("^Forbidden: required any of roles.*$"));
         excp = assertThrowsExactly(

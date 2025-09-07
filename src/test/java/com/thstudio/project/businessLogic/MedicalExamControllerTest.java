@@ -52,7 +52,7 @@ class MedicalExamControllerTest {
         doctorDao = new MariaDbDoctorDao(personDao);
         customerDao = new MariaDbCustomerDao(personDao);
         tagDao = new MariaDbTagDao();
-        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao);
+        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao, customerDao);
         loginController = new LoginController(personDao);
     }
 

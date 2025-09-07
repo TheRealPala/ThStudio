@@ -1,12 +1,14 @@
 package com.thstudio.project.businessLogic;
 
 import com.thstudio.project.dao.*;
+import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.Doctor;
 import com.thstudio.project.domainModel.MedicalExam;
 import com.thstudio.project.domainModel.Notification;
 import com.thstudio.project.domainModel.Search.Search;
 import com.thstudio.project.domainModel.State.Available;
 import com.thstudio.project.domainModel.State.Booked;
+import com.thstudio.project.domainModel.State.Deleted;
 import com.thstudio.project.domainModel.State.State;
 import com.thstudio.project.security.Authz;
 import com.thstudio.project.security.JwtService;
@@ -22,13 +24,15 @@ import static java.util.Collections.unmodifiableList;
 public class MedicalExamController {
     private final MedicalExamDao medicalExamDao;
     private final NotificationDao notificationDao;
+    private final CustomerDao customerDao;
     private final DoctorDao doctorDao;
     private final Authz authz;
 
-    public MedicalExamController(MedicalExamDao medicalExamDao, NotificationDao notificationDao, DoctorDao doctorDao) throws Exception{
+    public MedicalExamController(MedicalExamDao medicalExamDao, NotificationDao notificationDao, DoctorDao doctorDao, CustomerDao customerDao) throws Exception{
         this.medicalExamDao = medicalExamDao;
         this.doctorDao = doctorDao;
         this.notificationDao = notificationDao;
+        this.customerDao = customerDao;
         this.authz = new Authz(new JwtService());
     }
 
@@ -164,6 +168,40 @@ public class MedicalExamController {
         }
         this.updateMedicalExamLogic(medicalExam.getId(), medicalExam.getStartTime(), medicalExam.getEndTime(), medicalExam.getDescription(), medicalExam.getTitle(),
                 medicalExam.getPrice(), medicalExam.getState());
+        return true;
+    }
+
+    /**
+     * cancel a medical exam
+     *
+     * @param medicalExamId The medical exam id
+     * @param doctorId      The doctor id
+     * @return true, if the medical exam is canceled, raise up RuntimeExceptions otherwise
+     */
+    public boolean deleteMedicalExam(int medicalExamId, int doctorId, String token) throws Exception {
+        this.authz.requireAnyRole(token, "doctor", "admin");
+        Doctor d = this.doctorDao.get(doctorId);
+        MedicalExam me = this.medicalExamDao.get(medicalExamId);
+        if (me.getIdDoctor() != d.getId()) {
+            throw new RuntimeException("Unauthorized request");
+        }
+        if (LocalDateTime.now().isAfter(me.getStartTime())) {
+            throw new RuntimeException("Can't cancel an exam already started");
+        }
+
+        if (me.getState() instanceof Booked) {
+            double medicalExamPrice = me.getPrice();
+            Customer c = this.customerDao.get(me.getIdCustomer());
+            d.setBalance(d.getBalance() - medicalExamPrice);
+            c.setBalance(c.getBalance() + medicalExamPrice);
+            this.doctorDao.update(d);
+            this.customerDao.update(c);
+            Notification nd = new Notification("Deleted exam " + me.getTitle() + " by:" + d.getName(), c.getId());
+            notificationDao.insert(nd);
+        }
+
+        me.setState(new Deleted(LocalDateTime.now()));
+        this.medicalExamDao.deleteBookedMedicalExam(me);
         return true;
     }
 

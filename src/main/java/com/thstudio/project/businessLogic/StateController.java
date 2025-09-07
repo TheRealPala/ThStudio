@@ -101,40 +101,6 @@ public class StateController {
     }
 
     /**
-     * cancel a medical exam
-     *
-     * @param medicalExamId The medical exam id
-     * @param doctorId      The doctor id
-     * @return true, if the medical exam is canceled, raise up RuntimeExceptions otherwise
-     */
-    public boolean cancelMedicalExam(int medicalExamId, int doctorId, String token) throws Exception {
-        this.authz.requireAnyRole(token, "doctor", "admin");
-        Doctor d = this.doctorDao.get(doctorId);
-        MedicalExam me = this.medicalExamDao.get(medicalExamId);
-        if (me.getIdDoctor() != d.getId()) {
-            throw new RuntimeException("Unauthorized request");
-        }
-        if (LocalDateTime.now().isAfter(me.getStartTime())) {
-            throw new RuntimeException("Can't cancel an exam already started");
-        }
-
-        if (me.getState() instanceof Booked) {
-            double medicalExamPrice = me.getPrice();
-            Customer c = this.customerDao.get(me.getIdCustomer());
-            d.setBalance(d.getBalance() - medicalExamPrice);
-            c.setBalance(c.getBalance() + medicalExamPrice);
-            this.doctorDao.update(d);
-            this.customerDao.update(c);
-            Notification nd = new Notification("Deleted exam " + me.getTitle() + " by:" + d.getName(), c.getId());
-            notificationDao.insert(nd);
-        }
-
-        me.setState(new Deleted(LocalDateTime.now()));
-        this.medicalExamDao.deleteBookedMedicalExam(me);
-        return true;
-    }
-
-    /**
      * Complete a medical exam
      *
      * @param examId The id of the medical exam

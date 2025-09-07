@@ -64,10 +64,6 @@ public class JwtService {
         return jwt.getClaim("role").asString();
     }
 
-    public DecodedJWT decode(String token) {
-        return verifier.verify(token);
-    }
-
     private static RSAPrivateKey loadPrivateKey(Path path) throws Exception {
         String pem = Files.readString(path)
                 .replace("-----BEGIN PRIVATE KEY-----", "")

@@ -14,7 +14,7 @@ public class Authz {
     /**
      * Valida il token e restituisce il ruolo contenuto nel claim "role".
      */
-    public String role(String token) {
+    private String role(String token) {
         jwt.validate(token);
         return jwt.getRole(token);
     }

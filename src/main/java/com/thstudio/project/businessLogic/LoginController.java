@@ -14,7 +14,7 @@ public class LoginController {
         this.jwtService = new JwtService();
     }
 
-    public boolean checkPassword(String password, String hashedPassword) {
+    private boolean checkPassword(String password, String hashedPassword) {
         return BCrypt.checkpw(password, hashedPassword);
     }
 

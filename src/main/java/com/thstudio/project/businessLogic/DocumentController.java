@@ -20,7 +20,7 @@ public class DocumentController {
     private final PersonDao personDao;
     private final NotificationDao notificationDao;
     private final MedicalExamDao medicalExamDao;
-    private final com.thstudio.project.security.Authz authz;
+    private final Authz authz;
 
     public DocumentController(DocumentDao documentDao, PersonDao personDao, NotificationDao notificationDao,
                               MedicalExamDao medicalExamDao) throws Exception {

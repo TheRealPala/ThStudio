@@ -3,11 +3,10 @@ package com.thstudio.project.businessLogic;
 import com.thstudio.project.dao.PersonDao;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.security.Authn;
-import com.thstudio.project.security.Authz;
+
 
 public class LoginController {
     private final PersonDao personDao;
-    private final Authz authz = new Authz();
     private final Authn authn = new Authn();
 
     public LoginController(PersonDao personDao) throws Exception {

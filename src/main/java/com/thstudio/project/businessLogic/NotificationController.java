@@ -12,10 +12,11 @@ public class NotificationController {
     private final PersonDao personDao;
     private final Authz authz;
 
-    public NotificationController(NotificationDao notificationDao, PersonDao personDao) throws Exception {
+    public NotificationController(NotificationDao notificationDao,
+                                  PersonDao personDao, Authz authz) {
         this.notificationDao = notificationDao;
         this.personDao = personDao;
-        this.authz = new Authz();
+        this.authz = authz;
     }
 
     public List<Notification> getNotificationsByReceiverId(int receiverId, String token) throws Exception {

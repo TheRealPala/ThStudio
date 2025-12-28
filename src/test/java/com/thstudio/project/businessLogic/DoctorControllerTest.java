@@ -5,6 +5,9 @@ import com.thstudio.project.domainModel.Doctor;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,8 +36,11 @@ class DoctorControllerTest {
         assertTrue((Database.testConnection(true, false)));
         personDao = new MariaDbPersonDao();
         DoctorDao doctorDao = new MariaDbDoctorDao(personDao);
-        loginController = new LoginController(personDao);
-        doctorController = new DoctorController(doctorDao);
+        JwtService jwtService = new JwtService();
+        Authz authz = new Authz(jwtService);
+        Authn authn = new Authn(jwtService);
+        loginController = new LoginController(personDao, authn);
+        doctorController = new DoctorController(doctorDao, authz, authn);
     }
 
     @BeforeEach

@@ -10,6 +10,9 @@ import com.thstudio.project.fixture.CustomerFixture;
 import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.MedicalExamFixture;
 import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,9 +50,14 @@ class StateControllerTest {
         customerDao = new MariaDbCustomerDao(personDao);
         doctorDao = new MariaDbDoctorDao(personDao);
         notificationDao = new MariaDbNotificationDao();
-        stateController = new StateController(medicalExamDao, customerDao, doctorDao, notificationDao);
-        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao, customerDao);
-        loginController = new LoginController(personDao);
+        JwtService jwtService = new JwtService();
+        Authz authz = new Authz(jwtService);
+        Authn authn = new Authn(jwtService);
+        stateController = new StateController(medicalExamDao, customerDao,
+                doctorDao, notificationDao, authz);
+        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao,
+                doctorDao, customerDao, authz);
+        loginController = new LoginController(personDao, authn);
     }
 
     @BeforeEach

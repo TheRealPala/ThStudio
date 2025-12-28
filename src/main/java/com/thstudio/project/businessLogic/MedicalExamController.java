@@ -10,6 +10,7 @@ import com.thstudio.project.domainModel.State.Available;
 import com.thstudio.project.domainModel.State.Booked;
 import com.thstudio.project.domainModel.State.Deleted;
 import com.thstudio.project.domainModel.State.State;
+import com.thstudio.project.security.Authn;
 import com.thstudio.project.security.Authz;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,12 +27,13 @@ public class MedicalExamController {
     private final DoctorDao doctorDao;
     private final Authz authz;
 
-    public MedicalExamController(MedicalExamDao medicalExamDao, NotificationDao notificationDao, DoctorDao doctorDao, CustomerDao customerDao) throws Exception{
+    public MedicalExamController(MedicalExamDao medicalExamDao, NotificationDao notificationDao,
+                                 DoctorDao doctorDao, CustomerDao customerDao, Authz authz) {
         this.medicalExamDao = medicalExamDao;
         this.doctorDao = doctorDao;
         this.notificationDao = notificationDao;
         this.customerDao = customerDao;
-        this.authz = new Authz();
+        this.authz = authz;
     }
 
     private void checkDateTimeBounds(List<MedicalExam> medicalExams, LocalDateTime startTime,

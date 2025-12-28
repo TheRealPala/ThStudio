@@ -13,6 +13,9 @@ import com.thstudio.project.fixture.CustomerFixture;
 import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.MedicalExamFixture;
 import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -52,8 +55,12 @@ class MedicalExamControllerTest {
         doctorDao = new MariaDbDoctorDao(personDao);
         customerDao = new MariaDbCustomerDao(personDao);
         tagDao = new MariaDbTagDao();
-        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao, customerDao);
-        loginController = new LoginController(personDao);
+        JwtService jwtService = new JwtService();
+        Authz authz = new Authz(jwtService);
+        Authn authn = new Authn(jwtService);
+        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao,
+                doctorDao, customerDao, authz);
+        loginController = new LoginController(personDao, authn);
     }
 
     @BeforeEach
@@ -181,10 +188,10 @@ class MedicalExamControllerTest {
         Doctor doctorToAdd = DoctorFixture.genDoctor();
         doctorDao.insert(doctorToAdd);
         assertNotEquals(0, doctorToAdd.getId());
-        MedicalExam firstMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctorToAdd, LocalDateTime.parse("2025-10-01 15:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), LocalDateTime.parse("2025-10-01 16:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))), token);
+        MedicalExam firstMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctorToAdd, LocalDateTime.parse("2026-10-01 15:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), LocalDateTime.parse("2026-10-01 16:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))), token);
         assertNotEquals(0, firstMedicalExam.getId());
-        MedicalExam secondMedicalExam = medicalExamController.addMedicalExam((MedicalExamFixture.genMedicalExam(doctorToAdd, LocalDateTime.parse("2025-10-01 17:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), LocalDateTime.parse("2025-10-01 17:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))), token);
-        secondMedicalExam.setStartTimeFromString("2025-10-01 16:00:00");
+        MedicalExam secondMedicalExam = medicalExamController.addMedicalExam((MedicalExamFixture.genMedicalExam(doctorToAdd, LocalDateTime.parse("2026-10-01 17:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), LocalDateTime.parse("2026-10-01 17:30:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))), token);
+        secondMedicalExam.setStartTimeFromString("2026-10-01 16:00:00");
         IllegalArgumentException thrown = assertThrowsExactly(IllegalArgumentException.class,
                 () -> {
                     medicalExamController.updateMedicalExam(secondMedicalExam, token);

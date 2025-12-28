@@ -7,10 +7,11 @@ import com.thstudio.project.security.Authn;
 
 public class LoginController {
     private final PersonDao personDao;
-    private final Authn authn = new Authn();
+    private final Authn authn;
 
-    public LoginController(PersonDao personDao) throws Exception {
+    public LoginController(PersonDao personDao, Authn authn) {
         this.personDao = personDao;
+        this.authn = authn;
     }
 
 

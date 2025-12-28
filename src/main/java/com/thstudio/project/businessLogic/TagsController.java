@@ -14,10 +14,10 @@ public class TagsController {
     private final MedicalExamDao medicalExamDao;
     private final Authz authz;
 
-    public TagsController(TagDao tagDao, MedicalExamDao medicalExamDao) throws Exception {
+    public TagsController(TagDao tagDao, MedicalExamDao medicalExamDao, Authz authz) {
         this.tagDao = tagDao;
         this.medicalExamDao = medicalExamDao;
-        this.authz = new Authz();
+        this.authz = authz;
     }
 
     /**

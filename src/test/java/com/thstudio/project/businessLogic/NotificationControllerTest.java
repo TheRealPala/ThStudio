@@ -7,6 +7,9 @@ import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.NotificationFixture;
 import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,11 +40,14 @@ class NotificationControllerTest {
         Database.setDbPassword(dotenv.get("DB_PASSWORD"));
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
+        JwtService jwtService = new JwtService();
+        Authz authz = new Authz(jwtService);
+        Authn authn = new Authn(jwtService);
         personDao = new MariaDbPersonDao();
         doctorDao = new MariaDbDoctorDao(personDao);
         notificationDao = new MariaDbNotificationDao();
-        notificationController = new NotificationController(notificationDao, personDao);
-        loginController = new LoginController(personDao);
+        notificationController = new NotificationController(notificationDao, personDao, authz);
+        loginController = new LoginController(personDao, authn);
     }
 
     @BeforeEach

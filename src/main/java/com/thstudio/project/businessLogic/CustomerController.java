@@ -13,10 +13,10 @@ public class CustomerController {
     private final Authz authz;
     private final Authn authn;
     
-    public CustomerController(CustomerDao customerDao) throws Exception {
+    public CustomerController(CustomerDao customerDao, Authz authz, Authn authn) {
         this.customerDao = customerDao;
-        this.authz = new Authz();
-        this.authn = new Authn();
+        this.authz = authz;
+        this.authn = authn;
     }
 
 

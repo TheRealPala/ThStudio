@@ -3,6 +3,9 @@ package com.thstudio.project.businessLogic;
 import com.thstudio.project.dao.*;
 import com.thstudio.project.domainModel.*;
 import com.thstudio.project.fixture.*;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -42,8 +45,12 @@ class DocumentControllerTest {
         customerDao = new MariaDbCustomerDao(personDao);
         notificationDao = new MariaDbNotificationDao();
         medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
-        documentController = new DocumentController(documentDao, personDao, notificationDao, medicalExamDao);
-        loginController = new LoginController(personDao);
+        JwtService jwtService = new JwtService();
+        Authz authz = new Authz(jwtService);
+        Authn authn = new Authn(jwtService);
+        documentController = new DocumentController(documentDao, personDao,
+                notificationDao, medicalExamDao, authz);
+        loginController = new LoginController(personDao, authn);
     }
 
     @BeforeEach

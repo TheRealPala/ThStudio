@@ -23,13 +23,13 @@ public class DocumentController {
     private final Authz authz;
 
     public DocumentController(DocumentDao documentDao, PersonDao personDao, NotificationDao notificationDao,
-                              MedicalExamDao medicalExamDao) throws Exception {
+                              MedicalExamDao medicalExamDao, Authz authz) {
         this.documentDao = documentDao;
         this.personDao = personDao;
         this.baseDocumentPath = Dotenv.configure().directory("config").load().get("BASE_DOC_DIR_PATH");
         this.notificationDao = notificationDao;
         this.medicalExamDao = medicalExamDao;
-        this.authz = new Authz();
+        this.authz = authz;
     }
 
     public Document addDocument(String title, int ownerId, String token) throws Exception {

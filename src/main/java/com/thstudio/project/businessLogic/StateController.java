@@ -23,12 +23,12 @@ public class StateController {
     private final Authz authz;
 
     public StateController(MedicalExamDao medicalExamDao, CustomerDao customerDao,
-                           DoctorDao doctorDao, NotificationDao notificationDao) throws Exception {
+                           DoctorDao doctorDao, NotificationDao notificationDao, Authz authz) {
         this.medicalExamDao = medicalExamDao;
         this.customerDao = customerDao;
         this.doctorDao = doctorDao;
         this.notificationDao = notificationDao;
-        this.authz = new Authz();
+        this.authz = authz;
     }
 
     /**

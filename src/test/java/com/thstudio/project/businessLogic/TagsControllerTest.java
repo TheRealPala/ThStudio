@@ -11,6 +11,9 @@ import com.thstudio.project.domainModel.Tags.TagZone;
 import com.thstudio.project.fixture.DoctorFixture;
 import com.thstudio.project.fixture.MedicalExamFixture;
 import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,15 +44,19 @@ class TagsControllerTest {
         Database.setDbPassword(dotenv.get("DB_PASSWORD"));
         Database.setDbPort(dotenv.get("DB_PORT"));
         assertTrue((Database.testConnection(true, false)));
+        JwtService jwtService = new JwtService();
+        Authz authz = new Authz(jwtService);
+        Authn authn = new Authn(jwtService);
         TagDao tagDao = new MariaDbTagDao();
         MedicalExamDao medicalExamDao = new MariaDbMedicalExamDao(new MariaDbTagDao());
-        tagsController = new TagsController(tagDao, medicalExamDao);
+        tagsController = new TagsController(tagDao, medicalExamDao, authz);
         NotificationDao notificationDao = new MariaDbNotificationDao();
         personDao = new MariaDbPersonDao();
         doctorDao = new MariaDbDoctorDao(personDao);
         customerDao = new MariaDbCustomerDao(personDao);
-        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao, doctorDao, customerDao);
-        loginController = new LoginController(personDao);
+        medicalExamController = new MedicalExamController(medicalExamDao, notificationDao,
+                doctorDao, customerDao, authz);
+        loginController = new LoginController(personDao, authn);
     }
 
     @BeforeEach

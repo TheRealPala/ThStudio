@@ -4,9 +4,10 @@ package com.thstudio.project.security;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class Authn {
-    private final JwtService jwt = new JwtService();
+    private final JwtService jwt;
 
-    public Authn() throws Exception {
+    public Authn(JwtService jwt) {
+        this.jwt = jwt;
     }
 
     public String hashPassword(String password) {

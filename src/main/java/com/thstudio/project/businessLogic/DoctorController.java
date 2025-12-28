@@ -13,10 +13,10 @@ public class DoctorController {
     private final Authz authz;
     private final Authn authn;
 
-    public DoctorController(DoctorDao doctorDao) throws Exception {
+    public DoctorController(DoctorDao doctorDao, Authz authz, Authn authn) {
         this.doctorDao = doctorDao;
-        this.authz = new Authz();
-        this.authn = new Authn();
+        this.authz = authz;
+        this.authn = authn;
     }
 
     /**

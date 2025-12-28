@@ -11,6 +11,9 @@ import com.thstudio.project.domainModel.Customer;
 import com.thstudio.project.domainModel.Person;
 import com.thstudio.project.fixture.CustomerFixture;
 import com.thstudio.project.fixture.PersonFixture;
+import com.thstudio.project.security.Authn;
+import com.thstudio.project.security.Authz;
+import com.thstudio.project.security.JwtService;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.*;
 
@@ -34,8 +37,11 @@ class CustomerControllerTest {
         assertTrue((Database.testConnection(true, false)));
         personDao = new MariaDbPersonDao();
         CustomerDao customerDao = new MariaDbCustomerDao(personDao);
-        loginController = new LoginController(personDao);
-        customerController = new CustomerController(customerDao);
+        JwtService jwtService = new JwtService();
+        Authz authz = new Authz(jwtService);
+        Authn authn = new Authn(jwtService);
+        loginController = new LoginController(personDao, authn);
+        customerController = new CustomerController(customerDao, authz, authn);
     }
 
     @BeforeEach

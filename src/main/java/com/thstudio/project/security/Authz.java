@@ -5,9 +5,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Authz {
-    private final JwtService jwt = new JwtService();
+    private final JwtService jwt;
 
-    public Authz() throws Exception {
+    public Authz(JwtService jwt) throws Exception {
+        this.jwt = jwt;
     }
 
 

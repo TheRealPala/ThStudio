@@ -44,8 +44,8 @@ class LoginControllerTest {
         customerDao = new MariaDbCustomerDao(personDao);
         doctorDao = new MariaDbDoctorDao(personDao);
         jwtService = new JwtService();
-        authn = new Authn();
-        loginController = new LoginController(personDao);
+        authn = new Authn(jwtService);
+        loginController = new LoginController(personDao, authn);
     }
 
     @Test

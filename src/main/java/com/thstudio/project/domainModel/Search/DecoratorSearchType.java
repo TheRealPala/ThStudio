@@ -4,7 +4,7 @@ public class DecoratorSearchType extends BaseDecoratorSearch {
 
     public DecoratorSearchType(Search decoratedSearch, String type) {
         super(decoratedSearch);
-        this.arguments = super.getArguments();
+        this.arguments = decoratedSearch.getArguments();
         this.arguments.add(type);
     }
 

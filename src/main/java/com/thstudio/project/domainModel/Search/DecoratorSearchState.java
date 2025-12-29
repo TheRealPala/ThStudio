@@ -3,7 +3,7 @@ package com.thstudio.project.domainModel.Search;
 public class DecoratorSearchState extends BaseDecoratorSearch {
     public DecoratorSearchState(Search decoratedSearch, String state) {
         super(decoratedSearch);
-        this.arguments = super.getArguments();
+        this.arguments = decoratedSearch.getArguments();
         this.arguments.add(state);
     }
 

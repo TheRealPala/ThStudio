@@ -4,7 +4,7 @@ public class DecoratorSearchZone extends BaseDecoratorSearch {
 
     public DecoratorSearchZone(Search decoratedSearch, String zone) {
         super(decoratedSearch);
-        this.arguments = super.getArguments();
+        this.arguments = decoratedSearch.getArguments();
         this.arguments.add(zone);
     }
 

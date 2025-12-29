@@ -4,8 +4,9 @@ public class DecoratorSearchIsOnline extends BaseDecoratorSearch {
 
     public DecoratorSearchIsOnline(Search decoratedSearch, String online) {
         super(decoratedSearch);
-        this.arguments = super.getArguments();
+        this.arguments = decoratedSearch.getArguments();
         this.arguments.add(online);
+
     }
 
     @Override

@@ -126,28 +126,13 @@ public class MedicalExamController {
     }
 
     private void addMedicalExamLogic(MedicalExam medicalExam, Doctor doctor) throws Exception {
-        List<MedicalExam> medicalExams = new ArrayList<>();
-        try {
-            medicalExams = medicalExamDao.getDoctorExams(doctor.getId());
-        } catch (RuntimeException e) {
-            /* System.out.println("The doctor has not exam, therefore is free in the time specified");*/
-        }
+        List<MedicalExam> medicalExams = medicalExamDao.getDoctorExams(doctor.getId());
+
         if (!medicalExams.isEmpty()) {
             checkDateTimeBounds(medicalExams, medicalExam.getStartTime(), medicalExam.getEndTime());
         }
         medicalExam.setState(new Available());
         medicalExamDao.insert(medicalExam);
-    }
-
-    public MedicalExam addMedicalExam(int idDoctor, int idCustomer, String title, String description,
-                                      String startTime, String endTime, double price, String token) throws Exception {
-
-        authz.requireAnyRole(token, "doctor", "admin");
-        Doctor doctor = doctorDao.get(idDoctor);
-        MedicalExam medicalExam = new MedicalExam(doctor.getId(), startTime, endTime, description, title, price);
-        medicalExam.setIdCustomer(idCustomer);
-        this.addMedicalExamLogic(medicalExam, doctor);
-        return medicalExam;
     }
 
     public MedicalExam addMedicalExam(MedicalExam medicalExam, String token) throws Exception {

@@ -216,9 +216,6 @@ public class MariaDbMedicalExamDao implements MedicalExamDao {
                 tmp.setTags(tags);
                 mEList.add(tmp);
             }
-            if (mEList.isEmpty()) {
-                throw new RuntimeException("The Doctor has no Medical Exams in the database");
-            }
 
         } finally {
             assert rs != null : "ResultSet is Null";

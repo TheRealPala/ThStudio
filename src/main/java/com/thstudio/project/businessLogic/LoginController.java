@@ -29,13 +29,15 @@ public class LoginController {
     }
 
     public String login(String email, String password) throws Exception {
+        String token;
         Person person = this.personDao.getPersonByUsername(email);
         if (this.authn.checkPassword(password, person.getPassword())) {
             String role = getRole(person);
-            return this.authn.createToken(person.getId(), role);
+            token = this.authn.createToken(person.getId(), role);
         } else {
             throw new SecurityException("Invalid password");
         }
+        return token;
     }
 
 

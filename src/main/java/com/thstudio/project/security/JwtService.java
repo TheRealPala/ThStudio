@@ -15,7 +15,6 @@ import java.security.spec.X509EncodedKeySpec;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.Objects;
 
 public class JwtService {
 

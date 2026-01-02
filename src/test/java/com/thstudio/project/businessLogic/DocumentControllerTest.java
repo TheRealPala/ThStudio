@@ -85,17 +85,14 @@ class DocumentControllerTest {
         assertNotNull(addedDocuments);
         assertTrue(addedDocuments.contains(documentToAdd));
         assertEquals(documentToAdd, addedDocuments.getFirst());
-        //controllo dell' eccezione
         Customer otherCustomer = CustomerFixture.genCustomer();
         customerDao.insert(otherCustomer);
-
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
                     documentController.getDocumentsByReceiver(otherCustomer.getId(), token);
                 }
         );
         assertEquals("There is no Documents in the database for this receiver", thrown.getMessage());
-
     }
 
     @Test
@@ -108,7 +105,6 @@ class DocumentControllerTest {
         assertNotNull(addedDocuments);
         assertTrue(addedDocuments.contains(documentToAdd));
         assertEquals(documentToAdd, addedDocuments.getFirst());
-        //controllo dell' eccezione
         Doctor otherDoctor = DoctorFixture.genDoctor();
         doctorDao.insert(otherDoctor);
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
@@ -169,8 +165,7 @@ class DocumentControllerTest {
         MedicalExam otherMedicalExam = MedicalExamFixture.genMedicalExam(otherDoctor);
         medicalExamDao.insert(otherMedicalExam);
         documentController.attachDocumentToMedicalExam(documentToAdd.getId(), otherMedicalExam.getId(), token);
-        assertEquals(documentDao.get(documentToAdd.getId()).getMedicalExamId(), otherMedicalExam.getId());  // due medical exam a cui è stato attaccato lo stesso documento uno tramite attach e uno con add
-        // documento già presente nel db
+        assertEquals(documentDao.get(documentToAdd.getId()).getMedicalExamId(), otherMedicalExam.getId());
 
         RuntimeException otherThrown = assertThrowsExactly(RuntimeException.class,
                 () -> {

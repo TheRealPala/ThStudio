@@ -5,6 +5,7 @@ import com.thstudio.project.domainModel.*;
 import com.thstudio.project.domainModel.Search.*;
 import com.thstudio.project.domainModel.State.Available;
 import com.thstudio.project.domainModel.State.Booked;
+import com.thstudio.project.domainModel.State.Deleted;
 import com.thstudio.project.domainModel.Tags.Tag;
 import com.thstudio.project.domainModel.Tags.TagIsOnline;
 import com.thstudio.project.domainModel.Tags.TagType;
@@ -38,6 +39,7 @@ class MedicalExamControllerTest {
     private static TagDao tagDao;
     private static PersonDao personDao;
     private static LoginController loginController;
+    private static StateController stateController;
 
     @BeforeAll
     static void setDatabaseSettings() throws Exception {
@@ -61,6 +63,8 @@ class MedicalExamControllerTest {
         medicalExamController = new MedicalExamController(medicalExamDao, notificationDao,
                 doctorDao, customerDao, authz);
         loginController = new LoginController(personDao, authn);
+        stateController = new StateController(medicalExamDao, customerDao,
+                doctorDao, notificationDao, authz);
     }
 
     @BeforeEach
@@ -219,6 +223,29 @@ class MedicalExamControllerTest {
                 }
         );
         assertEquals("Forbidden! Can't update an exam already started", thrown.getMessage());
+    }
+
+    @Test
+    void updateMedicalExamPriceAfterBooking() throws Exception {
+        String token = loginController.login("test@test.com", "test");
+        Doctor doctor = DoctorFixture.genDoctor();
+        doctorDao.insert(doctor);
+        assertNotEquals(0, doctor.getId());
+        Customer customer = CustomerFixture.genCustomer();
+        customerDao.insert(customer);
+        assertNotEquals(0, customer.getId());
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
+        assertNotEquals(0, addedMedicalExam.getId());
+        assertTrue(stateController.bookMedicalExam(addedMedicalExam.getId(), customer.getId(), token));
+        MedicalExam bookedMedicalExam = medicalExamController.getExam(addedMedicalExam.getId(), token);
+        assertInstanceOf(Booked.class, bookedMedicalExam.getState());
+        assertEquals(customer.getId(), bookedMedicalExam.getIdCustomer());
+        bookedMedicalExam.setPrice(bookedMedicalExam.getPrice() + 10);
+        RuntimeException thrown = assertThrowsExactly(
+                RuntimeException.class,
+                () -> medicalExamController.updateMedicalExam(bookedMedicalExam, token)
+        );
+        assertEquals("exam already booked", thrown.getMessage());
     }
 
     @Test

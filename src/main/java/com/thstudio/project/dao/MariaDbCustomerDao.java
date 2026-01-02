@@ -1,9 +1,6 @@
 package com.thstudio.project.dao;
 
 import com.thstudio.project.domainModel.Customer;
-import com.thstudio.project.domainModel.Person;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
@@ -15,7 +12,6 @@ public class MariaDbCustomerDao implements CustomerDao {
         this.personDao = personDao;
     }
 
-    @NotNull
     private Customer parseResultSet(ResultSet rs) throws SQLException {
         Customer c;
         c = new Customer(

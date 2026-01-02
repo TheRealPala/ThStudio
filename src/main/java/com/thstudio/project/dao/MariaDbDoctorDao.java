@@ -1,7 +1,6 @@
 package com.thstudio.project.dao;
 
 import com.thstudio.project.domainModel.Doctor;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.ArrayList;

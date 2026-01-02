@@ -182,25 +182,6 @@ class StateControllerTest {
     }
 
     @Test
-    void cancelNotBookedMedicalExamBooking() throws Exception {
-        String token = loginController.login("test@test.com", "test");
-        Doctor doctor = DoctorFixture.genDoctor();
-        doctorDao.insert(doctor);
-        assertNotEquals(0, doctor.getId());
-        Customer customer = CustomerFixture.genCustomer();
-        customerDao.insert(customer);
-        assertNotEquals(0, customer.getId());
-        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
-        assertNotEquals(0, addedMedicalExam.getId());
-        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
-                () -> {
-                    stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), customer.getId(), token);
-                }
-        );
-        assertEquals("Can't cancel a booking for an exam which is not booked", thrown.getMessage());
-    }
-
-    @Test
     void cancelAlreadyStartedMedicalExamBooking() throws Exception {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
@@ -223,6 +204,26 @@ class StateControllerTest {
         );
         assertEquals("Can't cancel an exam already started", thrown.getMessage());
     }
+
+    @Test
+    void cancelNotBookedMedicalExamBooking() throws Exception {
+        String token = loginController.login("test@test.com", "test");
+        Doctor doctor = DoctorFixture.genDoctor();
+        doctorDao.insert(doctor);
+        assertNotEquals(0, doctor.getId());
+        Customer customer = CustomerFixture.genCustomer();
+        customerDao.insert(customer);
+        assertNotEquals(0, customer.getId());
+        MedicalExam addedMedicalExam = medicalExamController.addMedicalExam(MedicalExamFixture.genMedicalExam(doctor, customer), token);
+        assertNotEquals(0, addedMedicalExam.getId());
+        RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
+                () -> {
+                    stateController.cancelMedicalExamBooking(addedMedicalExam.getId(), customer.getId(), token);
+                }
+        );
+        assertEquals("Can't cancel a booking for an exam which is not booked", thrown.getMessage());
+    }
+
 
     @Test
     void cancelUnbookedMedicalExam() throws Exception {

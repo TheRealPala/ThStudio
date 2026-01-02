@@ -58,23 +58,11 @@ class NotificationControllerTest {
     }
 
     @Test
-    void getNotificationByReceiver() throws Exception {
+    void getNotificationsByReceiver() throws Exception {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
-        Notification notificationToInsert = new Notification(NotificationFixture.genTitle(), doctor.getId());
-        notificationDao.insert(notificationToInsert);
-        List<Notification> notificationList = notificationController.getNotificationsByReceiverId(doctor.getId(), token);
-        assertEquals(notificationList.getFirst(), notificationToInsert);
-    }
-
-    @Test
-    void getMoreThanOneNotificationByReceiver() throws Exception {
-        String token = loginController.login("test@test.com", "test");
-        Doctor doctor = DoctorFixture.genDoctor();
-        doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         Notification firstNotificationToAdd = new Notification(NotificationFixture.genTitle(), doctor.getId());
         Notification secondNotificationToAdd = new Notification(NotificationFixture.genTitle(), doctor.getId());
         List<Notification> notificationsToAdd = new ArrayList<>();
@@ -91,17 +79,17 @@ class NotificationControllerTest {
     }
 
     @Test
-    void getNoNotifications() throws Exception {
+    void getEmptyNotifications() throws Exception {
         String token = loginController.login("test@test.com", "test");
         Doctor doctor = DoctorFixture.genDoctor();
         doctorDao.insert(doctor);
-        assertNotEquals(doctor.getId(), 0);
+        assertNotEquals(0, doctor.getId());
         RuntimeException thrown = assertThrowsExactly(RuntimeException.class,
                 () -> {
                     notificationController.getNotificationsByReceiverId(doctor.getId(), token);
                 }
         );
-        assertEquals(thrown.getMessage(), "The receiver has not notifications");
+        assertEquals("The receiver has not notifications", thrown.getMessage());
     }
 
     @Test
